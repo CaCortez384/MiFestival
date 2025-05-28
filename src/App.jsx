@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import CreateFestival from './pages/CreateFestival';
 import Inicio from './pages/Inicio';
+import MisFestivales from './pages/MisFestivales';
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
         <Route path="*" element={<div className="p-4">Página no encontrada</div>} />
         <Route path="/crear-festival" element={<CreateFestival />} />
         <Route path="/inicio" element={<Inicio />} />
+        <Route path="/mis-festivales" element={<MisFestivales />} />
+        <Route path="/mis-festivales/:id" element={<MisFestivales />} />
 
       </Routes>
     </Router>

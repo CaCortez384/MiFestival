@@ -1,5 +1,9 @@
 // pages/CreateFestival.jsx
 import React, { useState } from "react";
+import { db, auth } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+
 
 const CreateFestival = () => {
     const [name, setName] = useState("");
@@ -10,11 +14,33 @@ const CreateFestival = () => {
         setStages([...stages, `Escenario ${stages.length + 1}`]);
     };
 
-    const handleSubmit = (e) => {
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Aquí guardarás el festival en la DB
-        console.log({ name, days, stages });
+
+        try {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Debes iniciar sesión para crear un festival.");
+                return;
+            }
+
+            const docRef = await addDoc(collection(db, "festivals"), {
+                name,
+                days,
+                stages,
+                createdAt: serverTimestamp(),
+                userId: user.uid,
+            });
+
+            console.log("Festival creado con ID:", docRef.id);
+            navigate(`/festival/${docRef.id}/artistas`);
+        } catch (error) {
+            console.error("Error al guardar el festival:", error);
+        }
     };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100">

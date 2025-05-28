@@ -32,6 +32,13 @@ const Home = () => {
                     <p className="text-sm text-gray-600">¿Ya tienes entradas? Revisa tu perfil y accede a tus festivales.</p>
                 </div>
                 <button
+                    onClick={() => window.location.href = "/mis-festivales"}
+                    className="mt-6 px-6 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition"
+                >
+                    Mis festivales
+                </button>
+                <br />
+                <button
                     onClick={async () => {
                         await auth.signOut(); // Esto cierra la sesión en Firebase
                     }}
