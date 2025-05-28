@@ -13,7 +13,7 @@ function Login() {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/');
+      navigate('/inicio');
     } catch (err) {
       setError('Correo o contraseña incorrectos');
     }

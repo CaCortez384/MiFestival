@@ -13,18 +13,7 @@ const Home = () => (
       </p>
 
       <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-        <a
-          href="/register"
-          className="bg-purple-600 text-white font-semibold py-3 px-6 rounded-full shadow-md hover:bg-purple-700 transition"
-        >
-          Regístrate
-        </a>
-        <a
-          href="/login"
-          className="bg-white text-purple-600 border border-purple-600 font-semibold py-3 px-6 rounded-full shadow-md hover:bg-purple-100 transition"
-        >
-          Iniciar sesión
-        </a>
+        <a href="/crear-festival" className="...">+ Crear nuevo festival</a>
       </div>
 
       <div className="mt-8">
