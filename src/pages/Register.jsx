@@ -13,35 +13,44 @@ function Register() {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/'); // redirigir a inicio
+      navigate('/');
     } catch (err) {
-      setError(err.message);
+      setError('Error al crear cuenta: ' + err.message);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleRegister} className="bg-white p-6 rounded shadow-md w-80">
-        <h2 className="text-xl font-bold mb-4">Crear cuenta</h2>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-3 px-3 py-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-4 px-3 py-2 border rounded"
-        />
-        <button type="submit" className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">
-          Registrarse
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 to-purple-600 px-4">
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+        <h1 className="text-2xl font-extrabold text-center text-purple-700 mb-6">🎵 MiFestival</h1>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">Crear cuenta</h2>
+        {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
+        <form onSubmit={handleRegister} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-purple-400 outline-none"
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-purple-400 outline-none"
+          />
+          <button
+            type="submit"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-md transition"
+          >
+            Registrarse
+          </button>
+        </form>
+        <p className="text-sm text-center text-gray-600 mt-4">
+          ¿Ya tienes cuenta? <a href="/login" className="text-purple-700 hover:underline">Inicia sesión</a>
+        </p>
+      </div>
     </div>
   );
 }
