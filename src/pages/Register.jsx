@@ -31,14 +31,14 @@ function Register() {
             placeholder="Correo electrónico"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-purple-400 outline-none"
+            className="w-full px-4 py-2 border border-black text-black rounded-md focus:ring-2 focus:ring-purple-400 outline-none"
           />
           <input
             type="password"
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-purple-400 outline-none"
+            className="w-full px-4 py-2 border border-black text-black rounded-md focus:ring-2 focus:ring-purple-400 outline-none"
           />
           <button
             type="submit"
@@ -51,7 +51,14 @@ function Register() {
           ¿Ya tienes cuenta? <a href="/login" className="text-purple-700 hover:underline">Inicia sesión</a>
         </p>
       </div>
+      <button
+        onClick={() => navigate('/home')}
+        className="absolute top-4 left-4 bg-white text-purple-700 border border-purple-600 px-4 py-2 rounded-md shadow hover:bg-purple-100 transition"
+      >
+        Volver a Home
+      </button>
     </div>
+
   );
 }
 
