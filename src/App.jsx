@@ -7,6 +7,8 @@ import Inicio from './pages/Inicio';
 import MisFestivales from './pages/MisFestivales';
 import Festival from './pages/Festival';
 import EditarFestival from './pages/EditarFestival';
+
+
 function App() {
   return (
     <Router>

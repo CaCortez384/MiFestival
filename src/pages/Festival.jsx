@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import PosterFestival from "./PosterFestival";
 
 const Festival = () => {
     const { id } = useParams();
@@ -44,7 +45,16 @@ const Festival = () => {
         <div className="min-h-screen flex bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-4 py-8">
             <main className="flex-1 bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-10 max-w-5xl w-full mx-auto">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-4xl font-extrabold text-purple-700">{festival.name}</h1>
+                    <div className="flex items-center gap-6">
+                        {festival.imagen && (
+                            <img
+                                src={festival.imagen}
+                                alt={festival.name}
+                                className="w-24 h-24 object-cover rounded-2xl shadow-lg border-4 border-purple-200"
+                            />
+                        )}
+                        <h1 className="text-4xl font-extrabold text-purple-700">{festival.name}</h1>
+                    </div>
                     <div className="flex gap-2">
                         <a
                             href={`/editarFestival/${id}`}
@@ -60,7 +70,23 @@ const Festival = () => {
                         </a>
                     </div>
                 </div>
-                <p className="mb-4 text-gray-700">Días: {festival.days} | Escenarios: {escenarios.join(", ")}</p>
+                <div className="mb-4 flex flex-wrap gap-4 items-center">
+                    <div className="bg-purple-100 px-4 py-2 rounded-lg text-purple-700 font-semibold shadow">
+                        <span className="mr-2">Días:</span>
+                        {dias.length}
+                    </div>
+                    <div className="bg-yellow-100 px-4 py-2 rounded-lg text-yellow-800 font-semibold shadow">
+                        <span className="mr-2">Escenarios:</span>
+                        {escenarios.map((esc, idx) => (
+                            <span
+                                key={idx}
+                                className="inline-block bg-yellow-200 text-yellow-900 px-2 py-1 rounded mr-1 text-sm"
+                            >
+                                {esc}
+                            </span>
+                        ))}
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     <table className="min-w-full border border-purple-200 rounded-lg">
                         <thead>
@@ -101,6 +127,23 @@ const Festival = () => {
                     </table>
                 </div>
             </main>
+            {/* Lateral derecho: Preview del póster */}
+            <aside
+                className="w-[420px] bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-6 ml-5 flex-shrink-0 h-fit self-start flex flex-col items-center"
+                style={{ minWidth: 420 }}
+            >
+                <h2 className="text-2xl font-bold text-purple-700 mb-4">Line UP</h2>
+                <div className="w-full h-[500px] flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200">
+                    {/* Aquí va el póster dinámico */}
+                    <PosterFestival festival={{
+                        ...festival,
+                        artistas: artistas
+                    }} />
+                </div>
+                <span className="text-sm text-gray-500 mt-2 text-center">
+                    Vista previa generada automáticamente.
+                </span>
+            </aside>
         </div>
     );
 };

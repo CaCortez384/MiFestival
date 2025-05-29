@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { db } from "../firebase";
 import Papa from "papaparse";
+import { toPng } from "html-to-image";
 const artistasCSV = "/src/assets/artistas.csv";
+import PosterFestival from "./PosterFestival";
 
 const Festival = () => {
     const { id } = useParams();
@@ -13,10 +15,10 @@ const Festival = () => {
     const [nuevoArtista, setNuevoArtista] = useState("");
     const [draggedArtista, setDraggedArtista] = useState(null);
     const [busqueda, setBusqueda] = useState("");
-
-    // Cargar artistas desde un CSV (solo nombres de la columna "Artist Name")
-
     const [artistasApi, setArtistasApi] = useState([]);
+
+    // Ref para el póster
+    const posterRef = useRef(null);
 
     useEffect(() => {
         // Cargar y parsear el CSV al montar el componente
@@ -127,6 +129,20 @@ const Festival = () => {
         const docRef = doc(db, "festivals", id);
         await updateDoc(docRef, { artistas: nuevosArtistas });
         setArtistas(nuevosArtistas);
+    };
+
+    // Función para descargar el póster como imagen
+    const handleDescargarPoster = async () => {
+        if (!posterRef.current) return;
+        try {
+            const dataUrl = await toPng(posterRef.current, { cacheBust: true });
+            const link = document.createElement("a");
+            link.download = `${festival.name || "poster"}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (err) {
+            alert("No se pudo generar la imagen.");
+        }
     };
 
 
@@ -259,7 +275,7 @@ const Festival = () => {
                     <div className="flex justify-end mt-6">
                         <button
                             className="px-6 py-3 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-all border-2 border-white"
-                            onClick={() => alert("Funcionalidad de generación de póster próximamente")}
+                            onClick={handleDescargarPoster}
                         >
                             Generar póster
                         </button>
@@ -267,19 +283,36 @@ const Festival = () => {
                 </div>
             </main>
             {/* Lateral derecho: Preview del póster */}
-            <aside className="w-80 bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-6 ml-8 flex-shrink-0 h-fit self-start flex flex-col items-center">
+            <aside
+                className="w-[420px] bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-6 ml-5 flex-shrink-0 h-fit self-start flex flex-col items-center"
+                style={{ minWidth: 420 }}
+            >
                 <h2 className="text-2xl font-bold text-purple-700 mb-4">Line UP</h2>
-                {/* Aquí puedes cambiar la ruta de la imagen por la del póster generado */}
-                <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200">
-                    <img
-                        src="/src/assets/poster-preview.png"
-                        alt="Preview del póster"
-                        className="object-contain max-h-full max-w-full"
-                        onError={e => { e.target.style.display = 'none'; }}
+                <div
+                    ref={posterRef}
+                    className="w-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200"
+                    style={{
+                        minHeight: 320,
+                        height: "auto",
+                        padding: 0,
+                    }}
+                >
+                    <PosterFestival
+                        festival={{
+                            ...festival,
+                            artistas: artistas
+                        }}
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            maxWidth: 380,
+                            maxHeight: 540,
+                        }}
                     />
                 </div>
                 <span className="text-sm text-gray-500 mt-2 text-center">
-                    El póster se actualizará aquí cuando esté disponible.
+                    Vista previa generada automáticamente.
                 </span>
             </aside>
         </div>
@@ -287,3 +320,4 @@ const Festival = () => {
 };
 
 export default Festival;
+
