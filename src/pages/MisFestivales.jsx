@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 
 const MisFestivales = () => {
     const [festivales, setFestivales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [usuario, setUsuario] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -47,7 +49,8 @@ const MisFestivales = () => {
                             {festivales.map(festival => (
                                 <li
                                     key={festival.id}
-                                    className="bg-purple-100 rounded-xl px-6 py-4 shadow hover:bg-purple-200 transition text-lg font-medium text-purple-800"
+                                    className="bg-purple-100 rounded-xl px-6 py-4 shadow hover:bg-purple-200 transition text-lg font-medium text-purple-800 cursor-pointer"
+                                    onClick={() => navigate(`/festival/${festival.id}/artistas`)}
                                 >
                                     {festival.nombre || festival.name}
                                 </li>
