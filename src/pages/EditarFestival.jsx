@@ -16,6 +16,10 @@ const Festival = () => {
     const [draggedArtista, setDraggedArtista] = useState(null);
     const [busqueda, setBusqueda] = useState("");
     const [artistasApi, setArtistasApi] = useState([]);
+    const [artistaSeleccionado, setArtistaSeleccionado] = useState(null);
+    const [showAsignarModal, setShowAsignarModal] = useState(false);
+    const [diaSeleccionado, setDiaSeleccionado] = useState('');
+    const [escenarioSeleccionado, setEscenarioSeleccionado] = useState('');
 
     // Ref para el póster
     const posterRef = useRef(null);
@@ -145,11 +149,26 @@ const Festival = () => {
         }
     };
 
+    const handleAsignarArtistaMobile = async () => {
+        if (!artistaSeleccionado || !diaSeleccionado || !escenarioSeleccionado) return;
+        const nuevosArtistas = [
+            ...artistas.filter(a => a.nombre !== artistaSeleccionado.nombre),
+            { ...artistaSeleccionado, dia: diaSeleccionado, escenario: escenarioSeleccionado }
+        ];
+        const docRef = doc(db, "festivals", id);
+        await updateDoc(docRef, { artistas: nuevosArtistas });
+        setArtistas(nuevosArtistas);
+        setShowAsignarModal(false);
+        setArtistaSeleccionado(null);
+        setDiaSeleccionado('');
+        setEscenarioSeleccionado('');
+    };
+
 
     return (
-        <div className="min-h-screen flex bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-4 py-8">
-            {/* Lateral izquierdo: lista de artistas de la "API" y no asignados */}
-            <aside className="w-64 bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-6 mr-8 flex-shrink-0 h-fit self-start">
+        <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-2 md:px-4 py-4 md:py-8 gap-4">
+            {/* Lateral izquierdo: lista de artistas */}
+            <aside className="w-full md:w-64 bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-6 mb-4 md:mb-0 md:mr-8 flex-shrink-0 h-fit self-start">
                 <h2 className="text-2xl font-bold text-purple-700 mb-4">Artistas disponibles</h2>
                 <input
                     type="text"
@@ -158,21 +177,17 @@ const Festival = () => {
                     placeholder="Buscar artista..."
                     className="mb-4 w-full px-3 py-2 rounded border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
                 />
-                <ul
-                    className="space-y-2 max-h-80 overflow-y-auto"
-                    style={{ maxHeight: "320px", overflowY: "auto" }}
-                >
+                <ul className="space-y-2 max-h-60 md:max-h-80 overflow-y-auto">
                     {artistasSinAsignar
-                        .filter(artista =>
-                            artista.nombre.toLowerCase().includes(busqueda.toLowerCase())
-                        )
+                        .filter(artista => artista.nombre.toLowerCase().includes(busqueda.toLowerCase()))
                         .slice(0, 10)
                         .map((artista, idx) => (
                             <li
                                 key={artista.nombre}
-                                className="bg-purple-100 rounded-lg px-4 py-2 text-purple-800 font-medium cursor-move"
-                                draggable
-                                onDragStart={() => onDragStart(artista)}
+                                className="bg-purple-100 rounded-lg px-4 py-2 text-purple-800 font-medium cursor-pointer md:cursor-move"
+                                draggable={window.innerWidth >= 768}
+                                onDragStart={window.innerWidth >= 768 ? () => onDragStart(artista) : undefined}
+                                onClick={window.innerWidth < 768 ? () => { setArtistaSeleccionado(artista); setShowAsignarModal(true); } : undefined}
                             >
                                 {artista.nombre}
                             </li>
@@ -180,10 +195,9 @@ const Festival = () => {
                 </ul>
             </aside>
             {/* Contenido principal */}
-            <main className="flex-1 bg-white bg-opacity-90 backdrop-blur-lg rounded-3xl shadow-2xl p-12 max-w-5xl w-full relative">
-                <div className="flex justify-between items-center mb-10">
-                    <div>
-                        {/* Editable festival name */}
+            <main className="flex-1 w-full bg-white bg-opacity-90 backdrop-blur-lg rounded-3xl shadow-2xl p-4 md:p-12 max-w-full md:max-w-5xl relative">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-10 gap-4">
+                    <div className="w-full">
                         <span className="inline-flex items-center px-2 py-1 bg-purple-200 text-purple-700 rounded-lg text-xs font-semibold shadow-sm">
                             Editar nombre
                         </span>
@@ -197,14 +211,13 @@ const Festival = () => {
                                     const docRef = doc(db, "festivals", id);
                                     await updateDoc(docRef, { name: newName });
                                 }}
-                                className="text-4xl font-extrabold text-purple-700 drop-shadow-lg outline-none border-b-2 border-purple-300 focus:border-purple-600 transition w-full px-2 py-1 focus:bg-purple-50 rounded-lg"
-                                style={{ minWidth: 220, maxWidth: 420, letterSpacing: 1 }}
+                                className="text-2xl md:text-4xl font-extrabold text-purple-700 drop-shadow-lg outline-none border-b-2 border-purple-300 focus:border-purple-600 transition w-full px-2 py-1 focus:bg-purple-50 rounded-lg"
+                                style={{ minWidth: 120, maxWidth: 420, letterSpacing: 1 }}
                                 spellCheck={false}
                                 autoComplete="off"
                             />
-
                         </div>
-                        <p className="mt-1 text-gray-600 font-medium text-lg">
+                        <p className="mt-1 text-gray-600 font-medium text-base md:text-lg">
                             <span className="inline-block mr-6">
                                 <span className="font-bold text-purple-600">Días:</span> {festival.days}
                             </span>
@@ -215,23 +228,23 @@ const Festival = () => {
                     </div>
                     <a
                         href="/inicio"
-                        className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:scale-105 hover:from-pink-500 hover:to-yellow-400 transition-all font-semibold border-2 border-white"
+                        className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-pink-500 hover:to-yellow-400 transition-all font-semibold border-2 border-white"
                     >
                         ← Volver a inicio
                     </a>
                 </div>
-                <div className="mb-10 flex flex-col items-center">
-                    <div className="flex bg-purple-100 rounded-xl shadow-inner overflow-hidden mb-2 border-2 border-purple-200 focus-within:border-purple-500 transition-all">
+                <div className="mb-6 flex flex-col items-center">
+                    <div className="flex bg-purple-100 rounded-xl shadow-inner overflow-hidden mb-2 border-2 border-purple-200 focus-within:border-purple-500 transition-all w-full max-w-md">
                         <input
                             type="text"
                             value={nuevoArtista}
                             onChange={e => setNuevoArtista(e.target.value)}
                             placeholder="Nombre del artista"
-                            className="px-4 py-2 bg-transparent focus:bg-white transition w-72 outline-none text-lg"
+                            className="px-4 py-2 bg-transparent focus:bg-white transition w-48 md:w-72 outline-none text-lg"
                         />
                         <button
                             onClick={handleAgregarArtista}
-                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold hover:from-pink-500 hover:to-yellow-400 transition-all text-lg"
+                            className="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold hover:from-pink-500 hover:to-yellow-400 transition-all text-lg"
                         >
                             + Agregar artista
                         </button>
@@ -242,23 +255,23 @@ const Festival = () => {
                 </div>
                 {/* Grilla de días (columnas) y escenarios (filas) */}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full border border-purple-200 rounded-lg">
+                    <table className="min-w-full border border-purple-200 rounded-lg text-xs md:text-base">
                         <thead>
                             <tr>
-                                <th className="border-b border-purple-200 px-4 py-2 bg-purple-100 text-purple-700">Escenario / Día</th>
+                                <th className="border-b border-purple-200 px-2 md:px-4 py-2 bg-purple-100 text-purple-700">Escenario / Día</th>
                                 {dias.map((dia, idx) => (
-                                    <th key={idx} className="border-b border-purple-200 px-4 py-2 bg-purple-100 text-purple-700">{dia}</th>
+                                    <th key={idx} className="border-b border-purple-200 px-2 md:px-4 py-2 bg-purple-100 text-purple-700">{dia}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {escenarios.map((escenario, idxEsc) => (
                                 <tr key={idxEsc}>
-                                    <td className="border-b border-purple-200 px-4 py-2 font-semibold text-purple-700 bg-purple-50">{escenario}</td>
+                                    <td className="border-b border-purple-200 px-2 md:px-4 py-2 font-semibold text-purple-700 bg-purple-50">{escenario}</td>
                                     {dias.map((dia, idxDia) => (
                                         <td
                                             key={idxDia}
-                                            className="border-b border-purple-200 px-4 py-2 bg-white min-w-[120px]"
+                                            className="border-b border-purple-200 px-2 md:px-4 py-2 bg-white min-w-[90px] md:min-w-[120px]"
                                             onDragOver={onDragOver}
                                             onDrop={() => onDrop(dia, escenario)}
                                         >
@@ -268,7 +281,7 @@ const Festival = () => {
                                                 .map((a, i) => (
                                                     <div
                                                         key={i}
-                                                        className="bg-purple-200 rounded px-2 py-1 mb-1 text-purple-900 text-sm flex items-center justify-between cursor-move"
+                                                        className="bg-purple-200 rounded px-2 py-1 mb-1 text-purple-900 text-xs md:text-sm flex items-center justify-between cursor-move"
                                                         draggable
                                                         onDragStart={() => onDragStart(a)}
                                                     >
@@ -289,13 +302,11 @@ const Festival = () => {
                                     ))}
                                 </tr>
                             ))}
-
                         </tbody>
                     </table>
-                    <div className="flex justify-end mt-6 ">
+                    <div className="flex justify-end mt-6">
                         <button
-                            className="px-6 py-3 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-bold rounded-xl shadow-lg transition-all border-2 border-white
-    hover:from-purple-600 hover:via-pink-600 hover:to-yellow-500"
+                            className="px-6 py-3 w-full md:w-auto bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-bold rounded-xl shadow-lg transition-all border-2 border-white hover:from-purple-600 hover:via-pink-600 hover:to-yellow-500"
                             onClick={handleDescargarPoster}
                         >
                             Generar póster
@@ -305,8 +316,8 @@ const Festival = () => {
             </main>
             {/* Lateral derecho: Preview del póster */}
             <aside
-                className="w-[420px] bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-6 ml-5 flex-shrink-0 h-fit self-start flex flex-col items-center"
-                style={{ minWidth: 420 }}
+                className="w-full md:w-[420px] bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-6 ml-0 md:ml-5 flex-shrink-0 h-fit self-start flex flex-col items-center mt-4 md:mt-0"
+                style={{ minWidth: 0, maxWidth: 520 }}
             >
                 <h2 className="text-2xl font-bold text-purple-700 mb-4">Line UP</h2>
                 <div
@@ -335,6 +346,50 @@ const Festival = () => {
                     Vista previa generada automáticamente.
                 </span>
             </aside>
+            {showAsignarModal && (
+                <div className="fixed inset-0  backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-[90vw] max-w-xs flex flex-col gap-4">
+                        <h3 className="text-lg font-bold text-purple-700 mb-2">Asignar artista</h3>
+                        <div className="mb-2">
+                            <div className="font-semibold text-purple-600">{artistaSeleccionado?.nombre}</div>
+                        </div>
+                        <select
+                            className="w-full border rounded p-2 mb-2"
+                            value={diaSeleccionado}
+                            onChange={e => setDiaSeleccionado(e.target.value)}
+                        >
+                            <option value="">Selecciona un día</option>
+                            {dias.map(dia => (
+                                <option key={dia} value={dia}>{dia}</option>
+                            ))}
+                        </select>
+                        <select
+                            className="w-full border rounded p-2 mb-2"
+                            value={escenarioSeleccionado}
+                            onChange={e => setEscenarioSeleccionado(e.target.value)}
+                        >
+                            <option value="">Selecciona un escenario</option>
+                            {escenarios.map(esc => (
+                                <option key={esc} value={esc}>{esc}</option>
+                            ))}
+                        </select>
+                        <div className="flex gap-2">
+                            <button
+                                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg py-2 font-bold"
+                                onClick={handleAsignarArtistaMobile}
+                            >
+                                Asignar
+                            </button>
+                            <button
+                                className="flex-1 bg-gray-200 rounded-lg py-2 font-bold text-gray-700"
+                                onClick={() => setShowAsignarModal(false)}
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
