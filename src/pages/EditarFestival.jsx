@@ -164,31 +164,47 @@ const Festival = () => {
                 </ul>
             </aside>
             {/* Contenido principal */}
-            <main className="flex-1 bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-10 max-w-5xl w-full">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-4xl font-extrabold text-purple-700">{festival.name}</h1>
+            <main className="flex-1 bg-white bg-opacity-90 backdrop-blur-lg rounded-3xl shadow-2xl p-12 max-w-5xl w-full relative">
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 className="text-4xl font-extrabold text-gradient bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-400 bg-clip-text text-transparent drop-shadow-lg">
+                            {festival.name}
+                        </h1>
+                        <p className="mt-2 text-gray-600 font-medium">
+                            <span className="inline-block mr-4">
+                                <span className="font-bold text-purple-600">Días:</span> {festival.days}
+                            </span>
+                            <span>
+                                <span className="font-bold text-purple-600">Escenarios:</span> {escenarios.join(", ")}
+                            </span>
+                        </p>
+                    </div>
                     <a
                         href="/inicio"
-                        className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
+                        className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:scale-105 hover:from-pink-500 hover:to-yellow-400 transition-all font-semibold border-2 border-white"
                     >
-                        Volver a inicio
+                        ← Volver a inicio
                     </a>
                 </div>
-                <p className="mb-4 text-gray-700">Días: {festival.days} | Escenarios: {escenarios.join(", ")}</p>
-                <div className="mb-6 flex justify-center">
-                    <input
-                        type="text"
-                        value={nuevoArtista}
-                        onChange={e => setNuevoArtista(e.target.value)}
-                        placeholder="Nombre del artista"
-                        className="px-4 py-2 rounded-l-lg border border-purple-300 focus:outline-none"
-                    />
-                    <button
-                        onClick={handleAgregarArtista}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition"
-                    >
-                        Agregar artista
-                    </button>
+                <div className="mb-8 flex flex-col items-center">
+                    <div className="flex bg-purple-100 rounded-lg shadow-inner overflow-hidden mb-2">
+                        <input
+                            type="text"
+                            value={nuevoArtista}
+                            onChange={e => setNuevoArtista(e.target.value)}
+                            placeholder="Nombre del artista"
+                            className="px-4 py-2 bg-transparent focus:bg-white transition w-64 outline-none"
+                        />
+                        <button
+                            onClick={handleAgregarArtista}
+                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold hover:from-pink-500 hover:to-yellow-400 transition-all"
+                        >
+                            + Agregar artista
+                        </button>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                        ¿No encuentras el artista en la lista? Agrégalo aquí.
+                    </span>
                 </div>
                 {/* Grilla de días (columnas) y escenarios (filas) */}
                 <div className="overflow-x-auto">
@@ -240,8 +256,32 @@ const Festival = () => {
 
                         </tbody>
                     </table>
+                    <div className="flex justify-end mt-6">
+                        <button
+                            className="px-6 py-3 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-all border-2 border-white"
+                            onClick={() => alert("Funcionalidad de generación de póster próximamente")}
+                        >
+                            Generar póster
+                        </button>
+                    </div>
                 </div>
             </main>
+            {/* Lateral derecho: Preview del póster */}
+            <aside className="w-80 bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-6 ml-8 flex-shrink-0 h-fit self-start flex flex-col items-center">
+                <h2 className="text-2xl font-bold text-purple-700 mb-4">Line UP</h2>
+                {/* Aquí puedes cambiar la ruta de la imagen por la del póster generado */}
+                <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200">
+                    <img
+                        src="/src/assets/poster-preview.png"
+                        alt="Preview del póster"
+                        className="object-contain max-h-full max-w-full"
+                        onError={e => { e.target.style.display = 'none'; }}
+                    />
+                </div>
+                <span className="text-sm text-gray-500 mt-2 text-center">
+                    El póster se actualizará aquí cuando esté disponible.
+                </span>
+            </aside>
         </div>
     );
 };
