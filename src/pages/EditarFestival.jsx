@@ -292,7 +292,6 @@ const Festival = () => {
                     ref={posterRef}
                     className="w-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200"
                     style={{
-                        minHeight: 320,
                         height: "auto",
                         padding: 0,
                     }}

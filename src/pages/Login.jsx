@@ -1,19 +1,29 @@
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, loginWithGoogle } from '../firebase';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from "../context/AuthContext";
+import GLogo from "../assets/GLogo.png"; // Asegúrate de que la ruta sea correcta
+
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/inicio");
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/inicio');
+      // No necesitas navegar aquí, el useEffect lo hará
     } catch (err) {
       setError('Correo o contraseña incorrectos');
     }
@@ -47,6 +57,15 @@ function Login() {
             Iniciar sesión
           </button>
         </form>
+        <br />
+        <button
+          onClick={loginWithGoogle}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow hover:bg-gray-100 transition"
+        >
+          <img src={GLogo} alt="Google" className="w-5 h-5" />
+          Iniciar sesión con Google
+        </button>
+
         <p className="text-sm text-center text-gray-600 mt-4">
           ¿No tienes cuenta? <a href="/register" className="text-indigo-700 hover:underline">Regístrate</a>
         </p>
