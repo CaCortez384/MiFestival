@@ -181,13 +181,31 @@ const Festival = () => {
             </aside>
             {/* Contenido principal */}
             <main className="flex-1 bg-white bg-opacity-90 backdrop-blur-lg rounded-3xl shadow-2xl p-12 max-w-5xl w-full relative">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex justify-between items-center mb-10">
                     <div>
-                        <h1 className="text-4xl font-extrabold text-gradient bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-400 bg-clip-text text-transparent drop-shadow-lg">
-                            {festival.name}
-                        </h1>
-                        <p className="mt-2 text-gray-600 font-medium">
-                            <span className="inline-block mr-4">
+                        {/* Editable festival name */}
+                        <span className="inline-flex items-center px-2 py-1 bg-purple-200 text-purple-700 rounded-lg text-xs font-semibold shadow-sm">
+                            Editar nombre
+                        </span>
+                        <div className="flex items-center gap-3 mb-2">
+                            <input
+                                type="text"
+                                value={festival.name}
+                                onChange={async (e) => {
+                                    const newName = e.target.value;
+                                    setFestival({ ...festival, name: newName });
+                                    const docRef = doc(db, "festivals", id);
+                                    await updateDoc(docRef, { name: newName });
+                                }}
+                                className="text-4xl font-extrabold text-purple-700 drop-shadow-lg outline-none border-b-2 border-purple-300 focus:border-purple-600 transition w-full px-2 py-1 focus:bg-purple-50 rounded-lg"
+                                style={{ minWidth: 220, maxWidth: 420, letterSpacing: 1 }}
+                                spellCheck={false}
+                                autoComplete="off"
+                            />
+
+                        </div>
+                        <p className="mt-1 text-gray-600 font-medium text-lg">
+                            <span className="inline-block mr-6">
                                 <span className="font-bold text-purple-600">Días:</span> {festival.days}
                             </span>
                             <span>
@@ -202,18 +220,18 @@ const Festival = () => {
                         ← Volver a inicio
                     </a>
                 </div>
-                <div className="mb-8 flex flex-col items-center">
-                    <div className="flex bg-purple-100 rounded-lg shadow-inner overflow-hidden mb-2">
+                <div className="mb-10 flex flex-col items-center">
+                    <div className="flex bg-purple-100 rounded-xl shadow-inner overflow-hidden mb-2 border-2 border-purple-200 focus-within:border-purple-500 transition-all">
                         <input
                             type="text"
                             value={nuevoArtista}
                             onChange={e => setNuevoArtista(e.target.value)}
                             placeholder="Nombre del artista"
-                            className="px-4 py-2 bg-transparent focus:bg-white transition w-64 outline-none"
+                            className="px-4 py-2 bg-transparent focus:bg-white transition w-72 outline-none text-lg"
                         />
                         <button
                             onClick={handleAgregarArtista}
-                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold hover:from-pink-500 hover:to-yellow-400 transition-all"
+                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold hover:from-pink-500 hover:to-yellow-400 transition-all text-lg"
                         >
                             + Agregar artista
                         </button>
@@ -250,7 +268,9 @@ const Festival = () => {
                                                 .map((a, i) => (
                                                     <div
                                                         key={i}
-                                                        className="bg-purple-200 rounded px-2 py-1 mb-1 text-purple-900 text-sm flex items-center justify-between"
+                                                        className="bg-purple-200 rounded px-2 py-1 mb-1 text-purple-900 text-sm flex items-center justify-between cursor-move"
+                                                        draggable
+                                                        onDragStart={() => onDragStart(a)}
                                                     >
                                                         <span>{a.nombre}</span>
                                                         <button
@@ -272,9 +292,10 @@ const Festival = () => {
 
                         </tbody>
                     </table>
-                    <div className="flex justify-end mt-6">
+                    <div className="flex justify-end mt-6 ">
                         <button
-                            className="px-6 py-3 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-all border-2 border-white"
+                            className="px-6 py-3 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-bold rounded-xl shadow-lg transition-all border-2 border-white
+    hover:from-purple-600 hover:via-pink-600 hover:to-yellow-500"
                             onClick={handleDescargarPoster}
                         >
                             Generar póster
