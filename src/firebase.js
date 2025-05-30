@@ -1,5 +1,5 @@
 // src/firebase.js
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore'; // <-- Importa Firestore
 // Asegúrate de que las dependencias de Firebase estén instaladas en tu proyecto  
@@ -19,7 +19,7 @@ export const googleProvider = new GoogleAuthProvider();
 export const db = getFirestore(app); // <-- Agrega esta línea
 export const loginWithGoogle = async () => {
   try {
-    await signInWithPopup(auth, googleProvider);
+    await signInWithRedirect(auth, googleProvider);
     // El usuario se autentica y tu AuthContext lo detecta automáticamente
   } catch (error) {
     alert("Error al iniciar sesión con Google");

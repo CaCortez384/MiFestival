@@ -1,12 +1,11 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
-import { signInWithPopup } from "firebase/auth";
-import { googleProvider } from "../firebase";
 
+// Solo define googleProvider aquí, NO lo importes de ../firebase
+const googleProvider = new GoogleAuthProvider();
 
-export const AuthContext = createContext(); // <-- AGREGA ESTA LÍNEA
+export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -33,12 +32,10 @@ export const loginWithGoogle = async () => {
     await signInWithPopup(auth, googleProvider);
     // El usuario ya estará autenticado y tu AuthContext lo detectará
   } catch (error) {
-    alert("Error al iniciar sesión con Google");
+    alert("Error al iniciar sesión con Google: " + error.message);
   }
 };
 
 export function useAuth() {
   return useContext(AuthContext);
 }
-
-

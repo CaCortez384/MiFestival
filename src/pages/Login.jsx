@@ -1,10 +1,10 @@
 import { useState, useContext, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, loginWithGoogle } from '../firebase';
+import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../context/AuthContext";
 import GLogo from "../assets/GLogo.png"; // Asegúrate de que la ruta sea correcta
-
+import { loginWithGoogle } from '../context/AuthContext';
 
 function Login() {
   const [email, setEmail] = useState('');
