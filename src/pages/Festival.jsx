@@ -59,7 +59,7 @@ const Festival = () => {
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
             {/* Header */}
-            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
+            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-30">
                 <div className="flex items-center gap-3">
                     <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
                     <span className="text-3xl font-black text-purple-700 tracking-tight">Detalle del Festival</span>

@@ -152,7 +152,7 @@ const Festival = () => {
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
             {/* Header */}
-            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
+            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-30">
                 <div className="flex items-center gap-3">
                     <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
                     <span className="text-3xl font-black text-purple-700 tracking-tight">Editar Festival</span>
@@ -164,9 +164,9 @@ const Festival = () => {
                     Volver a inicio
                 </a>
             </header>
-            <main className="flex-1 flex flex-col md:flex-row gap-8 px-4 py-8 w-full max-w-7xl mx-auto">
+            <main className="flex-1 flex flex-col md:flex-row gap-4 px-2 py-4 w-full max-w-[1700px] mx-auto overflow-x-auto">
                 {/* Lateral izquierdo: lista de artistas */}
-                <aside className="w-full md:w-72 bg-white bg-opacity-90 rounded-3xl shadow-2xl p-6 mb-8 md:mb-0 flex-shrink-0 h-fit self-start">
+                <aside className="w-full md:w-64 max-w-xs bg-white bg-opacity-90 rounded-2xl shadow-xl p-4 mb-4 md:mb-0 flex-shrink-0 h-fit self-start">
                     <h2 className="text-2xl font-bold text-purple-700 mb-4">Artistas disponibles</h2>
                     <input
                         type="text"
@@ -213,7 +213,7 @@ const Festival = () => {
                     </div>
                 </aside>
                 {/* Contenido principal */}
-                <section className="flex-1 w-full bg-white bg-opacity-90 rounded-3xl shadow-2xl p-6 md:p-10 max-w-full relative">
+                <section className="flex-1 w-full max-w-3xl bg-white bg-opacity-90 rounded-2xl shadow-xl p-4 md:p-6 relative overflow-x-auto">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                         <div className="w-full">
                             <span className="inline-flex items-center px-2 py-1 bg-purple-200 text-purple-700 rounded-lg text-xs font-semibold shadow-sm mb-2">
@@ -247,7 +247,7 @@ const Festival = () => {
                     </div>
                     {/* Grilla de días (columnas) y escenarios (filas) */}
                     <div className="overflow-x-auto">
-                        <table className="min-w-full border border-purple-200 rounded-lg text-xs md:text-base">
+                        <table className="min-w-full border border-purple-200 rounded-lg text-xs md:text-sm">
                             <thead>
                                 <tr>
                                     <th className="border-b border-purple-200 px-2 md:px-4 py-2 bg-purple-100 text-purple-700">Escenario / Día</th>
@@ -296,47 +296,6 @@ const Festival = () => {
                                 ))}
                             </tbody>
                         </table>
-                        <div className="flex gap-3 mt-6 mb-4 w-full justify-center">
-                            <button
-                                onClick={handleDescargarPoster}
-                                className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                            >
-                                <span className="inline-flex items-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Descargar póster
-                                </span>
-                            </button>
-                            {navigator.share && (
-                                <button
-                                    onClick={async () => {
-                                        if (!posterRef.current) return;
-                                        try {
-                                            const dataUrl = await toPng(posterRef.current, { cacheBust: true });
-                                            const res = await fetch(dataUrl);
-                                            const blob = await res.blob();
-                                            const file = new File([blob], `${festival.name || "poster"}.png`, { type: "image/png" });
-                                            await navigator.share({
-                                                files: [file],
-                                                title: festival.name || "Póster Festival",
-                                                text: "¡Mira el póster de mi festival!",
-                                            });
-                                        } catch (err) {
-                                            alert("No se pudo compartir el póster.");
-                                        }
-                                    }}
-                                    className="px-5 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 font-semibold border-2 border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                                >
-                                    <span className="inline-flex items-center gap-2">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2M12 15v-6m0 0l-3 3m3-3l3 3" />
-                                        </svg>
-                                        Compartir póster
-                                    </span>
-                                </button>
-                            )}
-                        </div>
                     </div>
                     {/* Consejos y ayuda */}
                     <div className="mt-8 w-full bg-purple-50 rounded-xl p-4 shadow flex flex-col items-center">
@@ -386,6 +345,48 @@ const Festival = () => {
                             }}
                             backgroundType={fondoPoster}
                         />
+                    </div>
+                    {/* Botones de acción debajo del póster */}
+                    <div className="flex gap-2 mt-4 mb-2 w-full justify-center flex-wrap">
+                        <button
+                            onClick={handleDescargarPoster}
+                            className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        >
+                            <span className="inline-flex items-center gap-2">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                                Descargar póster
+                            </span>
+                        </button>
+                        {navigator.share && (
+                            <button
+                                onClick={async () => {
+                                    if (!posterRef.current) return;
+                                    try {
+                                        const dataUrl = await toPng(posterRef.current, { cacheBust: true });
+                                        const res = await fetch(dataUrl);
+                                        const blob = await res.blob();
+                                        const file = new File([blob], `${festival.name || "poster"}.png`, { type: "image/png" });
+                                        await navigator.share({
+                                            files: [file],
+                                            title: festival.name || "Póster Festival",
+                                            text: "¡Mira el póster de mi festival!",
+                                        });
+                                    } catch (err) {
+                                        alert("No se pudo compartir el póster.");
+                                    }
+                                }}
+                                className="px-5 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 font-semibold border-2 border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            >
+                                <span className="inline-flex items-center gap-2">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2M12 15v-6m0 0l-3 3m3-3l3 3" />
+                                    </svg>
+                                    Compartir póster
+                                </span>
+                            </button>
+                        )}
                     </div>
                     <span className="text-sm text-gray-500 mt-2 text-center">
                         Vista previa generada automáticamente.
@@ -437,7 +438,7 @@ const Festival = () => {
                 )}
             </main>
             {/* Footer */}
-            <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
+            <footer className="w-screen py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
                 © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
             </footer>
         </div>
