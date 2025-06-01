@@ -3,8 +3,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
-import mflogo from "../assets/mflogo20.png"; // Asegúrate de que la ruta sea correcta
-
+import mflogo from "../assets/mflogo20.png";
 
 const MisFestivales = () => {
     const [festivales, setFestivales] = useState([]);
@@ -34,7 +33,7 @@ const MisFestivales = () => {
     }, []);
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
             <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-8 text-center">
                 <p className="text-lg text-purple-700 font-semibold">Cargando festivales...</p>
             </div>
@@ -42,65 +41,85 @@ const MisFestivales = () => {
     );
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-2 md:px-4 py-4 md:py-8 gap-4">
-            {/* Header mejorado */}
-            <header className="w-full flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2
-                        bg-gradient-to-r from-purple-600 via-pink-400 to-yellow-400
-                        rounded-3xl shadow-2xl px-6 py-4 border-2 border-white/70
-                    ">
-                <div className="flex items-center gap-4">
-                    <img src={mflogo} alt="MiFestival Logo" className="w-14 h-14 rounded-2xl shadow-lg border-2 border-white" />
-                    <div>
-                        <span className="text-3xl font-extrabold text-white tracking-wide drop-shadow-lg block">Bienvenido!</span>
-                    </div>
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
+            {/* Header */}
+            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                    <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
+                    <span className="text-3xl font-black text-purple-700 tracking-tight">Mis Festivales</span>
                 </div>
+                <button
+                    className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
+                    onClick={() => navigate('/inicio')}
+                >
+                    Volver a inicio
+                </button>
             </header>
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-4">
-                <div className="bg-white bg-opacity-90 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 max-w-2xl w-full text-center border-4 border-purple-200">
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-pink-500 to-yellow-500 mb-8 drop-shadow-lg">
-                        Mis Festivales
+            <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 w-full">
+                <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 max-w-3xl w-full flex flex-col items-center">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-purple-700 mb-8 text-center">
+                        Tus Festivales
                     </h2>
                     {usuario ? (
                         <>
                             <button
-                                className="mb-8 px-8 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-xl shadow-lg hover:scale-105 hover:from-green-500 hover:to-green-700 transition-all font-bold text-lg"
+                                className="mb-8 px-8 py-3 bg-gradient-to-r from-pink-500 to-yellow-400 text-white rounded-xl shadow-lg hover:scale-105 hover:from-pink-600 hover:to-yellow-500 transition-all font-bold text-lg"
                                 onClick={() => navigate('/crear-festival')}
                             >
                                 + Crear Festival
                             </button>
                             {festivales.length > 0 ? (
-                                <ul className="space-y-5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
                                     {festivales.map(festival => (
-                                        <li
+                                        <div
                                             key={festival.id}
-                                            className="bg-gradient-to-r from-purple-100 via-pink-100 to-yellow-100 rounded-2xl px-8 py-5 shadow-md hover:shadow-xl hover:bg-opacity-90 transition flex items-center justify-between group"
+                                            className="bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50 rounded-2xl px-8 py-6 shadow-md hover:shadow-xl hover:scale-105 transition flex flex-col justify-between group border border-purple-100"
                                         >
-                                            <span
-                                                className="text-xl font-semibold text-purple-800 cursor-pointer group-hover:underline"
-                                                onClick={() => navigate(`/festival/${festival.id}/artistas`)}
-                                            >
-                                                {festival.nombre || festival.name}
-                                            </span>
-                                            <button
-                                                className="ml-6 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg shadow hover:from-red-600 hover:to-pink-600 hover:scale-105 transition-all text-base font-semibold"
-                                                onClick={async (e) => {
-                                                    e.stopPropagation();
-                                                    if (window.confirm('¿Estás seguro de que deseas eliminar este festival?')) {
-                                                        try {
-                                                            const { deleteDoc, doc } = await import('firebase/firestore');
-                                                            await deleteDoc(doc(db, 'festivals', festival.id));
-                                                            setFestivales(prev => prev.filter(f => f.id !== festival.id));
-                                                        } catch (error) {
-                                                            alert('Error al eliminar el festival');
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <span className="text-2xl">🎉</span>
+                                                <span
+                                                    className="text-xl font-bold text-purple-800 cursor-pointer group-hover:underline"
+                                                    onClick={() => navigate(`/festival/${festival.id}/artistas`)}
+                                                >
+                                                    {festival.nombre || festival.name}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-4 mb-4">
+                                                <span className="bg-purple-200 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                                    Días: {festival.days}
+                                                </span>
+                                                <span className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">
+                                                    Escenarios: {festival.stages?.length || 0}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center mt-auto">
+                                                <button
+                                                    className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg shadow hover:from-red-600 hover:to-pink-600 hover:scale-105 transition-all text-base font-semibold"
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        if (window.confirm('¿Estás seguro de que deseas eliminar este festival?')) {
+                                                            try {
+                                                                const { deleteDoc, doc } = await import('firebase/firestore');
+                                                                await deleteDoc(doc(db, 'festivals', festival.id));
+                                                                setFestivales(prev => prev.filter(f => f.id !== festival.id));
+                                                            } catch (error) {
+                                                                alert('Error al eliminar el festival');
+                                                            }
                                                         }
-                                                    }
-                                                }}
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </li>
+                                                    }}
+                                                >
+                                                    Eliminar
+                                                </button>
+                                                <button
+                                                    className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg shadow hover:from-purple-600 hover:to-pink-600 hover:scale-105 transition-all text-base font-semibold"
+                                                    onClick={() => navigate(`/festival/${festival.id}/artistas`)}
+                                                >
+                                                    Editar
+                                                </button>
+                                            </div>
+                                        </div>
                                     ))}
-                                </ul>
+                                </div>
                             ) : (
                                 <div className="flex flex-col items-center mt-8">
                                     <svg className="w-16 h-16 text-purple-300 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -118,18 +137,11 @@ const MisFestivales = () => {
                             <p className="text-red-600 text-lg font-semibold">Debes iniciar sesión para ver tus festivales.</p>
                         </div>
                     )}
-                    <button
-                        className="mt-10 px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:scale-105 hover:from-purple-700 hover:to-pink-700 transition-all font-bold text-lg"
-                        onClick={() => window.location.href = '/inicio'}
-                    >
-                        Volver a inicio
-                    </button>
                 </div>
-            </div>
-            {/* Footer agregado */}
-            <footer className="w-full mt-8 py-4 bg-gradient-to-r from-purple-100 via-pink-100 to-yellow-100 rounded-t-3xl shadow-inner flex flex-col items-center text-center text-purple-700 text-sm font-medium border-t border-purple-200">
-                <span>© {new Date().getFullYear()} MiFestival. Todos los derechos reservados.</span>
-                <span className="text-xs text-gray-500 mt-1">Hecho con <span className="text-pink-500">♥</span> por tu equipo.</span>
+            </main>
+            {/* Footer */}
+            <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
+                © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
             </footer>
         </div>
     );

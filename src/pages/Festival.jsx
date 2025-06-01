@@ -4,8 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
-import mflogo from "../assets/mflogo20.png"; // Asegúrate de que la ruta sea correcta
-
+import mflogo from "../assets/mflogo20.png";
 
 const Festival = () => {
     const { id } = useParams();
@@ -42,7 +41,7 @@ const Festival = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
                 <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-8 text-center">
                     <p className="text-lg text-purple-700 font-semibold">Cargando festival...</p>
                 </div>
@@ -58,23 +57,24 @@ const Festival = () => {
     const escenarios = festival.stages || [];
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-2 md:px-4 py-4 md:py-8 gap-4">
-            {/* Header mejorado */}
-            <header className="w-full flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2
-                        bg-gradient-to-r from-purple-600 via-pink-400 to-yellow-400
-                        rounded-3xl shadow-2xl px-6 py-4 border-2 border-white/70
-                    ">
-                <div className="flex items-center gap-4">
-                    <img src={mflogo} alt="MiFestival Logo" className="w-14 h-14 rounded-2xl shadow-lg border-2 border-white" />
-                    <div>
-                        <span className="text-3xl font-extrabold text-white tracking-wide drop-shadow-lg block">Festival!</span>
-                    </div>
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
+            {/* Header */}
+            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                    <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
+                    <span className="text-3xl font-black text-purple-700 tracking-tight">Detalle del Festival</span>
                 </div>
+                <a
+                    href="/inicio"
+                    className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
+                >
+                    Volver a inicio
+                </a>
             </header>
-            <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-2 md:px-4 py-4 md:py-8 gap-4">
+            <main className="flex-1 flex flex-col lg:flex-row gap-8 px-4 py-12 w-full max-w-7xl mx-auto">
                 {/* Grilla principal */}
-                <main className="flex-1 w-full bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-10 max-w-full lg:max-w-4xl mx-auto mb-6 lg:mb-0">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <section className="flex-1 w-full bg-white bg-opacity-90 rounded-3xl shadow-2xl p-6 md:p-10 max-w-full relative mb-8 lg:mb-0">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                         <div className="flex items-center gap-4">
                             {festival.imagen && (
                                 <img
@@ -95,17 +95,6 @@ const Festival = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-1.414.828l-4.243 1.414 1.414-4.243a4 4 0 01.828-1.414z" />
                                     </svg>
                                     Editar
-                                </span>
-                            </a>
-                            <a
-                                href="/inicio"
-                                className="px-4 md:px-5 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 font-semibold border-2 border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm md:text-base"
-                            >
-                                <span className="inline-flex items-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6" />
-                                    </svg>
-                                    Volver a inicio
                                 </span>
                             </a>
                         </div>
@@ -166,13 +155,22 @@ const Festival = () => {
                             </tbody>
                         </table>
                     </div>
-                </main>
+                    {/* Consejos y ayuda */}
+                    <div className="mt-8 w-full bg-purple-50 rounded-xl p-4 shadow flex flex-col items-center">
+                        <h3 className="text-pink-500 font-bold mb-2 text-lg">¿Sabías que…?</h3>
+                        <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 text-left w-full max-w-md mx-auto">
+                            <li>Puedes editar tu festival en cualquier momento.</li>
+                            <li>Descarga o comparte tu póster para mostrar tu line up.</li>
+                            <li>¡Comparte tu festival con tus amigos!</li>
+                        </ul>
+                    </div>
+                </section>
                 {/* Poster: debajo en mobile, a la derecha en desktop */}
                 <aside
-                    className="w-full lg:w-[520px] bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-6 lg:ml-5 flex-shrink-0 h-fit self-start flex flex-col items-center"
-                    style={{ minWidth: 0, maxWidth: 520 }}
+                    className="w-full lg:w-[540px] bg-white bg-opacity-80 rounded-3xl shadow-2xl p-4 md:p-6 flex-shrink-0 h-fit self-start flex flex-col items-center"
+                    style={{ minWidth: 0, maxWidth: 560 }}
                 >
-                    <h2 className="text-2xl font-bold text-purple-700 mb-4">Line UP</h2>
+                    <h2 className="text-2xl font-bold text-purple-700 mb-4">Póster del Festival</h2>
                     <div className="flex gap-3 mb-4 w-full justify-center">
                         <button
                             onClick={handleDescargarPoster}
@@ -227,24 +225,16 @@ const Festival = () => {
                                 ...festival,
                                 artistas: artistas
                             }}
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "contain",
-                                maxWidth: 480,
-                                maxHeight: 640,
-                            }}
                         />
                     </div>
                     <span className="text-sm text-gray-500 mt-2 text-center">
                         Vista previa generada automáticamente.
                     </span>
                 </aside>
-            </div>
-            {/* Footer agregado */}
-            <footer className="w-full mt-8 py-4 bg-gradient-to-r from-purple-100 via-pink-100 to-yellow-100 rounded-t-3xl shadow-inner flex flex-col items-center text-center text-purple-700 text-sm font-medium border-t border-purple-200">
-                <span>© {new Date().getFullYear()} MiFestival. Todos los derechos reservados.</span>
-                <span className="text-xs text-gray-500 mt-1">Hecho con <span className="text-pink-500">♥</span> por tu equipo.</span>
+            </main>
+            {/* Footer */}
+            <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
+                © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
             </footer>
         </div>
     );

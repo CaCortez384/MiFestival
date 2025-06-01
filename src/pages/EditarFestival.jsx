@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { collection, doc, getDoc, updateDoc, arrayUnion, getDocs } from "firebase/firestore"; // <-- Agrega getDocs aquí
+import { collection, doc, getDoc, updateDoc, arrayUnion, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
-import mflogo from "../assets/mflogo20.png"; // Asegúrate de que la ruta sea correcta
+import mflogo from "../assets/mflogo20.png";
 
 const Festival = () => {
     const { id } = useParams();
@@ -19,8 +19,8 @@ const Festival = () => {
     const [showAsignarModal, setShowAsignarModal] = useState(false);
     const [diaSeleccionado, setDiaSeleccionado] = useState('');
     const [escenarioSeleccionado, setEscenarioSeleccionado] = useState('');
+    const [fondoPoster, setFondoPoster] = useState("city");
 
-    // Ref para el póster
     const posterRef = useRef(null);
 
     useEffect(() => {
@@ -70,20 +70,13 @@ const Festival = () => {
 
     const onDrop = async (dia, escenario) => {
         if (!draggedArtista) return;
-
-        // Si el artista ya está asignado, lo quitamos de su asignación anterior
         let nuevosArtistas = artistas.filter(
             a => !(a.nombre === draggedArtista.nombre && a.dia === draggedArtista.dia && a.escenario === draggedArtista.escenario)
         );
-
-        // Añadimos el artista con la nueva asignación
         const artistaAsignado = { ...draggedArtista, dia, escenario };
         nuevosArtistas.push(artistaAsignado);
-
-        // Actualizamos en Firestore
         const docRef = doc(db, "festivals", id);
         await updateDoc(docRef, { artistas: nuevosArtistas });
-
         setArtistas(nuevosArtistas);
         setDraggedArtista(null);
     };
@@ -94,7 +87,7 @@ const Festival = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
                 <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-8 text-center">
                     <p className="text-lg text-purple-700 font-semibold">Cargando festival...</p>
                 </div>
@@ -106,19 +99,15 @@ const Festival = () => {
         return <p className="text-center text-red-600 mt-10">Festival no encontrado.</p>;
     }
 
-    // Crear matriz para la grilla de días y escenarios
     const dias = Array.from({ length: festival.days }, (_, i) => `Día ${i + 1}`);
     const escenarios = festival.stages || [];
 
-    // Artistas agregados que no están asignados a ningún día/escenario
     const artistasSinAsignar = [
         ...artistas.filter(a => !a.dia && !a.escenario),
         ...artistasApi.filter(apiArtista => !artistas.some(a => a.nombre === apiArtista.nombre))
     ];
 
-    // Nueva función para eliminar artista de la grilla
     const handleEliminarArtista = async (artistaEliminar) => {
-        // Filtra el artista a eliminar
         const nuevosArtistas = artistas.filter(
             a =>
                 !(
@@ -127,13 +116,11 @@ const Festival = () => {
                     a.escenario === artistaEliminar.escenario
                 )
         );
-        // Actualiza en Firestore
         const docRef = doc(db, "festivals", id);
         await updateDoc(docRef, { artistas: nuevosArtistas });
         setArtistas(nuevosArtistas);
     };
 
-    // Función para descargar el póster como imagen
     const handleDescargarPoster = async () => {
         if (!posterRef.current) return;
         try {
@@ -163,39 +150,30 @@ const Festival = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-2 md:px-4 py-4 md:py-8 gap-4">
-            {/* Header mejorado */}
-            <header className="w-full flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2
-                bg-gradient-to-r from-purple-600 via-pink-400 to-yellow-400
-                rounded-3xl shadow-2xl px-6 py-4 border-2 border-white/70
-            ">
-                <div className="flex items-center gap-4">
-                    <img src={mflogo} alt="MiFestival Logo" className="w-14 h-14 rounded-2xl shadow-lg border-2 border-white" />
-                    <div>
-                        <span className="text-3xl font-extrabold text-white tracking-wide drop-shadow-lg block">Editar Festival</span>
-                        <span className="text-base font-medium text-white/80 block mt-1">Organiza y personaliza tu Line Up</span>
-                    </div>
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
+            {/* Header */}
+            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                    <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
+                    <span className="text-3xl font-black text-purple-700 tracking-tight">Editar Festival</span>
                 </div>
                 <a
                     href="/inicio"
-                    className="inline-flex items-center gap-2 px-6 py-2 bg-white/90 text-purple-700 rounded-full shadow-xl hover:bg-white transition-all font-semibold border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
                 >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
                     Volver a inicio
                 </a>
             </header>
-            <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-2 md:px-4 py-4 md:py-8 gap-4">
+            <main className="flex-1 flex flex-col md:flex-row gap-8 px-4 py-8 w-full max-w-7xl mx-auto">
                 {/* Lateral izquierdo: lista de artistas */}
-                <aside className="w-full md:w-64 bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-6 mb-4 md:mb-0 md:mr-8 flex-shrink-0 h-fit self-start">
+                <aside className="w-full md:w-72 bg-white bg-opacity-90 rounded-3xl shadow-2xl p-6 mb-8 md:mb-0 flex-shrink-0 h-fit self-start">
                     <h2 className="text-2xl font-bold text-purple-700 mb-4">Artistas disponibles</h2>
                     <input
                         type="text"
                         value={busqueda}
                         onChange={e => setBusqueda(e.target.value)}
                         placeholder="Buscar artista..."
-                        className="mb-4 w-full px-3 py-2 rounded border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="mb-4 w-full px-3 py-2 rounded-xl border border-purple-200 focus:outline-none focus:ring-2 focus:ring-pink-300"
                     />
                     <ul className="space-y-2 max-h-60 md:max-h-80 overflow-y-auto">
                         {artistasSinAsignar
@@ -235,10 +213,10 @@ const Festival = () => {
                     </div>
                 </aside>
                 {/* Contenido principal */}
-                <main className="flex-1 w-full bg-white bg-opacity-90 backdrop-blur-lg rounded-3xl shadow-2xl p-4 md:p-12 max-w-full md:max-w-5xl relative">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-10 gap-4">
+                <section className="flex-1 w-full bg-white bg-opacity-90 rounded-3xl shadow-2xl p-6 md:p-10 max-w-full relative">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                         <div className="w-full">
-                            <span className="inline-flex items-center px-2 py-1 bg-purple-200 text-purple-700 rounded-lg text-xs font-semibold shadow-sm">
+                            <span className="inline-flex items-center px-2 py-1 bg-purple-200 text-purple-700 rounded-lg text-xs font-semibold shadow-sm mb-2">
                                 Editar nombre
                             </span>
                             <div className="flex items-center gap-3 mb-2">
@@ -318,8 +296,7 @@ const Festival = () => {
                                 ))}
                             </tbody>
                         </table>
-                        <br />
-                        <div className="flex gap-3 mb-4 w-full justify-center">
+                        <div className="flex gap-3 mt-6 mb-4 w-full justify-center">
                             <button
                                 onClick={handleDescargarPoster}
                                 className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
@@ -361,13 +338,39 @@ const Festival = () => {
                             )}
                         </div>
                     </div>
-                </main>
+                    {/* Consejos y ayuda */}
+                    <div className="mt-8 w-full bg-purple-50 rounded-xl p-4 shadow flex flex-col items-center">
+                        <h3 className="text-pink-500 font-bold mb-2 text-lg">Tips para organizar tu Line Up:</h3>
+                        <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 text-left w-full max-w-md mx-auto">
+                            <li>Arrastra y suelta artistas en la grilla para asignarlos a un día y escenario.</li>
+                            <li>Puedes editar el nombre del festival en cualquier momento.</li>
+                            <li>Descarga o comparte tu póster cuando termines.</li>
+                            <li>¡Haz tu festival único y compártelo con tus amigos!</li>
+                        </ul>
+                    </div>
+                </section>
                 {/* Lateral derecho: Preview del póster */}
                 <aside
-                    className="w-full md:w-[420px] bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-6 ml-0 md:ml-5 flex-shrink-0 h-fit self-start flex flex-col items-center mt-4 md:mt-0"
-                    style={{ minWidth: 0, maxWidth: 520 }}
+                    className="w-full md:w-[540px] bg-white bg-opacity-80 rounded-3xl shadow-2xl p-4 md:p-6 flex-shrink-0 h-fit self-start flex flex-col items-center mt-8 md:mt-0"
+                    style={{ minWidth: 0, maxWidth: 560 }}
                 >
-                    <h2 className="text-2xl font-bold text-purple-700 mb-4">Line UP</h2>
+                    <h2 className="text-2xl font-bold text-purple-700 mb-4">Vista previa del póster</h2>
+                    {/* Dropdown para seleccionar fondo */}
+                    <div className="mb-4 w-full flex flex-col items-center">
+                        <label htmlFor="fondo-poster" className="text-sm font-semibold text-purple-700 mb-1">
+                            Fondo del póster:
+                        </label>
+                        <select
+                            id="fondo-poster"
+                            value={fondoPoster}
+                            onChange={e => setFondoPoster(e.target.value)}
+                            className="w-48 px-3 py-2 rounded-lg border-2 border-purple-200 focus:border-purple-500 bg-white text-purple-700 font-bold shadow"
+                        >
+                            <option value="city">Ciudad</option>
+                            <option value="beach">Playa</option>
+                            <option value="desert">Desierto</option>
+                        </select>
+                    </div>
                     <div
                         ref={posterRef}
                         className="w-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200"
@@ -381,13 +384,7 @@ const Festival = () => {
                                 ...festival,
                                 artistas: artistas
                             }}
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "contain",
-                                maxWidth: 380,
-                                maxHeight: 540,
-                            }}
+                            backgroundType={fondoPoster}
                         />
                     </div>
                     <span className="text-sm text-gray-500 mt-2 text-center">
@@ -438,11 +435,10 @@ const Festival = () => {
                         </div>
                     </div>
                 )}
-            </div>
-            {/* Footer agregado */}
-            <footer className="w-full mt-8 py-4 bg-gradient-to-r from-purple-100 via-pink-100 to-yellow-100 rounded-t-3xl shadow-inner flex flex-col items-center text-center text-purple-700 text-sm font-medium border-t border-purple-200">
-                <span>© {new Date().getFullYear()} MiFestival. Todos los derechos reservados.</span>
-                <span className="text-xs text-gray-500 mt-1">Hecho con <span className="text-pink-500">♥</span> por tu equipo.</span>
+            </main>
+            {/* Footer */}
+            <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
+                © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
             </footer>
         </div>
     );

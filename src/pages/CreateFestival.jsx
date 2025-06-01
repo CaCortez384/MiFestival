@@ -1,15 +1,15 @@
-// pages/CreateFestival.jsx
 import React, { useState } from "react";
 import { db, auth } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import mflogo from "../assets/mflogo20.png"; // Asegúrate de que la ruta sea correcta
-
+import mflogo from "../assets/mflogo20.png";
 
 const CreateFestival = () => {
     const [name, setName] = useState("");
     const [days, setDays] = useState(1);
     const [stages, setStages] = useState(["Escenario Principal"]);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleAddStage = () => {
         setStages([...stages, `Escenario ${stages.length + 1}`]);
@@ -24,14 +24,15 @@ const CreateFestival = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setError("");
+        setLoading(true);
         try {
             const user = auth.currentUser;
             if (!user) {
-                alert("Debes iniciar sesión para crear un festival.");
+                setError("Debes iniciar sesión para crear un festival.");
+                setLoading(false);
                 return;
             }
-
             const docRef = await addDoc(collection(db, "festivals"), {
                 name,
                 days,
@@ -39,40 +40,58 @@ const CreateFestival = () => {
                 createdAt: serverTimestamp(),
                 userId: user.uid,
             });
-
             navigate(`/editarFestival/${docRef.id}`);
         } catch (error) {
-            console.error("Error al guardar el festival:", error);
+            setError("Error al guardar el festival. Intenta de nuevo.");
+            setLoading(false);
         }
     };
 
+    // NUEVO: Ejemplo de inspiración y ayuda
+    const ejemplos = [
+        {
+            nombre: "Festival Primavera",
+            dias: 3,
+            escenarios: ["Main Stage", "Electro Garden", "Indie Tent"]
+        },
+        {
+            nombre: "Rock & Colors",
+            dias: 2,
+            escenarios: ["Escenario Central", "Rock Arena"]
+        }
+    ];
+
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 px-2 md:px-4 py-4 md:py-8 gap-4">
-            {/* Header mejorado */}
-            <header className="w-full flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2
-                        bg-gradient-to-r from-purple-600 via-pink-400 to-yellow-400
-                        rounded-3xl shadow-2xl px-6 py-4 border-2 border-white/70
-                    ">
-                <div className="flex items-center gap-4">
-                    <img src={mflogo} alt="MiFestival Logo" className="w-14 h-14 rounded-2xl shadow-lg border-2 border-white" />
-                    <div>
-                        <span className="text-3xl font-extrabold text-white tracking-wide drop-shadow-lg block">Crea!</span>
-                    </div>
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
+            {/* Header */}
+            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                    <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
+                    <span className="text-3xl font-black text-purple-700 tracking-tight">MiFestival</span>
                 </div>
+                <button
+                    type="button"
+                    onClick={() => window.history.back()}
+                    className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
+                >
+                    Volver
+                </button>
             </header>
-            <div className="min-h-screen bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300 flex items-center justify-center px-4">
-                <div className="bg-white/90 shadow-2xl rounded-3xl p-10 w-full max-w-2xl border border-purple-100">
-                    <button
-                        type="button"
-                        onClick={() => window.history.back()}
-                        className="mb-4 text-purple-700 hover:text-purple-900 font-semibold flex items-center gap-1 transition"
-                    >
-                        <span className="text-xl">←</span> Volver
-                    </button>
-                    <h2 className="text-4xl font-black text-purple-700 mb-8 text-center tracking-tight drop-shadow">
-                        Crear nuevo festival
-                    </h2>
-                    <form onSubmit={handleSubmit} className="space-y-7">
+
+            {/* Main */}
+            <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+                <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 max-w-2xl w-full flex flex-col items-center">
+                    <img
+                        src="https://undraw.co/api/illustrations/undraw_live_concert_re_g0e7.svg"
+                        alt="Ilustración crear festival"
+                        className="w-32 mb-4 drop-shadow"
+                    />
+                    <h2 className="text-3xl font-extrabold text-purple-700 mb-2 text-center">¡Crea tu festival!</h2>
+                    <p className="text-md text-gray-600 mb-6 text-center">
+                        Personaliza el nombre, los días y los escenarios de tu evento. ¡Hazlo único!
+                    </p>
+                    {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
+                    <form onSubmit={handleSubmit} className="w-full space-y-6">
                         <div>
                             <label className="block text-base font-semibold text-gray-700 mb-2">
                                 Nombre del festival
@@ -82,7 +101,7 @@ const CreateFestival = () => {
                                 placeholder="Ej: Festival Primavera"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-5 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:border-purple-500 bg-purple-50/50 transition text-lg"
+                                className="w-full px-5 py-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-gray-700 bg-purple-50"
                                 required
                             />
                         </div>
@@ -99,12 +118,14 @@ const CreateFestival = () => {
                                     const val = e.target.value;
                                     setDays(val === "" ? 0 : Number(val));
                                 }}
-                                className="w-36 px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:border-purple-500 bg-purple-50/50 text-lg transition"
+                                className="w-36 px-4 py-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-gray-700 bg-purple-50"
                                 required
                             />
                         </div>
                         <div>
-                            <p className="font-semibold text-gray-700 mb-3 text-base">Escenarios</p>
+                            <label className="block text-base font-semibold text-gray-700 mb-2">
+                                Escenarios
+                            </label>
                             <div className="space-y-3">
                                 {stages.map((stage, index) => (
                                     <div key={index} className="flex items-center gap-2">
@@ -113,7 +134,7 @@ const CreateFestival = () => {
                                             onChange={(e) =>
                                                 setStages(stages.map((s, i) => (i === index ? e.target.value : s)))
                                             }
-                                            className="flex-1 px-4 py-2 border-2 border-purple-200 rounded-xl focus:outline-none focus:border-purple-500 bg-purple-50/50 transition"
+                                            className="flex-1 px-4 py-2 border border-purple-200 rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-gray-700 bg-purple-50"
                                         />
                                         {stages.length > 1 && (
                                             <button
@@ -138,17 +159,44 @@ const CreateFestival = () => {
                         </div>
                         <button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:from-purple-700 hover:to-blue-600 transition"
+                            disabled={loading}
+                            className="w-full bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-bold py-3 rounded-full shadow-lg hover:scale-105 transition text-lg"
                         >
-                            Crear festival
+                            {loading ? "Creando..." : "Crear festival"}
                         </button>
                     </form>
+
+                    {/* Inspiración */}
+                    <div className="mt-8 w-full bg-yellow-50 rounded-xl p-4 shadow flex flex-col items-center">
+                        <h3 className="text-purple-700 font-bold mb-2 text-lg">¿Necesitas inspiración?</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                            {ejemplos.map((ej, idx) => (
+                                <div key={idx} className="bg-white rounded-xl shadow p-4 flex flex-col items-start">
+                                    <span className="font-bold text-pink-500">{ej.nombre}</span>
+                                    <span className="text-sm text-gray-600">Días: {ej.dias}</span>
+                                    <span className="text-sm text-gray-600">Escenarios: {ej.escenarios.join(", ")}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Consejos */}
+                    <div className="mt-8 w-full bg-purple-50 rounded-xl p-4 shadow flex flex-col items-center">
+                        <h3 className="text-pink-500 font-bold mb-2 text-lg">¿Sabías que…?</h3>
+                        <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 text-left w-full max-w-md mx-auto">
+                            <li>Puedes editar los escenarios y días después.</li>
+                            <li>¡Agrega tantos escenarios como quieras!</li>
+                            <li>Comparte tu festival con tus amigos al terminar.</li>
+                            <li>Pronto podrás añadir artistas y horarios personalizados.</li>
+                        </ul>
+                    </div>
+
                 </div>
-            </div>
-            {/* Footer agregado */}
-            <footer className="w-full mt-8 py-4 bg-gradient-to-r from-purple-100 via-pink-100 to-yellow-100 rounded-t-3xl shadow-inner flex flex-col items-center text-center text-purple-700 text-sm font-medium border-t border-purple-200">
-                <span>© {new Date().getFullYear()} MiFestival. Todos los derechos reservados.</span>
-                <span className="text-xs text-gray-500 mt-1">Hecho con <span className="text-pink-500">♥</span> por tu equipo.</span>
+            </main>
+
+            {/* Footer */}
+            <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
+                © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
             </footer>
         </div>
     );
