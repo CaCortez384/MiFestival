@@ -38,6 +38,7 @@ const CreateFestival = () => {
                 name,
                 days,
                 stages,
+                fondoPoster: "city",
                 createdAt: serverTimestamp(),
                 userId: user.uid,
             });

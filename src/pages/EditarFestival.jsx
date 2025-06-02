@@ -41,12 +41,19 @@ const Festival = () => {
     }, []);
 
     useEffect(() => {
+        if (!festival) return;
+        const docRef = doc(db, "festivals", id);
+        updateDoc(docRef, { fondoPoster });
+    }, [fondoPoster]);
+
+    useEffect(() => {
         const fetchFestival = async () => {
             const docRef = doc(db, "festivals", id);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 setFestival(docSnap.data());
                 setArtistas(docSnap.data().artistas || []);
+                setFondoPoster(docSnap.data().fondoPoster || "city"); // <-- agrega esta línea
             }
             setLoading(false);
         };

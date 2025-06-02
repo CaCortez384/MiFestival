@@ -11,6 +11,7 @@ const Festival = () => {
     const [festival, setFestival] = useState(null);
     const [loading, setLoading] = useState(true);
     const [artistas, setArtistas] = useState([]);
+    const [fondoPoster, setFondoPoster] = useState("gradient");
     const posterRef = useRef(null);
 
     const handleDescargarPoster = async () => {
@@ -33,6 +34,7 @@ const Festival = () => {
             if (docSnap.exists()) {
                 setFestival(docSnap.data());
                 setArtistas(docSnap.data().artistas || []);
+                setFondoPoster(docSnap.data().fondoPoster || "city"); // <-- agrega esto
             }
             setLoading(false);
         };
@@ -165,13 +167,30 @@ const Festival = () => {
                         </ul>
                     </div>
                 </section>
-                {/* Poster: debajo en mobile, a la derecha en desktop */}
+                {/* Lateral derecho: Preview del póster */}
                 <aside
-                    className="w-full lg:w-[540px] bg-white bg-opacity-80 rounded-3xl shadow-2xl p-4 md:p-6 flex-shrink-0 h-fit self-start flex flex-col items-center"
+                    className="w-full md:w-[540px] bg-white bg-opacity-80 rounded-3xl shadow-2xl p-4 md:p-6 flex-shrink-0 h-fit self-start flex flex-col items-center mt-8 md:mt-0"
                     style={{ minWidth: 0, maxWidth: 560 }}
                 >
-                    <h2 className="text-2xl font-bold text-purple-700 mb-4">Póster del Festival</h2>
-                    <div className="flex gap-3 mb-4 w-full justify-center">
+                    <h2 className="text-2xl font-bold text-purple-700 mb-4">Vista previa del póster</h2>
+                    <div
+                        ref={posterRef}
+                        className="w-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200"
+                        style={{
+                            height: "auto",
+                            padding: 0,
+                        }}
+                    >
+                        <PosterFestival
+                            festival={{
+                                ...festival,
+                                artistas: artistas
+                            }}
+                            backgroundType={fondoPoster}
+                        />
+                    </div>
+                    {/* Botones de acción debajo del póster */}
+                    <div className="flex gap-2 mt-4 mb-2 w-full justify-center flex-wrap">
                         <button
                             onClick={handleDescargarPoster}
                             className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
@@ -211,21 +230,6 @@ const Festival = () => {
                                 </span>
                             </button>
                         )}
-                    </div>
-                    <div
-                        ref={posterRef}
-                        className="w-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200"
-                        style={{
-                            height: "auto",
-                            padding: 0,
-                        }}
-                    >
-                        <PosterFestival
-                            festival={{
-                                ...festival,
-                                artistas: artistas
-                            }}
-                        />
                     </div>
                     <span className="text-sm text-gray-500 mt-2 text-center">
                         Vista previa generada automáticamente.
