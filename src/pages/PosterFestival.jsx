@@ -57,6 +57,7 @@ const PosterFestival = ({ festival, backgroundType = "city" }) => {
             style={{
                 width: POSTER_WIDTH,
                 height: "auto",
+                minHeight: 600, // <-- Mínimo de altura para mostrar el diseño inferior
                 background: `radial-gradient(ellipse at 50% 20%, #2c0161 60%, #0c0032 100%)`,
                 position: "relative",
                 boxShadow: "0 8px 32px 0 #00000044",
@@ -64,8 +65,8 @@ const PosterFestival = ({ festival, backgroundType = "city" }) => {
                 borderRadius: 24,
                 display: "flex",
                 flexDirection: "column",
-                paddingTop: 32,    // Espacio arriba (puedes ajustar el valor)
-                paddingBottom: 48, // Espacio abajo (puedes ajustar el valor)
+                paddingTop: 32,
+                paddingBottom: 48,
             }}
             className="text-white mx-auto"
         >

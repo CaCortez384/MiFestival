@@ -130,14 +130,32 @@ const Festival = () => {
 
     const handleDescargarPoster = async () => {
         if (!posterRef.current) return;
+        const node = posterRef.current.firstChild; // El div del poster real
+        if (!node) return;
+
+        // Guarda estilos originales
+        const originalWidth = node.style.width;
+        const originalMinWidth = node.style.minWidth;
+        const originalMaxWidth = node.style.maxWidth;
+
+        // Fuerza tamaño grande
+        node.style.width = "520px";
+        node.style.minWidth = "520px";
+        node.style.maxWidth = "520px";
+
         try {
-            const dataUrl = await toPng(posterRef.current, { cacheBust: true });
+            const dataUrl = await toPng(node, { cacheBust: true });
             const link = document.createElement("a");
             link.download = `${festival.name || "poster"}.png`;
             link.href = dataUrl;
             link.click();
         } catch (err) {
             alert("No se pudo generar la imagen.");
+        } finally {
+            // Restaura estilos originales
+            node.style.width = originalWidth;
+            node.style.minWidth = originalMinWidth;
+            node.style.maxWidth = originalMaxWidth;
         }
     };
 
@@ -339,10 +357,11 @@ const Festival = () => {
                     </div>
                     <div
                         ref={posterRef}
-                        className="w-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200"
+                        className="flex items-center justify-center rounded-3xl overflow-hidden border-2 border-purple-200 w-full md:w-[520px]"
                         style={{
                             height: "auto",
                             padding: 0,
+                            background: "none"
                         }}
                     >
                         <PosterFestival

@@ -16,20 +16,34 @@ const Festival = () => {
 
     const handleDescargarPoster = async () => {
         if (!posterRef.current) return;
+        const node = posterRef.current.firstChild; // El div del poster real
+        if (!node) return;
+
+        // Guarda estilos originales
+        const originalWidth = node.style.width;
+        const originalMinWidth = node.style.minWidth;
+        const originalMaxWidth = node.style.maxWidth;
+
+        // Fuerza tamaño grande
+        node.style.width = "520px";
+        node.style.minWidth = "520px";
+        node.style.maxWidth = "520px";
+
         try {
-            const dataUrl = await toPng(posterRef.current, {
-                cacheBust: true
-                // No pasar width ni height, ni modificar estilos
-            });
+            const dataUrl = await toPng(node, { cacheBust: true });
             const link = document.createElement("a");
             link.download = `${festival.name || "poster"}.png`;
             link.href = dataUrl;
             link.click();
         } catch (err) {
             alert("No se pudo generar la imagen.");
+        } finally {
+            // Restaura estilos originales
+            node.style.width = originalWidth;
+            node.style.minWidth = originalMinWidth;
+            node.style.maxWidth = originalMaxWidth;
         }
     };
-
     useEffect(() => {
         const fetchFestival = async () => {
             const docRef = doc(db, "festivals", id);
@@ -178,7 +192,7 @@ const Festival = () => {
                     <h2 className="text-2xl font-bold text-purple-700 mb-4">Vista previa del póster</h2>
                     <div
                         ref={posterRef}
-                        className="flex items-center justify-center rounded-3xl overflow-hidden border-2 border-purple-200"
+                        className="flex items-center justify-center rounded-3xl overflow-hidden border-2 border-purple-200 w-full md:w-[520px]"
                         style={{
                             height: "auto",
                             padding: 0,
