@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import { auth } from "../firebase";
 import mflogo from "../assets/mflogo20.png";
 import mfbanner from "../assets/bailando.webp";
+import { Link } from "react-router-dom";
 
 const quickActions = [
   {
@@ -83,9 +84,9 @@ const Inicio = () => {
           {/* Acciones rápidas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 w-full">
             {quickActions.map((action, i) => (
-              <a
+              <Link
                 key={i}
-                href={action.disabled ? undefined : action.href}
+                to={action.disabled ? undefined : action.href}
                 className={`flex flex-col items-center justify-center bg-gradient-to-br ${action.color} rounded-2xl shadow-lg p-6 transition
                   ${action.disabled
                     ? "opacity-50 pointer-events-none grayscale"
@@ -97,7 +98,7 @@ const Inicio = () => {
                 <span className="text-4xl mb-2">{action.icon}</span>
                 <span className="text-lg font-bold text-purple-700 mb-1">{action.title}</span>
                 <span className="text-sm text-gray-600 text-center">{action.desc}</span>
-              </a>
+              </Link>
             ))}
           </div>
           {/* Tips y ayuda */}

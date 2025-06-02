@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
+import { Link } from "react-router-dom";
 
 const Festival = () => {
     const { id } = useParams();
@@ -182,12 +183,12 @@ const Festival = () => {
                     <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
                     <span className="text-3xl font-black text-purple-700 tracking-tight">Editar Festival</span>
                 </div>
-                <a
-                    href="/inicio"
+                <Link
+                    to="/inicio"
                     className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
                 >
-                    Volver a inicio
-                </a>
+                    Volver Link inicio
+                </Link>
             </header>
             <main className="flex-1 flex flex-col md:flex-row gap-4 px-2 py-4 w-full max-w-[1700px] mx-auto overflow-x-auto">
                 {/* Lateral izquierdo: lista de artistas */}

@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
+import { Link } from "react-router-dom";
 
 const Festival = () => {
     const { id } = useParams();
@@ -83,12 +84,12 @@ const Festival = () => {
                     <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
                     <span className="text-3xl font-black text-purple-700 tracking-tight">Detalle del Festival</span>
                 </div>
-                <a
-                    href="/inicio"
+                <Link
+                    to="/inicio"
                     className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
                 >
                     Volver a inicio
-                </a>
+                </Link>
             </header>
             <main className="flex-1 flex flex-col lg:flex-row gap-8 px-4 py-12 w-full max-w-7xl mx-auto">
                 {/* Grilla principal */}
@@ -105,8 +106,8 @@ const Festival = () => {
                             <h1 className="text-3xl md:text-4xl font-extrabold text-purple-700">{festival.name}</h1>
                         </div>
                         <div className="flex gap-2 mt-4 md:mt-0">
-                            <a
-                                href={`/editarFestival/${id}`}
+                            <Link
+                                to={`/editarFestival/${id}`}
                                 className="px-4 md:px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm md:text-base"
                             >
                                 <span className="inline-flex items-center gap-2">
@@ -115,7 +116,7 @@ const Festival = () => {
                                     </svg>
                                     Editar
                                 </span>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap gap-4 items-center">

@@ -6,6 +6,7 @@ import { AuthContext } from "../context/AuthContext";
 import GLogo from "../assets/GLogo.png";
 import { loginWithGoogle } from '../context/AuthContext';
 import mflogo from "../assets/mflogo20.png";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -90,7 +91,7 @@ function Login() {
             Iniciar sesión con Google
           </button>
           <p className="text-sm text-center text-gray-600 mt-6">
-            ¿No tienes cuenta? <a href="/register" className="text-pink-600 font-bold hover:underline">Regístrate</a>
+            ¿No tienes cuenta? <Link to="/register" className="text-pink-600 font-bold hover:underline">Regístrate</Link>
           </p>
         </div>
       </main>

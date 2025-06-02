@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleA
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import mflogo from "../assets/mflogo20.png";
+import { Link } from "react-router-dom";
 
 function Register() {
   const [nombre, setNombre] = useState('');
@@ -107,7 +108,7 @@ function Register() {
             Registrarse con Google
           </button>
           <p className="text-sm text-center text-gray-600 mt-6">
-            ¿Ya tienes cuenta? <a href="/login" className="text-pink-600 font-bold hover:underline">Inicia sesión</a>
+            ¿Ya tienes cuenta? <Link to="/login" className="text-pink-600 font-bold hover:underline">Inicia sesión</Link>
           </p>
         </div>
       </main>
