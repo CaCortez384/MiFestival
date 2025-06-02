@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Navigate } from "react-router-dom";
 import { auth } from "../firebase";
 import mflogo from "../assets/mflogo20.png";
+import mfbanner from "../assets/bailando.webp";
 
 const quickActions = [
   {
@@ -69,9 +70,9 @@ const Inicio = () => {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 w-full">
         <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 max-w-2xl w-full flex flex-col items-center">
           <img
-            src="https://undraw.co/api/illustrations/undraw_concert_re_1b36.svg"
+            src={mfbanner}
             alt="Ilustración bienvenida"
-            className="w-40 mb-6 drop-shadow"
+            className="w-60 mb-6 drop-shadow"
           />
           <h1 className="text-4xl md:text-5xl font-extrabold text-purple-700 mb-4 text-center">
             ¡Hola, {user.displayName || "usuario"}!

@@ -1,5 +1,6 @@
 import React from "react";
 import mflogo from "../assets/mflogo20.png";
+import banner from "../assets/banner.png";
 
 const features = [
   {
@@ -38,9 +39,9 @@ const Home = () => (
       {/* Ilustración */}
       <div className="flex-1 flex justify-center">
         <img
-          src="https://undraw.co/api/illustrations/undraw_concert_re_1b36.svg"
+          src={banner}
           alt="Festival Ilustración"
-          className="w-80 md:w-96 drop-shadow-xl"
+          className="w-90 md:w-110 drop-shadow-xl"
         />
       </div>
       {/* Texto principal */}

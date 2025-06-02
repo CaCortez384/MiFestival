@@ -3,6 +3,7 @@ import { db, auth } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import mflogo from "../assets/mflogo20.png";
+import mfbanner from "../assets/bailando.webp";
 
 const CreateFestival = () => {
     const [name, setName] = useState("");
@@ -82,7 +83,7 @@ const CreateFestival = () => {
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
                 <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 max-w-2xl w-full flex flex-col items-center">
                     <img
-                        src="https://undraw.co/api/illustrations/undraw_live_concert_re_g0e7.svg"
+                        src={mfbanner}
                         alt="Ilustración crear festival"
                         className="w-32 mb-4 drop-shadow"
                     />

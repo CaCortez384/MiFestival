@@ -45,7 +45,7 @@ function Register() {
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 max-w-md w-full flex flex-col items-center">
           <img
-            src="https://undraw.co/api/illustrations/undraw_party_re_nmwj.svg"
+            src={mflogo}
             alt="Ilustración registro"
             className="w-32 mb-4 drop-shadow"
           />
