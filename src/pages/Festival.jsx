@@ -17,7 +17,10 @@ const Festival = () => {
     const handleDescargarPoster = async () => {
         if (!posterRef.current) return;
         try {
-            const dataUrl = await toPng(posterRef.current, { cacheBust: true });
+            const dataUrl = await toPng(posterRef.current, {
+                cacheBust: true
+                // No pasar width ni height, ni modificar estilos
+            });
             const link = document.createElement("a");
             link.download = `${festival.name || "poster"}.png`;
             link.href = dataUrl;
@@ -169,16 +172,17 @@ const Festival = () => {
                 </section>
                 {/* Lateral derecho: Preview del póster */}
                 <aside
-                    className="w-full md:w-[540px] bg-white bg-opacity-80 rounded-3xl shadow-2xl p-4 md:p-6 flex-shrink-0 h-fit self-start flex flex-col items-center mt-8 md:mt-0"
+                    className="w-full md:w-[540px] rounded-3xl shadow-2xl p-4 md:p-6 flex-shrink-0 h-fit self-start flex flex-col items-center mt-8 md:mt-0 bg-white bg-opacity-90"
                     style={{ minWidth: 0, maxWidth: 560 }}
                 >
                     <h2 className="text-2xl font-bold text-purple-700 mb-4">Vista previa del póster</h2>
                     <div
                         ref={posterRef}
-                        className="w-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-yellow-100 rounded-xl overflow-hidden border-2 border-purple-200"
+                        className="flex items-center justify-center rounded-3xl overflow-hidden border-2 border-purple-200"
                         style={{
                             height: "auto",
                             padding: 0,
+                            background: "none"
                         }}
                     >
                         <PosterFestival

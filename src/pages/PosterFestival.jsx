@@ -49,21 +49,23 @@ const PosterFestival = ({ festival, backgroundType = "city" }) => {
 
     // Ajustes de tamaño y scroll
     const POSTER_WIDTH = 520;
-    const POSTER_HEIGHT = 740;
+    // const POSTER_HEIGHT = 740; // Elimina esta línea
 
     return (
 
         <div
             style={{
                 width: POSTER_WIDTH,
-                height: POSTER_HEIGHT,
+                height: "auto",
                 background: `radial-gradient(ellipse at 50% 20%, #2c0161 60%, #0c0032 100%)`,
                 position: "relative",
                 boxShadow: "0 8px 32px 0 #00000044",
                 overflow: "hidden",
                 borderRadius: 24,
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
+                paddingTop: 32,    // Espacio arriba (puedes ajustar el valor)
+                paddingBottom: 48, // Espacio abajo (puedes ajustar el valor)
             }}
             className="text-white mx-auto"
         >
@@ -76,8 +78,8 @@ const PosterFestival = ({ festival, backgroundType = "city" }) => {
             <div
                 className="relative z-10 flex-1 flex flex-col px-6 pt-8 pb-6"
                 style={{
-                    overflowY: "auto",
-                    maxHeight: POSTER_HEIGHT - 48, // deja espacio para la marca inferior
+                    overflowY: "visible", // Cambia a visible
+                    // maxHeight: POSTER_HEIGHT - 48, // Elimina esta línea
                 }}
             >
                 {/* Nombre del festival */}
