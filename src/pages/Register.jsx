@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
+import mflogo from "../assets/mflogo20.png";
 
 function Register() {
   const [nombre, setNombre] = useState('');
@@ -30,7 +31,7 @@ function Register() {
       {/* Header */}
       <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <img src="/logo192.png" alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
+          <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
           <span className="text-3xl font-black text-purple-700 tracking-tight">MiFestival</span>
         </div>
         <button

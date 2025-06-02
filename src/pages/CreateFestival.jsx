@@ -94,7 +94,7 @@ const CreateFestival = () => {
                     <form onSubmit={handleSubmit} className="w-full space-y-6">
                         <div>
                             <label className="block text-base font-semibold text-gray-700 mb-2">
-                                Nombre del festival
+                                Nombre del festival *
                             </label>
                             <input
                                 type="text"
@@ -107,7 +107,7 @@ const CreateFestival = () => {
                         </div>
                         <div>
                             <label className="block text-base font-semibold text-gray-700 mb-2">
-                                Días del festival
+                                Días del festival *
                             </label>
                             <input
                                 type="number"
@@ -124,7 +124,7 @@ const CreateFestival = () => {
                         </div>
                         <div>
                             <label className="block text-base font-semibold text-gray-700 mb-2">
-                                Escenarios
+                                Escenarios (Opcional)
                             </label>
                             <div className="space-y-3">
                                 {stages.map((stage, index) => (
