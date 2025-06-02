@@ -24,7 +24,8 @@ const quickActions = [
     desc: "Gestiona tu cuenta y tus entradas.",
     icon: "🧑‍🎤",
     href: "/perfil",
-    color: "from-yellow-300 to-pink-400"
+    color: "from-yellow-300 to-pink-400",
+    disabled: true // <--- Desactivado
   }
 ];
 
@@ -83,8 +84,14 @@ const Inicio = () => {
             {quickActions.map((action, i) => (
               <a
                 key={i}
-                href={action.href}
-                className={`flex flex-col items-center justify-center bg-gradient-to-br ${action.color} rounded-2xl shadow-lg p-6 hover:scale-105 transition`}
+                href={action.disabled ? undefined : action.href}
+                className={`flex flex-col items-center justify-center bg-gradient-to-br ${action.color} rounded-2xl shadow-lg p-6 transition
+                  ${action.disabled
+                    ? "opacity-50 pointer-events-none grayscale"
+                    : "hover:scale-105"
+                  }`}
+                tabIndex={action.disabled ? -1 : 0}
+                aria-disabled={action.disabled ? "true" : "false"}
               >
                 <span className="text-4xl mb-2">{action.icon}</span>
                 <span className="text-lg font-bold text-purple-700 mb-1">{action.title}</span>
