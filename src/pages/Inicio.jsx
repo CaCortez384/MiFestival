@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { auth } from "../firebase";
 import mflogo from "../assets/mflogo20.png";
 import mfbanner from "../assets/bailando.webp";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const quickActions = [
   {
@@ -39,17 +39,19 @@ const tips = [
 ];
 
 const Inicio = () => {
-  const [user, setUser] = useState(undefined);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+  const { user, setUser } = useContext(AuthContext);
 
   if (user === undefined) return <div>Cargando...</div>;
   if (!user) return <Navigate to="/home" />;
+
+  // Cierre de sesión para invitado o usuario real
+  const handleLogout = async () => {
+    if (user.isGuest) {
+      setUser(null);
+    } else {
+      await auth.signOut();
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
@@ -60,7 +62,7 @@ const Inicio = () => {
           <span className="text-3xl font-black text-purple-700 tracking-tight">MiFestival</span>
         </div>
         <button
-          onClick={async () => { await auth.signOut(); }}
+          onClick={handleLogout}
           className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
         >
           Cerrar sesión
@@ -81,6 +83,13 @@ const Inicio = () => {
           <p className="text-lg md:text-xl text-gray-700 mb-8 text-center">
             Bienvenido a <span className="text-pink-500 font-bold">MiFestival</span>. Crea festivales, organiza artistas y comparte tu experiencia musical.
           </p>
+          {/* AVISO SOLO PARA INVITADO */}
+          {user.isGuest && (
+            <div className="w-full bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-xl mb-6 text-center font-semibold shadow">
+              Estás usando el modo invitado. <br />
+              <span className="font-normal">Los festivales que crees <b>no se guardarán</b> cuando cierres la sesión o recargues la página.</span>
+            </div>
+          )}
           {/* Acciones rápidas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 w-full">
             {quickActions.map((action, i) => (

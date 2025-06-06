@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { db, auth } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import mflogo from "../assets/mflogo20.png";
 import mfbanner from "../assets/bailando.webp";
+import { AuthContext } from "../context/AuthContext";
 
 const CreateFestival = () => {
     const [name, setName] = useState("");
@@ -11,6 +12,7 @@ const CreateFestival = () => {
     const [stages, setStages] = useState(["Escenario Principal"]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const { user } = useContext(AuthContext);
 
     const handleAddStage = () => {
         setStages([...stages, `Escenario ${stages.length + 1}`]);
@@ -28,9 +30,9 @@ const CreateFestival = () => {
         setError("");
         setLoading(true);
         try {
-            const user = auth.currentUser;
-            if (!user) {
-                setError("Debes iniciar sesión para crear un festival.");
+            // Permite si es usuario real o invitado
+            if (!user || (!user.isGuest && !auth.currentUser)) {
+                setError("Debes iniciar sesión o usar modo invitado para crear un festival.");
                 setLoading(false);
                 return;
             }
@@ -40,7 +42,7 @@ const CreateFestival = () => {
                 stages,
                 fondoPoster: "city",
                 createdAt: serverTimestamp(),
-                userId: user.uid,
+                userId: user.isGuest ? "invitado" : user.uid, // Marca los festivales de invitado
             });
             navigate(`/editarFestival/${docRef.id}`);
         } catch (error) {
@@ -92,6 +94,13 @@ const CreateFestival = () => {
                     <p className="text-md text-gray-600 mb-6 text-center">
                         Personaliza el nombre, los días y los escenarios de tu evento. ¡Hazlo único!
                     </p>
+                    {/* AVISO SOLO PARA INVITADO */}
+                    {user.isGuest && (
+                        <div className="w-full bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-xl mb-6 text-center font-semibold shadow">
+                            Estás usando el modo invitado. <br />
+                            <span className="font-normal">Los festivales que crees <b>no se guardarán</b> cuando cierres la sesión o recargues la página.</span>
+                        </div>
+                    )}
                     {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
                     <form onSubmit={handleSubmit} className="w-full space-y-6">
                         <div>
