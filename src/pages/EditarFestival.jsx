@@ -6,6 +6,9 @@ import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
 import { Link } from "react-router-dom";
+import cityImg from "../assets/City.svg";
+import beachImg from "../assets/Beach.svg";
+import desertImg from "../assets/Desert.svg";
 
 const Festival = () => {
     const { id } = useParams();
@@ -60,6 +63,14 @@ const Festival = () => {
         };
         fetchFestival();
     }, [id]);
+
+    useEffect(() => {
+        // Precarga las imágenes de fondo
+        [cityImg, beachImg, desertImg].forEach(src => {
+            const img = new window.Image();
+            img.src = src;
+        });
+    }, []);
 
     const handleAgregarArtista = async () => {
         if (!nuevoArtista.trim()) return;
@@ -187,7 +198,7 @@ const Festival = () => {
                     to="/inicio"
                     className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
                 >
-                    Volver Link inicio
+                    Volver a inicio
                 </Link>
             </header>
             <main className="flex-1 flex flex-col md:flex-row gap-4 px-2 py-4 w-full max-w-[1700px] mx-auto overflow-x-auto">
