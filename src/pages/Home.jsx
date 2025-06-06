@@ -80,7 +80,7 @@ const Home = () => {
             <button
               type="button"
               onClick={handleGuest}
-              className="bg-gray-200 text-purple-700 font-bold py-3 px-8 rounded-full shadow hover:bg-gray-300 transition"
+              className="bg-gradient-to-r from-yellow-200 via-pink-100 to-purple-100 text-purple-700 border border-purple-200 font-bold py-3 px-8 rounded-full shadow hover:bg-yellow-100 hover:text-pink-600 transition"
             >
               Entrar como invitado
             </button>
