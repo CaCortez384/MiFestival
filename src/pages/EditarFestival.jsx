@@ -21,10 +21,11 @@ const Festival = () => {
     const [artistasApi, setArtistasApi] = useState([]);
     const [artistaSeleccionado, setArtistaSeleccionado] = useState(null);
     const [showAsignarModal, setShowAsignarModal] = useState(false);
-    const [diaSeleccionado, setDiaSeleccionado] = useState('');
+    const [diaSeleccionado, setDiaSeleccionado] = useState('Día 1');
     const [escenarioSeleccionado, setEscenarioSeleccionado] = useState('');
     const [fondoPoster, setFondoPoster] = useState("city");
     const { user } = useContext(AuthContext);
+    const [artistaExpandido, setArtistaExpandido] = useState(null);
 
     const posterRef = useRef(null);
 
@@ -98,7 +99,9 @@ const Festival = () => {
         });
         setArtistas([...artistas, { nombre: nuevoArtista, dia: null, escenario: null }]);
         setNuevoArtista("");
+
     };
+
 
     // Drag & Drop handlers
     const onDragStart = (artista) => {
@@ -252,15 +255,51 @@ const Festival = () => {
                             .filter(artista => artista.nombre.toLowerCase().includes(busqueda.toLowerCase()))
                             .slice(0, 10)
                             .map((artista, idx) => (
-                                <li
-                                    key={artista.nombre}
-                                    className="bg-purple-100 rounded-lg px-4 py-2 text-purple-800 font-medium cursor-pointer md:cursor-move"
-                                    draggable={window.innerWidth >= 768}
-                                    onDragStart={window.innerWidth >= 768 ? () => onDragStart(artista) : undefined}
-                                    onClick={window.innerWidth < 768 ? () => { setArtistaSeleccionado(artista); setShowAsignarModal(true); } : undefined}
-                                >
-                                    {artista.nombre}
-                                </li>
+                                <React.Fragment key={artista.nombre}>
+                                    <li
+                                        className="bg-purple-100 rounded-lg px-4 py-2 text-purple-800 font-medium cursor-pointer md:cursor-move"
+                                        draggable={window.innerWidth >= 768}
+                                        onDragStart={window.innerWidth >= 768 ? () => onDragStart(artista) : undefined}
+                                        // Aquí reemplaza el onClick:
+                                        onClick={window.innerWidth < 768 ? () => {
+                                            setArtistaExpandido(artista.nombre === artistaExpandido ? null : artista.nombre);
+                                            setDiaSeleccionado('Día 1');
+                                        } : undefined}
+                                    >
+                                        {artista.nombre}
+                                    </li>
+                                    {/* Selectores en línea solo en mobile */}
+                                    {window.innerWidth < 768 && artistaExpandido === artista.nombre && (
+                                        <div className="bg-white rounded-lg shadow p-2 mt-1 flex flex-col gap-2">
+                                            <select
+                                                className="w-full border rounded p-2 mb-1"
+                                                value={diaSeleccionado}
+                                                onChange={e => setDiaSeleccionado(e.target.value)}
+                                            >
+                                                {dias.map(dia => (
+                                                    <option key={dia} value={dia}>{dia}</option>
+                                                ))}
+                                            </select>
+                                            <button
+                                                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg py-2 font-bold"
+                                                onClick={async () => {
+                                                    const escenarioPrincipal = escenarios[0] || "Escenario Principal";
+                                                    const nuevosArtistas = [
+                                                        ...artistas.filter(a => a.nombre !== artista.nombre),
+                                                        { ...artista, dia: diaSeleccionado, escenario: escenarioPrincipal }
+                                                    ];
+                                                    const docRef = doc(db, "festivals", id);
+                                                    await updateDoc(docRef, { artistas: nuevosArtistas });
+                                                    setArtistas(nuevosArtistas);
+                                                    setArtistaExpandido(null);
+                                                    setDiaSeleccionado('Día 1');
+                                                }}
+                                            >
+                                                Asignar
+                                            </button>
+                                        </div>
+                                    )}
+                                </React.Fragment>
                             ))}
                     </ul>
                     <div className="mb-6 flex flex-col items-center">
