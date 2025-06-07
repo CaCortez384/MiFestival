@@ -8,6 +8,7 @@ import Inicio from './pages/Inicio';
 import MisFestivales from './pages/MisFestivales';
 import Festival from './pages/Festival';
 import EditarFestival from './pages/EditarFestival';
+import VerFestival from './pages/VerFestival';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/inicio" element={<Inicio />} />
           <Route path="/mis-festivales" element={<MisFestivales />} />
           <Route path="/festival/:id" element={<Festival />} />
+          <Route path="/verfestival/:slugId" element={<VerFestival />} />
           <Route path="/festival/:id/artistas" element={<Festival />} />
           <Route path="/editarFestival/:id" element={<EditarFestival />} />
         </Routes>

@@ -6,6 +6,13 @@ import mflogo from "../assets/mflogo20.png";
 import mfbanner from "../assets/bailando.webp";
 import { AuthContext } from "../context/AuthContext";
 
+function generarSlug(nombre) {
+    return nombre
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "");
+}
+
 const CreateFestival = () => {
     const [name, setName] = useState("");
     const [days, setDays] = useState(1);
@@ -31,20 +38,23 @@ const CreateFestival = () => {
         setLoading(true);
         try {
             // Permite si es usuario real o invitado
-            if (!user || (!user.isGuest && !auth.currentUser)) {
+            if (!user) {
                 setError("Debes iniciar sesión o usar modo invitado para crear un festival.");
                 setLoading(false);
                 return;
             }
+            const slug = generarSlug(name); // Genera el slug a partir del nombre
             const docRef = await addDoc(collection(db, "festivals"), {
                 name,
+                slug,
                 days,
                 stages,
                 fondoPoster: "city",
                 createdAt: serverTimestamp(),
-                userId: user.isGuest ? "invitado" : user.uid, // Marca los festivales de invitado
+                userId: user.isGuest ? "invitado" : user.uid,
             });
             navigate(`/editarFestival/${docRef.id}`);
+            await updateDoc(docRef, { id: docRef.id });
         } catch (error) {
             setError("Error al guardar el festival. Intenta de nuevo.");
             setLoading(false);

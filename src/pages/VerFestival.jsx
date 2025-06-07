@@ -6,13 +6,10 @@ import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
 
 const Festival = () => {
-    const { id } = useParams();
-    const { user } = useContext(AuthContext);
+    const { slugId } = useParams();
+    const id = slugId.split('-').pop();
     const [festival, setFestival] = useState(null);
     const [loading, setLoading] = useState(true);
     const [artistas, setArtistas] = useState([]);
@@ -54,9 +51,9 @@ const Festival = () => {
             const docRef = doc(db, "festivals", id);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                setFestival({ id: docSnap.id, ...docSnap.data() }); // <-- agrega el id aquí
+                setFestival(docSnap.data());
                 setArtistas(docSnap.data().artistas || []);
-                setFondoPoster(docSnap.data().fondoPoster || "city");
+                setFondoPoster(docSnap.data().fondoPoster || "city"); // <-- agrega esto
             }
             setLoading(false);
         };
@@ -75,17 +72,6 @@ const Festival = () => {
 
     if (!festival) {
         return <p className="text-center text-red-600 mt-10">Festival no encontrado.</p>;
-    }
-
-    if (!user || festival.userId !== user.uid) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
-                <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-8 text-center">
-                    <p className="text-lg text-red-600 font-semibold">No tienes permiso para editar este festival.</p>
-                    <Link to="/inicio" className="mt-4 inline-block text-purple-700 underline">Volver al inicio</Link>
-                </div>
-            </div>
-        );
     }
 
     const dias = Array.from({ length: festival.days }, (_, i) => `Día ${i + 1}`);
@@ -119,19 +105,6 @@ const Festival = () => {
                                 />
                             )}
                             <h1 className="text-3xl md:text-4xl font-extrabold text-purple-700">{festival.name}</h1>
-                        </div>
-                        <div className="flex gap-2 mt-4 md:mt-0">
-                            <Link
-                                to={`/editarFestival/${id}`}
-                                className="px-4 md:px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm md:text-base"
-                            >
-                                <span className="inline-flex items-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-1.414.828l-4.243 1.414 1.414-4.243a4 4 0 01.828-1.414z" />
-                                    </svg>
-                                    Editar
-                                </span>
-                            </Link>
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap gap-4 items-center">
@@ -194,7 +167,6 @@ const Festival = () => {
                     <div className="mt-8 w-full bg-purple-50 rounded-xl p-4 shadow flex flex-col items-center">
                         <h3 className="text-pink-500 font-bold mb-2 text-lg">¿Sabías que…?</h3>
                         <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 text-left w-full max-w-md mx-auto">
-                            <li>Puedes editar tu festival en cualquier momento.</li>
                             <li>Descarga o comparte tu póster para mostrar tu line up.</li>
                             <li>¡Comparte tu festival con tus amigos!</li>
                         </ul>
@@ -236,34 +208,6 @@ const Festival = () => {
                                 Descargar póster
                             </span>
                         </button>
-                        {navigator.share && (
-                            <button
-                                onClick={async () => {
-                                    if (!posterRef.current) return;
-                                    try {
-                                        const dataUrl = await toPng(posterRef.current, { cacheBust: true });
-                                        const res = await fetch(dataUrl);
-                                        const blob = await res.blob();
-                                        const file = new File([blob], `${festival.name || "poster"}.png`, { type: "image/png" });
-                                        await navigator.share({
-                                            files: [file],
-                                            title: festival.name || "Póster Festival",
-                                            text: `¡Mira el póster de mi festival!\n${window.location.origin}/verfestival/${festival.slug}-${festival.id}`,
-                                        });
-                                    } catch (err) {
-                                        alert("No se pudo compartir el póster.");
-                                    }
-                                }}
-                                className="px-5 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 font-semibold border-2 border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            >
-                                <span className="inline-flex items-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2M12 15v-6m0 0l-3 3m3-3l3 3" />
-                                    </svg>
-                                    Compartir póster
-                                </span>
-                            </button>
-                        )}
                     </div>
                     <span className="text-sm text-gray-500 mt-2 text-center">
                         Vista previa generada automáticamente.

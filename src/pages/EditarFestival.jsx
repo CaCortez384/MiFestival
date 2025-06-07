@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { collection, doc, getDoc, updateDoc, arrayUnion, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
-import { Link } from "react-router-dom";
 import cityImg from "../assets/City.svg";
 import beachImg from "../assets/Beach.svg";
 import desertImg from "../assets/Desert.svg";
+import { AuthContext } from "../context/AuthContext";
 
 const Festival = () => {
     const { id } = useParams();
@@ -24,8 +24,17 @@ const Festival = () => {
     const [diaSeleccionado, setDiaSeleccionado] = useState('');
     const [escenarioSeleccionado, setEscenarioSeleccionado] = useState('');
     const [fondoPoster, setFondoPoster] = useState("city");
+    const { user } = useContext(AuthContext);
 
     const posterRef = useRef(null);
+
+    function generarSlug(nombre) {
+        return nombre
+            .toLowerCase()
+            .replace(/ /g, "-")
+            .replace(/[^\w-]+/g, "");
+    }
+
 
     useEffect(() => {
         const fetchArtistasFirestore = async () => {
@@ -45,6 +54,15 @@ const Festival = () => {
     }, []);
 
     useEffect(() => {
+        if (festival && !festival.slug && festival.name) {
+            const nuevoSlug = generarSlug(festival.name);
+            const docRef = doc(db, "festivals", id);
+            updateDoc(docRef, { slug: nuevoSlug });
+            setFestival({ ...festival, slug: nuevoSlug });
+        }
+    }, [festival, id]);
+
+    useEffect(() => {
         if (!festival) return;
         const docRef = doc(db, "festivals", id);
         updateDoc(docRef, { fondoPoster });
@@ -55,9 +73,9 @@ const Festival = () => {
             const docRef = doc(db, "festivals", id);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                setFestival(docSnap.data());
+                setFestival({ id: docSnap.id, ...docSnap.data() }); // <-- agrega el id aquí
                 setArtistas(docSnap.data().artistas || []);
-                setFondoPoster(docSnap.data().fondoPoster || "city"); // <-- agrega esta línea
+                setFondoPoster(docSnap.data().fondoPoster || "city");
             }
             setLoading(false);
         };
@@ -116,6 +134,23 @@ const Festival = () => {
 
     if (!festival) {
         return <p className="text-center text-red-600 mt-10">Festival no encontrado.</p>;
+    }
+
+    if (
+        !user ||
+        (
+            (!user.isGuest && festival.userId !== user.uid) ||
+            (user.isGuest && festival.userId !== "invitado")
+        )
+    ) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
+                <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-8 text-center">
+                    <p className="text-lg text-red-600 font-semibold">No tienes permiso para editar este festival.</p>
+                    <Link to="/inicio" className="mt-4 inline-block text-purple-700 underline">Volver al inicio</Link>
+                </div>
+            </div>
+        );
     }
 
     const dias = Array.from({ length: festival.days }, (_, i) => `Día ${i + 1}`);
@@ -409,7 +444,7 @@ const Festival = () => {
                                         await navigator.share({
                                             files: [file],
                                             title: festival.name || "Póster Festival",
-                                            text: "¡Mira el póster de mi festival!",
+                                            text: `¡Mira el póster de mi festival!\n${window.location.origin}/verfestival/${festival.slug}-${festival.id}`,
                                         });
                                     } catch (err) {
                                         alert("No se pudo compartir el póster.");
