@@ -34,7 +34,7 @@ Accede a la aplicación aquí:
 
 ## ¿Cómo funciona?
 
-1. Ingresa a [https://mifestival.app](https://mifestival.app).
+1. Ingresa a [https://mifestival.web.app](https://mifestival.web.app).
 2. Agrega tus artistas favoritos o selecciona de la lista.
 3. Asigna cada artista a un día y escenario.
 4. Personaliza el nombre del festival y el fondo del póster.
