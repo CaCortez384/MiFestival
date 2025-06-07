@@ -104,7 +104,7 @@ function Register() {
             className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-full py-3 font-bold text-gray-700 shadow hover:bg-gray-50 transition"
             type="button"
           >
-            <svg width="22" height="22" viewBox="0 0 48 48" className="mr-2"><g><path fill="#4285F4" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.3-5.7 7-10.3 7-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.6l6.6-6.6C34.5 6.5 29.6 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5c10.5 0 19.5-8.5 19.5-19 0-1.3-.1-2.2-.3-3z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C15.1 16.1 19.2 13 24 13c2.6 0 5 .9 6.9 2.6l6.6-6.6C34.5 6.5 29.6 4.5 24 4.5c-7.3 0-13.5 4.1-16.7 10.2z"/><path fill="#FBBC05" d="M24 45.5c5.6 0 10.5-1.9 14.4-5.2l-6.7-5.5c-2 1.4-4.5 2.2-7.7 2.2-4.6 0-8.7-2.7-10.3-7H6.3c3.2 6.1 9.4 10.5 17.7 10.5z"/><path fill="#EA4335" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.3-5.7 7-10.3 7-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.6l6.6-6.6C34.5 6.5 29.6 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5c10.5 0 19.5-8.5 19.5-19 0-1.3-.1-2.2-.3-3z"/></g></svg>
+            <svg width="22" height="22" viewBox="0 0 48 48" className="mr-2"><g><path fill="#4285F4" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.3-5.7 7-10.3 7-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.6l6.6-6.6C34.5 6.5 29.6 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5c10.5 0 19.5-8.5 19.5-19 0-1.3-.1-2.2-.3-3z" /><path fill="#34A853" d="M6.3 14.7l6.6 4.8C15.1 16.1 19.2 13 24 13c2.6 0 5 .9 6.9 2.6l6.6-6.6C34.5 6.5 29.6 4.5 24 4.5c-7.3 0-13.5 4.1-16.7 10.2z" /><path fill="#FBBC05" d="M24 45.5c5.6 0 10.5-1.9 14.4-5.2l-6.7-5.5c-2 1.4-4.5 2.2-7.7 2.2-4.6 0-8.7-2.7-10.3-7H6.3c3.2 6.1 9.4 10.5 17.7 10.5z" /><path fill="#EA4335" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.3-5.7 7-10.3 7-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.6l6.6-6.6C34.5 6.5 29.6 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5c10.5 0 19.5-8.5 19.5-19 0-1.3-.1-2.2-.3-3z" /></g></svg>
             Registrarse con Google
           </button>
           <p className="text-sm text-center text-gray-600 mt-6">
@@ -115,6 +115,9 @@ function Register() {
       {/* Footer */}
       <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
         © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
+        <div className="mt-2">
+          Desarrollado por <a href="https://github.com/CaCortez384" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:underline">Carlos Cortez</a>
+        </div>
       </footer>
     </div>
   );

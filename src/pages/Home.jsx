@@ -129,6 +129,9 @@ const Home = () => {
           <a href="/contact" className="hover:underline mx-2">Contacto</a>·
           <a href="/privacy" className="hover:underline mx-2">Privacidad</a>
         </div>
+        <div className="mt-2">
+          Desarrollado por <a href="https://github.com/CaCortez384" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:underline">Carlos Cortez</a>
+        </div>
       </footer>
     </div>
   );

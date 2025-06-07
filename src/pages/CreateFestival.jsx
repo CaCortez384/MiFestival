@@ -218,6 +218,9 @@ const CreateFestival = () => {
             {/* Footer */}
             <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
                 © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
+                <div className="mt-2">
+                    Desarrollado por <a href="https://github.com/CaCortez384" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:underline">Carlos Cortez</a>
+                </div>
             </footer>
         </div>
     );
