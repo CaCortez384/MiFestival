@@ -215,7 +215,7 @@ const PosterFestival = ({ festival, backgroundType = "city" }) => {
                         textShadow: `0 1px 4px ${colorSombras}`
                     }}
                 >
-                    MiFestival.app
+                    mifestival.web.app
                 </span>
             </div>
         </div>
