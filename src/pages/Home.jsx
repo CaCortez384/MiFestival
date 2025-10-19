@@ -1,25 +1,27 @@
 import { useNavigate } from "react-router-dom";
 import mflogo from "../assets/mflogo20.png";
-import banner from "../assets/banner.png";
+import banner from "../assets/banner.png"; // Usaremos la imagen existente
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
+// NUEVO: Texto más orientado al beneficio y conciso
 const features = [
   {
-    title: "Crea tu festival",
-    desc: "Personaliza los días, escenarios y elige el nombre de tu evento.",
-    icon: "🎤",
+    title: "Diseña a Tu Gusto",
+    desc: "Elige nombre, días y escenarios. Control total.",
+    // Iconos Emoji como fallback simple y universal
+    icon: "🎨",
   },
   {
-    title: "Organiza artistas",
-    desc: "Arrastra y suelta artistas en tu line up, desde cualquier dispositivo.",
-    icon: "🎸",
+    title: "Organiza Fácilmente",
+    desc: "Arrastra y suelta artistas en tu lineup visual.",
+    icon: "🎧",
   },
   {
-    title: "Comparte tu póster",
-    desc: "Descarga y comparte tu line up personalizado en redes sociales.",
-    icon: "📲",
+    title: "Comparte al Instante",
+    desc: "Descarga o comparte tu póster profesional.",
+    icon: "✨",
   },
 ];
 
@@ -29,108 +31,116 @@ const Home = () => {
 
   const handleGuest = () => {
     setUser({ isGuest: true, displayName: "Invitado" });
-    navigate("/inicio"); // <-- Navegación sin recargar la página
+    navigate("/inicio");
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
+    // MODIFICADO: Fondo blanco limpio, tipografía sans-serif por defecto
+    <div className="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
       {/* Header */}
-      <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
-          <span className="text-3xl font-black text-purple-700 tracking-tight">MiFestival</span>
-        </div>
-        <nav className="hidden md:flex gap-6">
-          <Link to="/login" className="text-purple-700 font-semibold hover:underline transition">Iniciar sesión</Link>
-          <Link to="/register" className="text-pink-600 font-semibold hover:underline transition">Regístrate</Link>
-        </nav>
-      </header>
-
-      {/* Hero */}
-      <section className="flex-1 flex flex-col md:flex-row items-center justify-center px-6 py-12 gap-10">
-        {/* Ilustración */}
-        <div className="flex-1 flex justify-center">
-          <img
-            src={banner}
-            alt="Festival Ilustración"
-            className="w-90 md:w-110 drop-shadow-xl"
-          />
-        </div>
-        {/* Texto principal */}
-        <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-purple-700 mb-4 leading-tight">
-            ¡Crea tu propio <span className="text-pink-500">festival</span> musical!
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-xl">
-            Diseña line ups, organiza artistas y comparte tu experiencia única con amigos. Todo desde tu móvil o PC.
-          </p>
-          <div className="flex flex-col gap-3 md:flex-row md:gap-4">
-            <Link
-              to="/register"
-              className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:scale-105 transition"
-            >
-              ¡Empieza gratis!
-            </Link>
+      {/* MODIFICADO: Sencillo, limpio, con énfasis en el CTA principal */}
+      <header className="w-full px-4 sm:px-6 py-3 border-b border-gray-100 sticky top-0 z-50 bg-white bg-opacity-95 backdrop-blur-sm">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={mflogo} alt="MiFestival Logo" className="w-8 h-8 rounded-md" />
+            <span className="text-lg font-bold text-gray-900">MiFestival</span>
+          </Link>
+          <nav className="flex items-center gap-2">
             <Link
               to="/login"
-              className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-3 px-8 rounded-full shadow hover:bg-purple-50 transition"
+              className="px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition"
             >
-              Ya tengo cuenta
+              Entrar
             </Link>
-            <button
-              type="button"
-              onClick={handleGuest}
-              className="bg-gradient-to-r from-yellow-200 via-pink-100 to-purple-100 text-purple-700 border border-purple-200 font-bold py-3 px-8 rounded-full shadow hover:bg-yellow-100 hover:text-pink-600 transition"
+            <Link
+              to="/register"
+              // CTA Principal en Header
+              className="px-4 py-1.5 rounded-md text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 shadow-sm transition"
             >
-              Entrar como invitado
-            </button>
+              Crear Cuenta
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      {/* MODIFICADO: Texto MUY claro y directo, CTAs grandes y contrastados, imagen como soporte visual */}
+      <section className="flex-grow flex items-center py-16 md:py-24">
+        <div className="container mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+          {/* Columna de Texto - Enfocada en la acción */}
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 leading-tight">
+              Crea <span className="text-cyan-600">Pósters</span> de Festivales Únicos.
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Tu herramienta online para diseñar lineups y compartirlos fácilmente.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-3">
+              <Link
+                to="/register"
+                // CTA Principal GRANDE
+                className="w-full sm:w-auto text-center bg-cyan-500 text-white text-base font-semibold py-3 px-8 rounded-lg shadow hover:bg-cyan-600 transform hover:scale-105 transition duration-150"
+              >
+                Empezar Gratis
+              </Link>
+              <button
+                type="button"
+                onClick={handleGuest}
+                // CTA Secundario más sutil pero claro
+                className="w-full sm:w-auto text-center bg-gray-100 text-gray-700 text-base font-semibold py-3 px-8 rounded-lg hover:bg-gray-200 transition duration-150"
+              >
+                Ver Demo Invitado
+              </button>
+            </div>
+            {/* NUEVO: Prueba Social / Beneficio Clave (Opcional) */}
+            <p className="mt-6 text-sm text-gray-500">
+              ✅ No necesitas cuenta de Spotify &nbsp; ✨ Totalmente gratis
+            </p>
+          </div>
+
+          {/* Columna de Imagen - Soporte visual claro */}
+          <div className="flex justify-center items-center px-4">
+            <img
+              src={banner} // Reutilizamos la imagen banner existente
+              alt="Ejemplo visual de posters de MiFestival"
+              className="w-full max-w-lg rounded-lg shadow-xl" // Sombra más marcada
+            />
           </div>
         </div>
       </section>
 
-      {/* Características */}
-      <section className="py-12 bg-white bg-opacity-80">
-        <h2 className="text-3xl font-bold text-center text-pink-600 mb-8">¿Cómo funciona?</h2>
-        <div className="flex flex-col md:flex-row justify-center gap-8 max-w-5xl mx-auto">
-          {features.map((f, i) => (
-            <div
-              key={i}
-              className="flex-1 bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 transition"
-            >
-              <div className="text-5xl mb-4">{f.icon}</div>
-              <h3 className="text-xl font-bold text-purple-700 mb-2">{f.title}</h3>
-              <p className="text-gray-600">{f.desc}</p>
-            </div>
-          ))}
+      {/* Cómo Funciona (Simplificado) */}
+      {/* MODIFICADO: Sección integrada, título como pregunta, tarjetas minimalistas */}
+      <section className="py-16 md:py-20 bg-gray-50 border-t border-gray-100">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-10">¿Cómo Crear Tu Lineup?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
+            {features.map((f, i) => (
+              <div
+                key={i}
+                // Tarjeta minimalista con icono y texto
+                className="flex items-start gap-4 p-4"
+              >
+                <div className="flex-shrink-0 text-3xl">{f.icon}</div> {/* Icono Emoji */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 mb-1">{f.title}</h3>
+                  <p className="text-gray-600 text-sm">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Llamado a la acción */}
-      <section className="py-10 flex flex-col items-center">
-        <h3 className="text-2xl font-bold text-purple-700 mb-2">¿Listo para crear tu festival?</h3>
-        <Link
-          to="/register"
-          className="bg-pink-500 text-white font-bold py-3 px-10 rounded-full shadow-lg hover:bg-pink-600 transition text-lg"
-        >
-          Regístrate ahora
-        </Link>
-        <p className="mt-4 text-gray-500 text-sm">
-          ¿Ya tienes cuenta? <Link to="/login" className="text-purple-700 hover:underline">Inicia sesión aquí</Link>
-        </p>
-      </section>
+      {/* CTA Final (Opcional - puede ser redundante si el Hero es fuerte) */}
+      {/* Se puede eliminar si buscamos máxima simplificación */}
+      {/* <section className="py-16 bg-white"> ... </section> */}
 
       {/* Footer */}
-      <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
-        <div className="mb-2">
-          © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
-        </div>
-        <div>
-          <a href="/about" className="hover:underline mx-2">Acerca de</a>·
-          <a href="/contact" className="hover:underline mx-2">Contacto</a>·
-          <a href="/privacy" className="hover:underline mx-2">Privacidad</a>
-        </div>
-        <div className="mt-2">
-          Desarrollado por <a href="https://github.com/CaCortez384" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:underline">Carlos Cortez</a>
+      {/* MODIFICADO: Ultra minimalista */}
+      <footer className="w-full py-5 text-center text-xs text-gray-400 border-t border-gray-100">
+        <div className="container mx-auto px-4 sm:px-6">
+          © {new Date().getFullYear()} MiFestival por Carlos Cortez.
         </div>
       </footer>
     </div>
