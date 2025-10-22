@@ -1,284 +1,359 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom"; // Cambiado Navigate por useNavigate
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
-import { Link } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
+// Iconos
+import { ArrowLeftIcon, PencilSquareIcon, ArrowDownTrayIcon, ShareIcon, CalendarDaysIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
+// Nombre original del componente
 const Festival = () => {
+    // --- Estados y Hooks Originales ---
     const { id } = useParams();
+    const navigate = useNavigate(); // agregado
     const { user } = useContext(AuthContext);
     const [festival, setFestival] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(''); // Estado de error
+    // Mantenemos estados separados originales aunque podríamos derivarlos
     const [artistas, setArtistas] = useState([]);
-    const [fondoPoster, setFondoPoster] = useState("gradient");
+    const [fondoPoster, setFondoPoster] = useState("city"); // Mantenemos estado original, aunque podríamos usar festival.fondoPoster
     const posterRef = useRef(null);
 
-    const handleDescargarPoster = async () => {
-        if (!posterRef.current) return;
-        const node = posterRef.current.firstChild; // El div del poster real
-        if (!node) return;
-
-        // Guarda estilos originales
-        const originalWidth = node.style.width;
-        const originalMinWidth = node.style.minWidth;
-        const originalMaxWidth = node.style.maxWidth;
-
-        // Fuerza tamaño grande
-        node.style.width = "520px";
-        node.style.minWidth = "520px";
-        node.style.maxWidth = "520px";
-
+    // nuevo: manejar volver atrás o al inicio
+    const handleVolver = () => {
         try {
-            const dataUrl = await toPng(node, { cacheBust: true });
-            const link = document.createElement("a");
-            link.download = `${festival.name || "poster"}.png`;
-            link.href = dataUrl;
-            link.click();
+            if (window.history.length > 2) {
+                navigate(-1);
+            } else {
+                navigate('/inicio');
+            }
         } catch (err) {
-            alert("No se pudo generar la imagen.");
-        } finally {
-            // Restaura estilos originales
-            node.style.width = originalWidth;
-            node.style.minWidth = originalMinWidth;
-            node.style.maxWidth = originalMaxWidth;
+            navigate('/inicio');
         }
     };
+
+    // --- Funciones Originales ---
+    const generarSlug = (nombre) => nombre.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, ""); // Función auxiliar
+
+    const handleDescargarPoster = async () => { /* ...código original con mejoras calidad/nombre... */
+        if (!posterRef.current || !festival) return; const node = posterRef.current.querySelector(':scope > div'); if (!node) return; try { const dataUrl = await toPng(node, { pixelRatio: 2, cacheBust: true }); const link = document.createElement("a"); link.download = `${generarSlug(festival.name || 'mi-festival')}-poster.png`; link.href = dataUrl; link.click(); } catch (err) { console.error(err); alert("No se pudo generar imagen."); }
+     };
+
+    const handleSharePoster = async () => { /* ...código original con mejoras datos compartidos... */
+        if (!posterRef.current || !navigator.share || !festival) return; const node = posterRef.current.querySelector(':scope > div'); if (!node) return; try { const dataUrl = await toPng(node, { pixelRatio: 1.5, cacheBust: true }); const res = await fetch(dataUrl); const blob = await res.blob(); const file = new File([blob], `${generarSlug(festival.name || 'mi-festival')}.png`, { type: 'image/png' }); const shareUrl = `${window.location.origin}/verfestival/${festival.slug || id}`; if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: festival.name || 'Poster', text:`Mira mi lineup para ${festival.name || 'mi festival'}!`, url: shareUrl }); } else { await navigator.share({ title: festival.name || 'Poster', text: `Mira mi lineup para ${festival.name || 'mi festival'}!\n${shareUrl}`, url: shareUrl }); } } catch (err) { if (err.name !== 'AbortError') alert('No se pudo compartir.'); console.error(err); }
+    };
+
+
+    // useEffect Carga Original (con manejo de error añadido)
     useEffect(() => {
+        let isMounted = true;
         const fetchFestival = async () => {
-            const docRef = doc(db, "festivals", id);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                setFestival({ id: docSnap.id, ...docSnap.data() }); // <-- agrega el id aquí
-                setArtistas(docSnap.data().artistas || []);
-                setFondoPoster(docSnap.data().fondoPoster || "city");
+            setLoading(true);
+            setError('');
+            try {
+                const docRef = doc(db, "festivals", id);
+                const docSnap = await getDoc(docRef);
+                if (isMounted) {
+                    if (docSnap.exists()) {
+                        // Lógica original de setear estados separados
+                        setFestival({ id: docSnap.id, ...docSnap.data() });
+                        setArtistas(docSnap.data().artistas || []);
+                        setFondoPoster(docSnap.data().fondoPoster || "city"); // Usa valor del doc o 'city'
+                    } else {
+                        setError("Festival no encontrado.");
+                        setFestival(null);
+                    }
+                }
+            } catch (err) {
+                if (isMounted) { setError("Error al cargar el festival."); console.error(err); }
+            } finally {
+                if (isMounted) setLoading(false);
             }
-            setLoading(false);
         };
         fetchFestival();
-    }, [id]);
+        return () => { isMounted = false };
+    }, [id]); // Solo depende de ID
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
-                <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-8 text-center">
-                    <p className="text-lg text-purple-700 font-semibold">Cargando festival...</p>
-                </div>
-            </div>
-        );
+    // --- Renderizado Condicional Original ---
+     if (loading) {
+         return ( // MODIFICADO: Estilo carga consistente
+             <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                 <p className="text-gray-500 animate-pulse">Cargando festival...</p>
+             </div>
+         );
+     }
+
+     if (error) { // MODIFICADO: Pantalla de error consistente
+         return (
+             <div className="min-h-screen flex flex-col bg-gray-50">
+                  <header className="w-full px-4 sm:px-6 py-3 border-b border-gray-100 bg-white"> {/* Header simple */}
+                     <div className="container mx-auto flex justify-between items-center">
+                         <Link to="/inicio" className="flex items-center gap-2"><img src={mflogo} alt="MiFestival Logo" className="w-8 h-8 rounded-md" /><span className="text-lg font-bold text-gray-900">MiFestival</span></Link>
+                         <Link to="/inicio" className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-gray-100"><ArrowLeftIcon className="w-4 h-4" />Volver a Inicio</Link>
+                     </div>
+                 </header>
+                 <main className="flex-grow flex items-center justify-center px-4"><div className="bg-white rounded-lg shadow p-8 text-center max-w-md"><h2 className="text-xl font-semibold text-red-600 mb-4">Error</h2><p className="text-gray-600 mb-6">{error}</p><Link to="/inicio" className="inline-block bg-cyan-500 text-white font-medium py-2 px-5 rounded-md hover:bg-cyan-600 transition">Ir a Inicio</Link></div></main>
+                 <footer className="w-full py-5 text-center text-xs text-gray-400 border-t border-gray-100 mt-auto"><div className="container mx-auto px-4 sm:px-6">© {new Date().getFullYear()} MiFestival por Carlos Cortez.</div></footer>
+             </div>
+         );
+     }
+
+    if (!festival) { // MODIFICADO: Estado "no encontrado" consistente
+        return <div className="min-h-screen flex items-center justify-center bg-gray-50"><p className="text-gray-500">Festival no encontrado.</p></div>;
     }
 
-    if (!festival) {
-        return <p className="text-center text-red-600 mt-10">Festival no encontrado.</p>;
+    // -- Lógica de Permisos Original (Mantenida) --
+    // !! De nuevo, si esta página es PÚBLICA, deberías QUITAR esta validación !!
+    if (!user || (festival.userId !== "invitado" && festival.userId !== user?.uid)) {
+       console.warn("Validación de permiso activa en página de visualización.");
+         return ( // MODIFICADO: Estilo error consistente
+             <div className="min-h-screen flex flex-col bg-gray-50 items-center justify-center p-4">
+                  <img src={mflogo} alt="" className="w-16 h-16 mb-4 rounded-lg opacity-80" />
+                  <p className="text-center text-red-600 font-semibold mb-6">No tienes permiso para ver este festival.</p>
+                  <Link to="/inicio" className="px-5 py-2 rounded-md font-semibold text-white bg-cyan-500 hover:bg-cyan-600 shadow-sm transition">Volver a Inicio</Link>
+              </div>
+         );
     }
+    // -- Fin Lógica de Permisos --
 
-    if (!user || festival.userId !== user.uid) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
-                <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-8 text-center">
-                    <p className="text-lg text-red-600 font-semibold">No tienes permiso para editar este festival.</p>
-                    <Link to="/inicio" className="mt-4 inline-block text-purple-700 underline">Volver al inicio</Link>
-                </div>
-            </div>
-        );
-    }
-
-    const dias = Array.from({ length: festival.days }, (_, i) => `Día ${i + 1}`);
+    // Variables para Render (Originales)
+    const dias = Array.from({ length: festival.days || 0 }, (_, i) => `Día ${i + 1}`);
     const escenarios = festival.stages || [];
 
+
+    // --- JSX Principal (Nuevo Diseño) ---
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
-            {/* Header */}
-            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-30">
-                <div className="flex items-center gap-3">
-                    <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
-                    <span className="text-3xl font-black text-purple-700 tracking-tight">Detalle del Festival</span>
-                </div>
-                <Link
-                    to="/inicio"
-                    className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
-                >
-                    Volver a inicio
-                </Link>
-            </header>
-            <main className="flex-1 flex flex-col lg:flex-row gap-8 px-4 py-12 w-full max-w-7xl mx-auto">
-                {/* Grilla principal */}
-                <section className="flex-1 w-full bg-white bg-opacity-90 rounded-3xl shadow-2xl p-6 md:p-10 max-w-full relative mb-8 lg:mb-0">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                        <div className="flex items-center gap-4">
-                            {festival.imagen && (
-                                <img
-                                    src={festival.imagen}
-                                    alt={festival.name}
-                                    className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-2xl shadow-lg border-4 border-purple-200"
-                                />
-                            )}
-                            <h1 className="text-3xl md:text-4xl font-extrabold text-purple-700">{festival.name}</h1>
-                        </div>
-                        <div className="flex gap-2 mt-4 md:mt-0">
-                            <Link
-                                to={`/editarFestival/${id}`}
-                                className="px-4 md:px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm md:text-base"
-                            >
-                                <span className="inline-flex items-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-1.414.828l-4.243 1.414 1.414-4.243a4 4 0 01.828-1.414z" />
-                                    </svg>
-                                    Editar
-                                </span>
-                            </Link>
-                        </div>
+        // Layout general limpio
+        <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800 font-sans">
+            {/* Header consistente */}
+            <header className="w-full px-4 sm:px-6 py-3 border-b border-gray-100 sticky top-0 z-50 bg-white bg-opacity-95 backdrop-blur-sm">
+                 <div className="container mx-auto flex justify-between items-center">
+                     <div className="flex items-center gap-2 min-w-0"> {/* min-w-0 para truncar texto */}
+                         <img src={mflogo} alt="MiFestival Logo" className="w-8 h-8 rounded-md flex-shrink-0" />
+                         <span className="text-lg font-bold text-gray-900 truncate">{festival.name || 'Detalle del Festival'}</span>
+                     </div>
+                     {/* Botón Volver o Editar según contexto (Lógica original) */}
+                      {user && (festival.userId === user.uid || (user.isGuest && festival.userId === 'invitado')) ? ( // Si es el dueño
+                          <Link
+                              to={`/editarFestival/${id}`} // Enlace directo a editar
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium text-cyan-600 bg-cyan-50 hover:bg-cyan-100 transition whitespace-nowrap"
+                          >
+                              <PencilSquareIcon className="w-4 h-4" />
+                              Editar
+                          </Link>
+                      ) : ( // Si no es el dueño (o no logueado)
+                          <Link
+                              to="/inicio" // O a /home
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-gray-100 transition whitespace-nowrap"
+                          >
+                              <ArrowLeftIcon className="w-4 h-4" />
+                              Volver
+                          </Link>
+                      )}
+                 </div>
+             </header>
+
+            {/* Main Content Layout (2 columnas) */}
+            <main className="flex-grow container mx-auto px-4 sm:px-6 py-8 md:py-12 flex flex-col lg:flex-row gap-8 items-start">
+
+                {/* Columna Izquierda: Grilla */}
+                <section className="flex-grow w-full bg-white rounded-lg shadow border border-gray-100 p-4 md:p-6 overflow-hidden">
+                    {/* Info básica (Estilo consistente) */}
+                    <div className="mb-6 border-b border-gray-100 pb-4">
+                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{festival.name || 'Festival'}</h1>
+                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                              <span className="inline-flex items-center gap-1"><CalendarDaysIcon className="w-4 h-4"/>{dias.length} {dias.length === 1 ? 'día' : 'días'}</span>
+                              <span className="inline-flex items-center gap-1"><MapPinIcon className="w-4 h-4"/>{escenarios.length} {escenarios.length === 1 ? 'escenario' : 'escenarios'}</span>
+                         </div>
                     </div>
-                    <div className="mb-4 flex flex-wrap gap-4 items-center">
-                        <div className="bg-purple-100 px-4 py-2 rounded-lg text-purple-700 font-semibold shadow">
-                            <span className="mr-2">Días:</span>
-                            {dias.length}
-                        </div>
-                        <div className="bg-yellow-100 px-4 py-2 rounded-lg text-yellow-800 font-semibold shadow">
-                            <span className="mr-2">Escenarios:</span>
-                            {escenarios.map((esc, idx) => (
-                                <span
-                                    key={idx}
-                                    className="inline-block bg-yellow-200 text-yellow-900 px-2 py-1 rounded mr-1 text-sm"
-                                >
-                                    {esc}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+
+                    {/* Grilla de solo lectura (Estilo consistente) */}
                     <div className="overflow-x-auto">
-                        <table className="min-w-full border border-purple-200 rounded-lg text-xs md:text-base">
+                        <table className="min-w-full border-collapse">
                             <thead>
                                 <tr>
-                                    <th className="border-b border-purple-200 px-4 py-2 bg-purple-100 text-purple-700">Escenario / Día</th>
-                                    {dias.map((dia, idx) => (
-                                        <th key={idx} className="border-b border-purple-200 px-4 py-2 bg-purple-100 text-purple-700">{dia}</th>
+                                    <th className="sticky left-0 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 text-left z-10">Escenario</th>
+                                    {dias.map((dia) => (
+                                        <th key={dia} className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 text-center">{dia}</th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody>
-                                {escenarios.map((escenario, idxEsc) => (
-                                    <tr key={idxEsc}>
-                                        <td className="border-b border-purple-200 px-4 py-2 font-semibold text-purple-700 bg-purple-50">{escenario}</td>
-                                        {dias.map((dia, idxDia) => (
-                                            <td
-                                                key={idxDia}
-                                                className="border-b border-purple-200 px-4 py-2 bg-white min-w-[100px] md:min-w-[120px]"
-                                            >
-                                                {artistas
-                                                    .filter(a => a.dia === dia && a.escenario === escenario)
-                                                    .map((a, i) => (
-                                                        <div
-                                                            key={i}
-                                                            className="bg-purple-200 rounded px-2 py-1 mb-1 text-purple-900 text-xs md:text-sm flex items-center justify-between"
-                                                        >
-                                                            <span>{a.nombre}</span>
-                                                        </div>
-                                                    ))}
-                                                {artistas.filter(a => a.dia === dia && a.escenario === escenario).length === 0 && (
-                                                    <span className="text-gray-400 italic">Vacío</span>
-                                                )}
-                                            </td>
-                                        ))}
+                            <tbody className="bg-white divide-y divide-gray-100">
+                                {escenarios.map((escenario) => (
+                                    <tr key={escenario}>
+                                        <td className="sticky left-0 bg-white px-3 py-2 text-sm font-semibold text-gray-800 border-b border-gray-100 whitespace-nowrap z-10">{escenario}</td>
+                                        {dias.map((dia) => {
+                                            // Usamos el estado 'artistas' original aquí
+                                            const artistasEnCelda = artistas.filter(a => a.dia === dia && a.escenario === escenario);
+                                            const celdaVacia = artistasEnCelda.length === 0;
+                                            return (
+                                                <td key={`${dia}-${escenario}`} className="px-2 py-2 text-xs border-b border-gray-100 align-top min-w-[120px] md:min-w-[140px] h-24">
+                                                    <div className="space-y-1">
+                                                        {artistasEnCelda.map((a, i) => (
+                                                            <div key={i} className="bg-gray-100 rounded px-2 py-1 text-gray-700 text-xs font-medium truncate">
+                                                                {a.nombre}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    {celdaVacia && <span className="text-gray-300 italic text-xs">Vacío</span>}
+                                                </td>
+                                            );
+                                        })}
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-                    {/* Consejos y ayuda */}
-                    <div className="mt-8 w-full bg-purple-50 rounded-xl p-4 shadow flex flex-col items-center">
-                        <h3 className="text-pink-500 font-bold mb-2 text-lg">¿Sabías que…?</h3>
-                        <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 text-left w-full max-w-md mx-auto">
-                            <li>Puedes editar tu festival en cualquier momento.</li>
-                            <li>Descarga o comparte tu póster para mostrar tu line up.</li>
-                            <li>¡Comparte tu festival con tus amigos!</li>
-                        </ul>
-                    </div>
+                     {/* Sección Tips Original (con nuevo estilo) */}
+                    <div className="mt-8 w-full bg-gray-50 rounded-lg border border-gray-200 p-4">
+                       <h3 className="text-sm font-semibold text-cyan-700 mb-2">¿Te gusta este Lineup?</h3>
+                       <ul className="list-disc list-inside text-gray-600 text-xs space-y-1 pl-2">
+                           <li>Puedes descargar el póster o compartirlo.</li>
+                           <li>Si eres el creador, puedes volver a editarlo.</li>
+                       </ul>
+                   </div>
                 </section>
-                {/* Lateral derecho: Preview del póster */}
-                <aside
-                    className="w-full md:w-[540px] rounded-3xl shadow-2xl p-4 md:p-6 flex-shrink-0 h-fit self-start flex flex-col items-center mt-8 md:mt-0 bg-white bg-opacity-90"
-                    style={{ minWidth: 0, maxWidth: 560 }}
-                >
-                    <h2 className="text-2xl font-bold text-purple-700 mb-4">Vista previa del póster</h2>
-                    <div
-                        ref={posterRef}
-                        className="flex items-center justify-center rounded-3xl overflow-hidden border-2 border-purple-200 w-full md:w-[520px]"
+
+                {/* Columna Derecha: Preview del póster */}
+                <aside className="w-full lg:w-80 xl:w-96 bg-white rounded-lg shadow border border-gray-100 p-4 lg:sticky lg:top-20 flex-shrink-0 space-y-4">
+                    <h2 className="text-base font-semibold text-gray-900">Vista previa del póster</h2>
+
+                    {/* Selector de fondo */}
+                    <div className="w-full">
+                        <label htmlFor="fondo-poster" className="text-sm font-medium text-gray-700 mb-1 block">
+                            Fondo del póster:
+                        </label>
+                        <select
+                            id="fondo-poster"
+                            value={fondoPoster}
+                            onChange={e => setFondoPoster(e.target.value)}
+                            className="w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-cyan-500 focus:border-cyan-500"
+                        >
+                            <option value="city">Ciudad</option>
+                            <option value="beach">Playa</option>
+                            <option value="desert">Desierto</option>
+                        </select>
+                    </div>
+
+                    {/* Preview del póster escalado */}
+                    <div 
+                        className="border border-gray-200 rounded-md overflow-hidden bg-gray-100"
                         style={{
-                            height: "auto",
-                            padding: 0,
-                            background: "none"
+                            width: "100%",
+                            position: "relative",
                         }}
                     >
-                        <PosterFestival
-                            festival={{
-                                ...festival,
-                                artistas: artistas
-                            }}
-                            backgroundType={fondoPoster}
-                        />
+                        <div style={{
+                            width: "100%",
+                            paddingBottom: "108%", // Ratio 1512/1400 = 1.08
+                            position: "relative",
+                        }}>
+                            <div style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                transform: "scale(0.27)", // Escala para que quepa en ~380px
+                                transformOrigin: "top left",
+                            }}>
+                                <PosterFestival
+                                    festival={{
+                                        ...festival,
+                                        artistas: artistas
+                                    }}
+                                    backgroundType={fondoPoster}
+                                />
+                            </div>
+                        </div>
                     </div>
-                    {/* Botones de acción debajo del póster */}
-                    <div className="flex gap-2 mt-4 mb-2 w-full justify-center flex-wrap">
+
+                    {/* Póster para descarga (tamaño real, oculto) */}
+                    <div style={{ position: "absolute", left: "-99999px", top: 0 }}>
+                        <div ref={posterRef}>
+                            <PosterFestival
+                                festival={{
+                                    ...festival,
+                                    artistas: artistas
+                                }}
+                                backgroundType={fondoPoster}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Botones de acción */}
+                    <div className="space-y-2 pt-4 border-t border-gray-100">
+                        {/* Nuevo botón Volver */}
+                        <button
+                            onClick={handleVolver}
+                            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-md shadow-sm hover:bg-gray-50 transition"
+                        >
+                            <ArrowLeftIcon className="w-4 h-4" />
+                            Volver
+                        </button>
+
                         <button
                             onClick={handleDescargarPoster}
-                            className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-semibold border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            className="w-full flex items-center justify-center gap-2 bg-cyan-500 text-white text-sm font-semibold py-2 px-4 rounded-md shadow-sm hover:bg-cyan-600 transition"
                         >
-                            <span className="inline-flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Descargar póster
-                            </span>
+                            <ArrowDownTrayIcon className="w-4 h-4" />
+                            Descargar póster
                         </button>
                         {navigator.share && (
                             <button
                                 onClick={async () => {
                                     if (!posterRef.current) return;
                                     try {
-                                        const dataUrl = await toPng(posterRef.current, { cacheBust: true });
+                                        const dataUrl = await toPng(posterRef.current.firstChild, { pixelRatio: 1, cacheBust: true });
                                         const res = await fetch(dataUrl);
                                         const blob = await res.blob();
-                                        const file = new File([blob], `${festival.name || "poster"}.png`, { type: "image/png" });
-                                        await navigator.share({
-                                            files: [file],
-                                            title: festival.name || "Póster Festival",
-                                            text: `¡Mira el póster de mi festival!\n${window.location.origin}/verfestival/${festival.slug}-${festival.id}`,
-                                        });
+                                        const file = new File([blob], `${generarSlug(festival.name || 'mi-festival')}.png`, { type: 'image/png' });
+                                        const shareUrl = `${window.location.origin}/verfestival/${festival.slug || id}`;
+                                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                            await navigator.share({
+                                                files: [file],
+                                                title: festival.name || 'Poster',
+                                                text: `¡Mira mi lineup para ${festival.name || 'mi festival'}!`,
+                                                url: shareUrl
+                                            });
+                                        } else {
+                                            await navigator.share({
+                                                title: festival.name || 'Poster',
+                                                text: `¡Mira mi lineup para ${festival.name || 'mi festival'}!\n${shareUrl}`,
+                                                url: shareUrl
+                                            });
+                                        }
                                     } catch (err) {
-                                        alert("No se pudo compartir el póster.");
+                                        if (err.name !== 'AbortError') {
+                                            alert('No se pudo compartir.');
+                                        }
+                                        console.error(err);
                                     }
                                 }}
-                                className="px-5 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 font-semibold border-2 border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium py-2 px-4 rounded-md shadow-sm hover:bg-gray-50 transition"
                             >
-                                <span className="inline-flex items-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2M12 15v-6m0 0l-3 3m3-3l3 3" />
-                                    </svg>
-                                    Compartir póster
-                                </span>
+                                <ShareIcon className="w-4 h-4" />
+                                Compartir póster
                             </button>
                         )}
                     </div>
-                    <span className="text-sm text-gray-500 mt-2 text-center">
+                    <span className="text-xs text-gray-400 mt-2 text-center block">
                         Vista previa generada automáticamente.
                     </span>
                 </aside>
+
             </main>
-            {/* Footer */}
-            <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
-                © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
-                <div className="mt-2">
-                    Desarrollado por <a href="https://github.com/CaCortez384" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:underline">Carlos Cortez</a>
-                </div>
+
+            {/* Footer consistente */}
+            <footer className="w-full py-5 text-center text-xs text-gray-400 border-t border-gray-100 mt-auto">
+                 <div className="container mx-auto px-4 sm:px-6">© {new Date().getFullYear()} MiFestival por Carlos Cortez.</div>
             </footer>
         </div>
     );
 };
 
-export default Festival;
+export default Festival; // Mantenemos nombre original

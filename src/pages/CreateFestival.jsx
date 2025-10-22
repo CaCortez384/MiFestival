@@ -1,10 +1,12 @@
 import React, { useState, useContext } from "react";
+// MODIFICADO: Importa updateDoc también
 import { db, auth } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { collection, addDoc, serverTimestamp, doc, updateDoc } from "firebase/firestore";
+import { useNavigate, Link } from "react-router-dom"; // Importa Link
 import mflogo from "../assets/mflogo20.png";
-import mfbanner from "../assets/bailando.webp";
+// import mfbanner from "../assets/bailando.webp"; // Eliminamos banner para un look más limpio
 import { AuthContext } from "../context/AuthContext";
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'; // Icono para volver
 
 function generarSlug(nombre) {
     return nombre
@@ -16,119 +18,137 @@ function generarSlug(nombre) {
 const CreateFestival = () => {
     const [name, setName] = useState("");
     const [days, setDays] = useState(1);
-    const [stages, setStages] = useState(["Escenario Principal"]);
+    // const [stages, setStages] = useState(["Escenario Principal"]); // Mantenemos la lógica original donde escenarios no se definen aquí
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const { user } = useContext(AuthContext);
 
-    const handleAddStage = () => {
-        setStages([...stages, `Escenario ${stages.length + 1}`]);
-    };
-
-    const handleRemoveStage = (index) => {
-        if (stages.length === 1) return;
-        setStages(stages.filter((_, i) => i !== index));
-    };
+    // Eliminamos handleAddStage y handleRemoveStage ya que no hay UI para ellos aquí
 
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+
+        // Validación simple
+        if (!name.trim()) {
+            setError("Por favor, dale un nombre a tu festival.");
+            return;
+        }
+        if (days < 1 || days > 30) {
+            setError("El número de días debe estar entre 1 y 30.");
+            return;
+        }
+
         setLoading(true);
         try {
-            // Permite si es usuario real o invitado
             if (!user) {
                 setError("Debes iniciar sesión o usar modo invitado para crear un festival.");
                 setLoading(false);
                 return;
             }
-            const slug = generarSlug(name); // Genera el slug a partir del nombre
+            const slug = generarSlug(name);
+            const initialStages = ["Escenario Principal"]; // Definimos el escenario inicial aquí
             const docRef = await addDoc(collection(db, "festivals"), {
-                name,
+                name: name.trim(), // Usamos trim()
                 slug,
-                days,
-                stages,
-                fondoPoster: "city",
+                days: Number(days), // Aseguramos que sea número
+                stages: initialStages, // Guardamos el escenario inicial
+                fondoPoster: "city", // Valor por defecto
                 createdAt: serverTimestamp(),
                 userId: user.isGuest ? "invitado" : user.uid,
+                // No guardamos el ID aquí, Firebase lo asigna automáticamente.
+                // Si necesitas el ID *dentro* del documento por alguna razón,
+                // se haría en un paso posterior, pero generalmente no es necesario.
             });
-            navigate(`/editarFestival/${docRef.id}`);
-            await updateDoc(docRef, { id: docRef.id });
+            // No necesitamos updateDoc aquí solo para añadir el ID.
+            navigate(`/editarFestival/${docRef.id}`); // Navega a editar con el ID real
         } catch (error) {
             setError("Error al guardar el festival. Intenta de nuevo.");
-            setLoading(false);
+            console.error("Error creating festival:", error);
+            setLoading(false); // Asegúrate que loading se quite en caso de error
         }
+        // No necesitas setLoading(false) aquí si navegas, pero es buena práctica tenerlo en el catch
     };
 
-    // NUEVO: Ejemplo de inspiración y ayuda
+    // Mantenemos ejemplos, pero podrían eliminarse si buscas ultra-minimalismo
     const ejemplos = [
-        {
-            nombre: "Festival Primavera",
-            dias: 3,
-            escenarios: ["Main Stage", "Electro Garden", "Indie Tent"]
-        },
-        {
-            nombre: "Rock & Colors",
-            dias: 2,
-            escenarios: ["Escenario Central", "Rock Arena"]
-        }
+        { nombre: "Eco Sound Fest", dias: 3 },
+        { nombre: "Noche Urbana", dias: 2 },
     ];
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100">
+        // MODIFICADO: Fondo limpio consistente
+        <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800 font-sans">
             {/* Header */}
-            <header className="w-full px-6 py-4 flex justify-between items-center bg-white bg-opacity-80 shadow-lg sticky top-0 z-10">
-                <div className="flex items-center gap-3">
-                    <img src={mflogo} alt="MiFestival Logo" className="w-12 h-12 rounded-2xl shadow-lg" />
-                    <span className="text-3xl font-black text-purple-700 tracking-tight">MiFestival</span>
+            {/* MODIFICADO: Estilo consistente, botón "Volver" con icono */}
+            <header className="w-full px-4 sm:px-6 py-3 border-b border-gray-100 sticky top-0 z-50 bg-white bg-opacity-95 backdrop-blur-sm">
+                <div className="container mx-auto flex justify-between items-center">
+                    <Link to="/inicio" className="flex items-center gap-2"> {/* Enlace a Inicio (dashboard) */}
+                        <img src={mflogo} alt="MiFestival Logo" className="w-8 h-8 rounded-md" />
+                        <span className="text-lg font-bold text-gray-900 hidden sm:inline">MiFestival</span>
+                    </Link>
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)} // Vuelve a la página anterior
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
+                    >
+                        <ArrowLeftIcon className="w-4 h-4" />
+                        Volver
+                    </button>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => window.history.back()}
-                    className="bg-white text-purple-700 border-2 border-purple-500 font-bold py-2 px-6 rounded-full shadow hover:bg-purple-50 transition"
-                >
-                    Volver
-                </button>
             </header>
 
-            {/* Main */}
-            <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-                <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 max-w-2xl w-full flex flex-col items-center">
-                    <img
-                        src={mfbanner}
-                        alt="Ilustración crear festival"
-                        className="w-32 mb-4 drop-shadow"
-                    />
-                    <h2 className="text-3xl font-extrabold text-purple-700 mb-2 text-center">¡Crea tu festival!</h2>
-                    <p className="text-md text-gray-600 mb-6 text-center">
-                        Personaliza el nombre, los días y los escenarios de tu evento. ¡Hazlo único!
-                    </p>
-                    {/* AVISO SOLO PARA INVITADO */}
-                    {user.isGuest && (
-                        <div className="w-full bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-xl mb-6 text-center font-semibold shadow">
-                            Estás usando el modo invitado. <br />
-                            <span className="font-normal">Los festivales que crees <b>no se guardarán</b> cuando cierres la sesión o recargues la página.</span>
+            {/* Main Content */}
+            {/* MODIFICADO: Centrado, card limpia para el formulario */}
+            <main className="flex-grow flex items-center justify-center px-4 py-12 sm:py-16">
+                <div className="bg-white rounded-lg shadow-lg p-8 sm:p-10 max-w-lg w-full"> {/* max-w-lg para un poco más de espacio */}
+                    <div className="text-center mb-8">
+                        {/* <img src={mflogo} alt="" className="w-16 h-16 mx-auto mb-4 rounded-lg"/> */}
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">Crea Tu Nuevo Festival</h1>
+                        <p className="text-sm text-gray-500">
+                            Define los detalles básicos para empezar a diseñar.
+                        </p>
+                    </div>
+
+                    {/* Aviso Invitado */}
+                    {user?.isGuest && ( // Añadido '?' por seguridad
+                         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm rounded-md p-4 mb-6 flex items-start gap-3">
+                           <span className="mt-0.5">⚠️</span>
+                           <div>
+                             <span className="font-semibold">Modo Invitado:</span> Tus festivales se perderán al cerrar o recargar. <Link to="/register" className="font-medium underline hover:text-yellow-900">Regístrate gratis</Link> para guardarlos.
+                           </div>
+                         </div>
+                    )}
+
+                    {/* Mensaje de Error */}
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded p-3 mb-4 text-center">
+                            {error}
                         </div>
                     )}
-                    {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
-                    <form onSubmit={handleSubmit} className="w-full space-y-6">
+
+                    {/* Formulario */}
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-base font-semibold text-gray-700 mb-2">
-                                Nombre del festival *
+                            <label htmlFor="festival-name" className="block text-sm font-medium text-gray-700 mb-1">
+                                Nombre del Festival <span className="text-red-500">*</span>
                             </label>
                             <input
+                                id="festival-name"
                                 type="text"
-                                placeholder="Ej: Festival Primavera"
+                                placeholder="Ej: Festival del Sol"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-5 py-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-gray-700 bg-purple-50"
                                 required
+                                // MODIFICADO: Estilo de input consistente
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition duration-150 ease-in-out"
                             />
                         </div>
                         <div>
-                            <label className="block text-base font-semibold text-gray-700 mb-2">
-                                Días del festival *
+                            <label htmlFor="festival-days" className="block text-sm font-medium text-gray-700 mb-1">
+                                Número de Días <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -139,55 +159,53 @@ const CreateFestival = () => {
                                     const val = e.target.value;
                                     setDays(val === "" ? 0 : Number(val));
                                 }}
-                                className="w-36 px-4 py-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-gray-700 bg-purple-50"
                                 required
+                            
+                                // MODIFICADO: Input más pequeño y consistente
+                                className="w-24 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition duration-150 ease-in-out"
                             />
+                             <p className="text-xs text-gray-500 mt-1">Entre 1 y 30 días.</p>
                         </div>
-                        {/* Escenarios eliminados */}
+
+                        {/* Botón Crear */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-bold py-3 rounded-full shadow-lg hover:scale-105 transition text-lg"
+                            // MODIFICADO: Botón principal consistente
+                             className={`w-full text-center bg-cyan-500 text-white font-semibold py-2.5 px-4 rounded-md shadow-sm transition duration-150 ease-in-out ${
+                                loading
+                                  ? 'opacity-70 cursor-not-allowed'
+                                  : 'hover:bg-cyan-600'
+                              }`}
                         >
-                            {loading ? "Creando..." : "Crear festival"}
+                            {loading ? "Creando..." : "Crear y Añadir Artistas"}
                         </button>
                     </form>
 
-                    {/* Inspiración */}
-                    <div className="mt-8 w-full bg-yellow-50 rounded-xl p-4 shadow flex flex-col items-center">
-                        <h3 className="text-purple-700 font-bold mb-2 text-lg">¿Necesitas inspiración?</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                            {ejemplos.map((ej, idx) => (
-                                <div key={idx} className="bg-white rounded-xl shadow p-4 flex flex-col items-start">
-                                    <span className="font-bold text-pink-500">{ej.nombre}</span>
-                                    <span className="text-sm text-gray-600">Días: {ej.dias}</span>
-                                    <span className="text-sm text-gray-600">Escenarios: {ej.escenarios.join(", ")}</span>
-                                </div>
-                            ))}
-                        </div>
+                     {/* Sección Inspiración (Opcional, diseño simple) */}
+                    <div className="mt-8 pt-6 border-t border-gray-100">
+                         <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">¿Necesitas Ideas?</h3>
+                         <div className="flex justify-center gap-4">
+                             {ejemplos.map((ej, idx) => (
+                                 <div key={idx} className="bg-gray-50 rounded-md p-3 text-center text-xs">
+                                     <span className="font-semibold text-gray-800 block">{ej.nombre}</span>
+                                     <span className="text-gray-500">{ej.dias} días</span>
+                                 </div>
+                             ))}
+                         </div>
                     </div>
 
-                    {/* Consejos */}
-                    <div className="mt-8 w-full bg-purple-50 rounded-xl p-4 shadow flex flex-col items-center">
-                        <h3 className="text-pink-500 font-bold mb-2 text-lg">¿Sabías que…?</h3>
-                        <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 text-left w-full max-w-md mx-auto">
-                            <li>Puedes editar los escenarios y días después.</li>
-                            <li>¡Agrega tantos escenarios como quieras!</li>
-                            <li>Comparte tu festival con tus amigos al terminar.</li>
-                            <li>Pronto podrás añadir artistas y horarios personalizados.</li>
-                        </ul>
-                    </div>
-
+                    {/* Eliminamos sección "Consejos" para simplificar */}
                 </div>
             </main>
 
             {/* Footer */}
-            <footer className="w-full py-6 text-center text-sm text-gray-500 bg-white bg-opacity-70 backdrop-blur border-t">
-                © {new Date().getFullYear()} <span className="font-bold text-purple-700">MiFestival</span> · Crea tu experiencia musical
-                <div className="mt-2">
-                    Desarrollado por <a href="https://github.com/CaCortez384" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:underline">Carlos Cortez</a>
-                </div>
-            </footer>
+            {/* MODIFICADO: Minimalista consistente */}
+            <footer className="w-full py-5 text-center text-xs text-gray-400 border-t border-gray-100 mt-auto">
+                 <div className="container mx-auto px-4 sm:px-6">
+                   © {new Date().getFullYear()} MiFestival por Carlos Cortez.
+                 </div>
+             </footer>
         </div>
     );
 };

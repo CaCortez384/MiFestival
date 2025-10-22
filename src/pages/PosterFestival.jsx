@@ -2,7 +2,6 @@ import cityImg from "../assets/City.svg";
 import beachImg from "../assets/Beach.svg";
 import desertImg from "../assets/Desert.svg";
 
-
 // Utilidad para obtener los nombres de los días y fechas próximas
 const diasSemana = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 function getDiasFestival(numDias) {
@@ -38,184 +37,269 @@ const PosterFestival = ({ festival, backgroundType = "city" }) => {
     const artistas = festival.artistas || [];
     const diasConArtistas = agruparArtistasPorDia(artistas, dias);
 
-    // Paleta y fuentes mejoradas
+    // Colores
     const colorHeadliner = "#FFD700";
     const colorSecundario = "#FC6AFD";
-    const colorFondo = "#0c0032";
     const colorSombras = "#00000099";
-    const fontHeadliner = "'Passion One', Impact, sans-serif";
-    const fontSecundario = "'Secuela', 'Montserrat', sans-serif";
-    const fontFestival = "'Ganache', 'Bebas Neue', sans-serif";
 
-    // Ajustes de tamaño y scroll
-    const POSTER_WIDTH = 520;
-    // const POSTER_HEIGHT = 740; // Elimina esta línea
+    // DIMENSIONES FIJAS como en Python
+    const POSTER_WIDTH = 1400;
+    const POSTER_HEIGHT = 1512; // Ratio similar a Instafest
+
+    // Posiciones Y calculadas (similar al código Python)
+    let yOffset = 80; // Inicio del contenido
+    const headlinerSpacing = 320; // Espacio entre cada día
 
     return (
-
-        <div
+        <div 
             style={{
                 width: POSTER_WIDTH,
-                height: "auto",
-                minHeight: 600, // <-- Mínimo de altura para mostrar el diseño inferior
-                background: `radial-gradient(ellipse at 50% 20%, #2c0161 60%, #0c0032 100%)`,
+                height: POSTER_HEIGHT,
+                backgroundColor: "#0c0032",
                 position: "relative",
-                boxShadow: "0 8px 32px 0 #00000044",
                 overflow: "hidden",
-                borderRadius: 24,
-                display: "flex",
-                flexDirection: "column",
-                paddingTop: 32,
-                paddingBottom: 48,
             }}
-            className="text-white mx-auto"
         >
+            {/* Imagen de fondo */}
             <img
                 src={backgroundImg}
                 alt=""
-                className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
-                style={{ zIndex: 0 }}
+                style={{ 
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    opacity: 0.6,
+                    zIndex: 0,
+                }}
             />
-            <div
-                className="relative z-10 flex-1 flex flex-col px-6 pt-8 pb-6"
-                style={{
-                    overflowY: "visible", // Cambia a visible
-                    // maxHeight: POSTER_HEIGHT - 48, // Elimina esta línea
+
+            {/* Nombre del festival */}
+            <div 
+                style={{ 
+                    position: "absolute",
+                    top: 20,
+                    left: 0,
+                    width: "100%",
+                    textAlign: "center",
+                    fontFamily: "Ganache, 'Bebas Neue', sans-serif",
+                    fontSize: 110,
+                    color: "#fff",
+                    textShadow: `0 4px 12px ${colorSombras}, 0 2px 0 ${colorSecundario}`,
+                    zIndex: 10,
+                    fontWeight: 900,
                 }}
             >
-                {/* Nombre del festival */}
-                <div
-                    className="text-5xl md:text-6xl text-center font-black tracking-wide drop-shadow-lg mb-2"
-                    style={{
-                        fontFamily: fontFestival,
-                        letterSpacing: 2,
-                        color: "#fff",
-                        textShadow: `0 4px 24px ${colorSombras}, 0 2px 0 #FC6AFD`,
-                        wordBreak: "break-word"
-                    }}
-                >
-                    {festival.name}
-                </div>
-                {/* Fechas y escenarios */}
-                <div className="flex flex-wrap justify-center gap-2 mb-4">
-                    <span
-                        className="bg-[#FC6AFD] bg-opacity-80 text-white px-4 py-1 rounded-full text-xs font-bold shadow"
-                        style={{ fontFamily: fontSecundario, letterSpacing: 1 }}
-                    >
-                        {dias.map(d => d.fecha).join(" / ")}
-                    </span>
-                    {festival.stages && festival.stages.length > 1 && (
-                        <span
-                            className="bg-[#FFD700] bg-opacity-80 text-[#2c0161] px-4 py-1 rounded-full text-xs font-bold shadow"
-                            style={{ fontFamily: fontSecundario, letterSpacing: 1 }}
+                {festival.name}
+            </div>
+
+            {/* Presented by / fechas */}
+            <div 
+                style={{
+                    position: "absolute",
+                    top: 180,
+                    left: 0,
+                    width: "100%",
+                    textAlign: "center",
+                    fontFamily: "Secuela, Montserrat, sans-serif",
+                    fontSize: 40,
+                    color: colorSecundario,
+                    zIndex: 10,
+                    fontWeight: 700,
+                }}
+            >
+                {dias.map(d => d.fecha).join(" / ")}
+            </div>
+
+            {/* Lineup por día - posicionamiento absoluto */}
+            {diasConArtistas.map((dia, idx) => {
+                const currentY = 300 + (idx * headlinerSpacing);
+                const dayX = 50;
+                const dateX = POSTER_WIDTH - 280;
+                
+                return (
+                    <div key={dia.nombre + idx}>
+                        {/* Día de la semana (izquierda) */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: currentY + 60,
+                                left: dayX,
+                                fontFamily: "Secuela, Montserrat, sans-serif",
+                                fontSize: 60,
+                                color: colorSecundario,
+                                fontWeight: 700,
+                                zIndex: 10,
+                            }}
                         >
-                            {festival.stages.join(" • ")}
-                        </span>
-                    )}
-                </div>
-                {/* Lineup por día */}
-                <div className="flex flex-col gap-6">
-                    {diasConArtistas.map((dia, idx) => (
-                        <div className="text-center" key={dia.nombre + idx}>
-                            <div className="flex items-center justify-center mb-2 gap-2">
-                                <div
-                                    className="shrink text-base font-bold w-14"
-                                    style={{
-                                        color: colorSecundario,
-                                        fontFamily: fontSecundario,
-                                        letterSpacing: 2,
-                                        textShadow: `0 2px 8px ${colorSombras}`
-                                    }}
-                                >
-                                    {dia.nombre}
-                                </div>
-                                <div className="flex-1">
-                                    <h1
-                                        className="text-3xl md:text-4xl font-black uppercase tracking-wider"
-                                        style={{
-                                            fontFamily: fontHeadliner,
-                                            color: colorHeadliner,
-                                            textShadow: `0 6px 24px ${colorSombras}, 0 2px 0 #fff`,
-                                            wordBreak: "break-word"
-                                        }}
-                                    >
-                                        {dia.artistas[0] || "Headliner"}
-                                    </h1>
-                                </div>
-                                <div
-                                    className="shrink text-base font-bold w-14"
-                                    style={{
-                                        color: colorSecundario,
-                                        fontFamily: fontSecundario,
-                                        letterSpacing: 2,
-                                        textShadow: `0 2px 8px ${colorSombras}`
-                                    }}
-                                >
-                                    {dia.fecha}
-                                </div>
-                            </div>
-                            {/* Artistas secundarios */}
+                            {dia.nombre}
+                        </div>
+
+                        {/* Headliner (centro) */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: currentY,
+                                left: 0,
+                                width: "100%",
+                                textAlign: "center",
+                                fontFamily: "'Passion One', Impact, sans-serif",
+                                fontSize: 90,
+                                color: colorHeadliner,
+                                textShadow: `0 4px 12px ${colorSombras}, 0 2px 0 #fff`,
+                                textTransform: "uppercase",
+                                fontWeight: 900,
+                                zIndex: 10,
+                            }}
+                        >
+                            {dia.artistas[0] || "HEADLINER"}
+                        </div>
+
+                        {/* Fecha (derecha) */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: currentY + 60,
+                                left: dateX,
+                                fontFamily: "Secuela, Montserrat, sans-serif",
+                                fontSize: 60,
+                                color: colorSecundario,
+                                fontWeight: 700,
+                                zIndex: 10,
+                            }}
+                        >
+                            {dia.fecha}
+                        </div>
+
+                        {/* Artistas secundarios - Primera línea */}
+                        {dia.artistas.length > 1 && (
                             <div
-                                className="flex flex-wrap justify-center gap-x-2 gap-y-1 text-lg md:text-xl mt-2 font-bold"
                                 style={{
-                                    fontFamily: fontSecundario,
+                                    position: "absolute",
+                                    top: currentY + 145,
+                                    left: 0,
+                                    width: "100%",
+                                    textAlign: "center",
+                                    fontFamily: "Secuela, Montserrat, sans-serif",
+                                    fontSize: 50,
                                     color: "#fff",
-                                    textShadow: `0 2px 8px ${colorSombras}`,
-                                    maxWidth: "90%",
-                                    margin: "0 auto"
+                                    textShadow: `0 2px 6px ${colorSombras}`,
+                                    fontWeight: 700,
+                                    zIndex: 10,
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    padding: "0 100px",
                                 }}
                             >
-                                {dia.artistas.slice(1, 7).map((art, i) => (
-                                    <span key={art + i} style={{ whiteSpace: "nowrap" }}>
+                                {dia.artistas.slice(1, 4).map((art, i, arr) => (
+                                    <span key={art + i}>
                                         {art}
-                                        {i < 6 && dia.artistas.length > i + 2 && (
+                                        {i < arr.length - 1 && (
                                             <span style={{ color: colorSecundario }}> • </span>
                                         )}
                                     </span>
                                 ))}
                             </div>
-                            {/* Artistas extra */}
-                            {dia.artistas.length > 8 && (
-                                <div
-                                    className="flex flex-wrap justify-center gap-x-2 gap-y-1 text-base md:text-lg mt-1 opacity-90 font-medium"
-                                    style={{
-                                        fontFamily: fontSecundario,
-                                        color: "#e0e0e0",
-                                        textShadow: `0 1px 4px ${colorSombras}`,
-                                        maxWidth: "92%",
-                                        margin: "0 auto"
-                                    }}
-                                >
-                                    {dia.artistas.slice(7).map((art, i, arr) => (
-                                        <span key={art + i} style={{ whiteSpace: "nowrap" }}>
-                                            {art}
-                                            {i < arr.length - 1 && <span style={{ color: colorSecundario }}> • </span>}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </div>
-            {/* Marca inferior */}
-            <div
-                className="absolute bottom-0 left-0 w-full flex items-center justify-center py-2"
+                        )}
+
+                        {/* Artistas secundarios - Segunda línea */}
+                        {dia.artistas.length > 4 && (
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: currentY + 216,
+                                    left: 0,
+                                    width: "100%",
+                                    textAlign: "center",
+                                    fontFamily: "Secuela, Montserrat, sans-serif",
+                                    fontSize: 40,
+                                    color: "#fff",
+                                    textShadow: `0 1px 4px ${colorSombras}`,
+                                    fontWeight: 600,
+                                    zIndex: 10,
+                                    opacity: 0.9,
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    padding: "0 80px",
+                                }}
+                            >
+                                {dia.artistas.slice(4, 9).map((art, i, arr) => (
+                                    <span key={art + i}>
+                                        {art}
+                                        {i < arr.length - 1 && (
+                                            <span style={{ color: colorSecundario }}> • </span>
+                                        )}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Artistas secundarios - Tercera línea */}
+                        {dia.artistas.length > 9 && (
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: currentY + 260,
+                                    left: 0,
+                                    width: "100%",
+                                    textAlign: "center",
+                                    fontFamily: "Secuela, Montserrat, sans-serif",
+                                    fontSize: 30,
+                                    color: "#fff",
+                                    textShadow: `0 1px 4px ${colorSombras}`,
+                                    fontWeight: 600,
+                                    zIndex: 10,
+                                    opacity: 0.9,
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    padding: "0 80px",
+                                }}
+                            >
+                                {dia.artistas.slice(9, 14).map((art, i, arr) => (
+                                    <span key={art + i}>
+                                        {art}
+                                        {i < arr.length - 1 && (
+                                            <span style={{ color: colorSecundario }}> • </span>
+                                        )}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+
+            {/* Footer */}
+            <div 
                 style={{
-                    background: "linear-gradient(90deg, #2c0161cc 0%, #FC6AFDcc 100%)",
-                    zIndex: 20
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: 410,
+                    height: 124,
+                    background: "rgba(44, 1, 97, 0.75)",
+                    borderTopRightRadius: 10,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 20,
                 }}
             >
-                <span
-                    className="text-xs font-bold tracking-widest uppercase"
+                <span 
                     style={{
-                        fontFamily: fontSecundario,
-                        color: "#FFD700",
+                        fontFamily: "Secuela, Montserrat, sans-serif",
+                        color: colorHeadliner,
+                        fontSize: 32,
+                        fontWeight: 700,
                         letterSpacing: 2,
-                        textShadow: `0 1px 4px ${colorSombras}`
                     }}
                 >
-                    mifestival.web.app
+                    MIFESTIVAL.WEB.APP
                 </span>
             </div>
         </div>
