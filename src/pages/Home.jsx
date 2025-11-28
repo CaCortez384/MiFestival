@@ -65,10 +65,10 @@ const Home = () => {
 
       {/* Hero Section */}
       {/* MODIFICADO: Texto MUY claro y directo, CTAs grandes y contrastados, imagen como soporte visual */}
-      <section className="flex-grow flex items-center py-16 md:py-24">
-        <div className="container mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+      <section className="flex-grow flex py-16 md:py-24">
+        <div className="container mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-stretch">
           {/* Columna de Texto - Enfocada en la acción */}
-          <div className="text-center md:text-left">
+          <div className="text-center md:text-left flex flex-col justify-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 leading-tight">
               Crea <span className="text-cyan-600">Pósters</span> de Festivales Únicos.
             </h1>
@@ -99,11 +99,11 @@ const Home = () => {
           </div>
 
           {/* Columna de Imagen - Soporte visual claro */}
-          <div className="flex justify-center items-center px-4">
+          <div className="px-4 h-full">
             <img
               src={banner} // Reutilizamos la imagen banner existente
               alt="Ejemplo visual de posters de MiFestival"
-              className="w-full max-w-lg rounded-lg shadow-xl" // Sombra más marcada
+              className="w-full h-full rounded-lg object-cover"
             />
           </div>
         </div>
