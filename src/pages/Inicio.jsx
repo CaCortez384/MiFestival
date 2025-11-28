@@ -1,85 +1,101 @@
 import { useContext } from "react";
-import { Navigate, Link } from "react-router-dom"; // Import Link
+import { Navigate, Link } from "react-router-dom";
 import { auth } from "../firebase";
 import mflogo from "../assets/mflogo20.png";
-// import mfbanner from "../assets/bailando.webp"; // Eliminamos el banner para un look más limpio
 import { AuthContext } from "../context/AuthContext";
-// NUEVO: Importamos iconos (Asegúrate que @heroicons/react está instalado o usa emojis)
-import { PlusCircleIcon, ListBulletIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+// Iconos
+import { 
+  PlusCircleIcon, 
+  ListBulletIcon, 
+  UserCircleIcon, 
+  ArrowRightOnRectangleIcon, 
+  ExclamationTriangleIcon,
+  SparklesIcon,
+  FireIcon,
+  ShareIcon
+} from '@heroicons/react/24/outline';
 
-// MODIFICADO: Acciones rápidas con iconos importados y sin colores de fondo complejos
 const quickActions = [
   {
     title: "Crear Nuevo Festival",
     desc: "Empieza a diseñar tu próximo evento.",
-    icon: <PlusCircleIcon className="w-8 h-8 text-cyan-600 mb-2" />, // Icono
+    icon: <PlusCircleIcon className="w-10 h-10 text-cyan-400 mb-3 group-hover:scale-110 transition-transform duration-300" />,
     href: "/crear-festival",
-    disabled: false, // Asegurarse que esté habilitado
+    disabled: false,
+    colorClass: "hover:border-cyan-500/50 hover:bg-cyan-500/10"
   },
   {
     title: "Mis Festivales",
     desc: "Ver y editar tus creaciones guardadas.",
-    icon: <ListBulletIcon className="w-8 h-8 text-cyan-600 mb-2" />, // Icono
+    icon: <ListBulletIcon className="w-10 h-10 text-purple-400 mb-3 group-hover:scale-110 transition-transform duration-300" />,
     href: "/mis-festivales",
     disabled: false,
+    colorClass: "hover:border-purple-500/50 hover:bg-purple-500/10"
   },
   {
     title: "Mi Perfil",
-    desc: "Gestiona tu información de cuenta.",
-    icon: <UserCircleIcon className="w-8 h-8 text-gray-400 mb-2" />, // Icono gris (deshabilitado)
-    href: "#", // Enlace '#' ya que está deshabilitado funcionalmente por ahora
-    disabled: true // Mantenemos deshabilitado funcionalmente, pero lo mostraremos
+    desc: "Estadísticas y ajustes de cuenta.",
+    icon: <UserCircleIcon className="w-10 h-10 text-gray-500 mb-3" />,
+    href: "#",
+    disabled: true,
+    colorClass: ""
   }
 ];
 
-// Eliminamos la lista de tips por simplicidad
+// Datos falsos para la sección de inspiración visual
+const inspirationIdeas = [
+    { title: "Indie Sunset", gradient: "from-orange-400 to-pink-600", tag: "Playa" },
+    { title: "Neon Cyberpunk", gradient: "from-cyan-400 to-blue-800", tag: "Ciudad" },
+    { title: "Desert Dust", gradient: "from-yellow-400 to-orange-700", tag: "Desierto" },
+];
 
 const Inicio = () => {
   const { user, setUser } = useContext(AuthContext);
 
-  // Pantalla de carga mientras se verifica el usuario
   if (user === undefined) {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <p className="text-gray-500">Cargando...</p> {/* Mensaje simple */}
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
+        <p className="text-gray-400 animate-pulse">Cargando...</p>
+      </div>
     );
   }
-  // Redirige si no hay usuario
-  if (!user) return <Navigate to="/home" replace />; // Usa replace para no guardar en historial
+  
+  if (!user) return <Navigate to="/home" replace />;
 
-  // Cierre de sesión (sin cambios lógicos)
   const handleLogout = async () => {
     try {
         if (user.isGuest) {
-            setUser(null); // Limpia el usuario invitado del contexto
-            // No necesitamos navegar aquí, el componente se re-renderizará y el !user redirigirá
+            setUser(null);
         } else {
             await auth.signOut();
-            // El onAuthStateChanged se encargará de actualizar el user a null,
-            // y el componente se re-renderizará, redirigiendo
         }
     } catch (error) {
         console.error("Error al cerrar sesión:", error);
-        // Podrías mostrar un mensaje al usuario aquí si falla el signOut
     }
   };
 
   return (
-    // MODIFICADO: Fondo limpio consistente
-    <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800 font-sans">
-      {/* Header */}
-      {/* MODIFICADO: Estilo consistente, botón de cerrar sesión */}
-      <header className="w-full px-4 sm:px-6 py-3 border-b border-gray-100 sticky top-0 z-50 bg-white bg-opacity-95 backdrop-blur-sm">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={mflogo} alt="MiFestival Logo" className="w-8 h-8 rounded-md" />
-            <span className="text-lg font-bold text-gray-900">MiFestival</span>
+    <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white font-sans selection:bg-cyan-500 selection:text-white relative overflow-hidden">
+      
+      {/* Luces de fondo */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute top-[10%] left-[20%] w-[40%] h-[40%] bg-purple-900/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[10%] right-[10%] w-[30%] h-[30%] bg-cyan-900/10 rounded-full blur-[100px]"></div>
+      </div>
+
+      {/* --- HEADER --- */}
+      <header className="w-full px-6 py-4 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md bg-[#0B0F19]/80">
+        <div className="container mx-auto flex justify-between items-center max-w-7xl">
+          <Link to="/" className="flex items-center gap-3 group">
+             <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg blur opacity-40 group-hover:opacity-100 transition duration-200"></div>
+                <img src={mflogo} alt="MiFestival Logo" className="relative w-9 h-9 rounded-lg" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">MiFestival</span>
           </Link>
           <button
             onClick={handleLogout}
-            // MODIFICADO: Botón simple para cerrar sesión
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition border border-transparent hover:border-white/10"
           >
             <ArrowRightOnRectangleIcon className="w-4 h-4" />
             Salir
@@ -87,66 +103,132 @@ const Inicio = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow container mx-auto px-4 sm:px-6 py-12 md:py-16">
-        <div className="max-w-3xl mx-auto"> {/* Centra el contenido */}
-          {/* Mensaje de Bienvenida */}
-          <div className="mb-10 text-center md:text-left">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              ¡Hola, {user.displayName || "Usuario"}!
+      {/* --- MAIN CONTENT --- */}
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-12 md:py-16 max-w-6xl">
+        
+        {/* Bienvenida + CTA Texto */}
+        <div className="mb-12 text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-6">
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 tracking-tight">
+              Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">{user.displayName || "Usuario"}</span>
             </h1>
-            <p className="text-lg text-gray-600">
-              Bienvenido a tu panel de MiFestival. ¿Qué quieres hacer hoy?
+            <p className="text-lg text-gray-400 max-w-xl">
+              El escenario está listo. Crea lineups épicos, comparte con amigos y viraliza tu gusto musical.
             </p>
           </div>
-
-          {/* Aviso Invitado */}
-          {/* MODIFICADO: Estilo más sutil y alineado */}
-          {user.isGuest && (
-            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm rounded-md p-4 mb-8 flex items-start gap-3">
-              <span className="mt-0.5">⚠️</span> {/* Emoji o icono */}
-              <div>
-                <span className="font-semibold">Modo Invitado:</span> Tus festivales se perderán al cerrar o recargar la página. <Link to="/register" className="font-medium underline hover:text-yellow-900">Regístrate gratis</Link> para guardarlos.
-              </div>
-            </div>
-          )}
-
-          {/* Acciones Rápidas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {quickActions.map((action, i) => (
-              <Link
-                key={i}
-                to={action.disabled ? '#' : action.href} // Enlace '#' si está deshabilitado
-                // MODIFICADO: Tarjetas limpias, estilo hover sutil
-                className={`
-                  block bg-white rounded-lg shadow border border-gray-100 p-6 transition duration-200 ease-in-out
-                  ${action.disabled
-                    ? 'opacity-60 cursor-not-allowed grayscale' // Estilo deshabilitado
-                    : 'hover:shadow-md hover:border-gray-200 hover:-translate-y-1' // Estilo habilitado hover
-                  }
-                `}
-                onClick={(e) => action.disabled && e.preventDefault()} // Previene navegación si está deshabilitado
-                aria-disabled={action.disabled}
-              >
-                {action.icon}
-                <h3 className="text-base font-semibold text-gray-900 mb-1">{action.title}</h3>
-                <p className="text-sm text-gray-500">{action.desc}</p>
-              </Link>
-            ))}
-          </div>
-
-          {/* Eliminamos la sección de Tips */}
-
+          {/* Botón CTA extra para móviles o acceso rápido visual */}
+          <Link to="/crear-festival" className="hidden md:flex items-center gap-2 bg-white text-[#0B0F19] px-6 py-3 rounded-full font-bold hover:bg-cyan-400 transition shadow-lg shadow-white/5">
+            <SparklesIcon className="w-5 h-5" />
+            Nuevo Proyecto
+          </Link>
         </div>
+
+        {/* Aviso Invitado */}
+        {user.isGuest && (
+          <div className="bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-sm rounded-xl p-4 mb-10 flex items-start gap-4 animate-fade-in-up">
+            <div className="bg-yellow-500/20 p-2 rounded-lg text-yellow-400 shrink-0">
+               <ExclamationTriangleIcon className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-bold text-yellow-400 text-sm mb-1">Modo Invitado Activo</h4>
+              <p className="text-yellow-200/80 text-sm">
+                Tus festivales no se guardarán si cierras el navegador. <Link to="/register" className="text-white font-bold underline hover:text-cyan-400 transition">Regístrate gratis</Link> para guardarlos.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* --- SECTION 1: ACCIONES PRINCIPALES --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          {quickActions.map((action, i) => (
+            <Link
+              key={i}
+              to={action.disabled ? '#' : action.href}
+              className={`
+                group relative block bg-white/5 border border-white/10 rounded-2xl p-8 transition-all duration-300 ease-in-out overflow-hidden
+                ${action.disabled
+                  ? 'opacity-50 cursor-not-allowed grayscale'
+                  : `hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-900/20 ${action.colorClass}`
+                }
+              `}
+              onClick={(e) => action.disabled && e.preventDefault()}
+            >
+              {!action.disabled && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-300"></div>
+              )}
+              <div className="relative z-10">
+                  {action.icon}
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">{action.title}</h3>
+                  <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors leading-relaxed">{action.desc}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* --- SECTION 2: INSPIRACIÓN VISUAL (NUEVO) --- */}
+        {/* Esto llena el vacío visual y da ideas */}
+        <div className="mb-16">
+            <div className="flex items-center gap-3 mb-6">
+                <FireIcon className="w-6 h-6 text-orange-500" />
+                <h2 className="text-2xl font-bold text-white">Inspiración Trending</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {inspirationIdeas.map((item, idx) => (
+                    <Link to="/crear-festival" key={idx} className="group relative aspect-[3/4] md:aspect-video lg:aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-cyan-500/20 transition-all duration-500 hover:-translate-y-1">
+                        {/* Background Gradient simulando póster */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-80 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                        
+                        {/* Overlay Content */}
+                        <div className="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
+                            <span className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1 border border-white/20 px-2 py-1 rounded-md w-fit backdrop-blur-sm">{item.tag}</span>
+                            <h3 className="text-2xl font-bold text-white">{item.title}</h3>
+                            <p className="text-sm text-white/80 mt-2 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                                Usar este estilo →
+                            </p>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+        </div>
+
+        {/* --- SECTION 3: PRO TIPS (TEXTO DE RELLENO ÚTIL) --- */}
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 md:p-10 relative overflow-hidden">
+            {/* Elemento decorativo de fondo */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]"></div>
+            
+            <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+                <div className="bg-purple-500/20 p-4 rounded-xl shrink-0">
+                    <SparklesIcon className="w-8 h-8 text-purple-300" />
+                </div>
+                <div>
+                    <h3 className="text-xl font-bold text-white mb-3">¿Cómo hacer que tu cartel sea viral?</h3>
+                    <ul className="space-y-3 text-gray-400 text-sm">
+                        <li className="flex items-start gap-2">
+                            <span className="text-cyan-400">•</span>
+                            <span>Mezcla géneros inesperados para generar debate en los comentarios.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-cyan-400">•</span>
+                            <span>Usa los "Headliners" (letras grandes) para tus artistas top del momento.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-cyan-400">•</span>
+                            <span>Comparte en Stories etiquetando a tus amigos para que hagan su versión.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
       </main>
 
-      {/* Footer */}
-      {/* MODIFICADO: Minimalista consistente */}
-       <footer className="w-full py-5 text-center text-xs text-gray-400 border-t border-gray-100 mt-auto">
-         <div className="container mx-auto px-4 sm:px-6">
-           © {new Date().getFullYear()} MiFestival por Carlos Cortez.
-         </div>
-       </footer>
+      {/* --- FOOTER --- */}
+      <footer className="w-full py-6 text-center text-xs text-gray-500 border-t border-white/5 bg-[#0B0F19]">
+        <div className="container mx-auto px-4">
+          © {new Date().getFullYear()} MiFestival.
+        </div>
+      </footer>
     </div>
   );
 };
