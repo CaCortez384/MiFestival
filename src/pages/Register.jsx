@@ -121,7 +121,7 @@ function Register() {
           )}
 
           {/* Formulario */}
-          <form onSubmit={handleRegister} className="space-y-5">
+          <form onSubmit={handleRegister} id='register-form' className="space-y-5">
             
             {/* Input Nombre */}
             <div>

@@ -129,7 +129,7 @@ const CreateFestival = () => {
                     )}
 
                     {/* Formulario */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} id="create-festival" className="space-y-6">
                         
                         {/* Input Nombre */}
                         <div>
@@ -180,7 +180,8 @@ const CreateFestival = () => {
                         </div>
 
                         {/* Botón Crear */}
-                        <button
+                        <button 
+                            id="create-festival"
                             type="submit"
                             disabled={loading}
                             className={`w-full text-center bg-cyan-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-200 transform hover:-translate-y-0.5 ${
