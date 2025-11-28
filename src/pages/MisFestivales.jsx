@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../firebase';
 import { useNavigate, Link } from 'react-router-dom';
 import mflogo from "../assets/mflogo20.png";
-// Iconos
-import { ArrowLeftIcon, PlusIcon, PencilSquareIcon, TrashIcon, TicketIcon, CalendarDaysIcon, MapPinIcon } from '@heroicons/react/24/outline';
+// Iconos: Agregamos HeartIcon
+import { ArrowLeftIcon, PlusIcon, PencilSquareIcon, TrashIcon, TicketIcon, CalendarDaysIcon, MapPinIcon, GlobeAltIcon, LockClosedIcon, HeartIcon } from '@heroicons/react/24/outline';
 
 const MisFestivales = () => {
     const [festivales, setFestivales] = useState([]);
@@ -62,6 +62,29 @@ const MisFestivales = () => {
         }
     };
 
+    const handleTogglePublic = async (festival) => {
+        if (!usuario) return;
+        const newState = !festival.isPublic;
+        
+        const updatedFestivales = festivales.map(f => 
+            f.id === festival.id ? { ...f, isPublic: newState } : f
+        );
+        setFestivales(updatedFestivales);
+
+        try {
+            const docRef = doc(db, "festivals", festival.id);
+            await updateDoc(docRef, { 
+                isPublic: newState,
+                userName: usuario.displayName || "Anónimo",
+                likes: festival.likes || 0 
+            });
+        } catch (error) {
+            console.error("Error actualizando estado público:", error);
+            setFestivales(festivales); 
+            alert("No se pudo actualizar el estado público.");
+        }
+    };
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
             <p className="text-gray-400 animate-pulse">Cargando tus festivales...</p>
@@ -79,7 +102,6 @@ const MisFestivales = () => {
     );
 
     return (
-        // FONDO OSCURO + LUCES
         <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white font-sans selection:bg-cyan-500 selection:text-white relative overflow-hidden">
             
             {/* Blobs de luz */}
@@ -130,28 +152,56 @@ const MisFestivales = () => {
                         {festivales.map(festival => (
                             <div
                                 key={festival.id}
-                                className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-900/10 transition-all duration-300 flex flex-col"
+                                className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-900/10 transition-all duration-300 flex flex-col relative"
                             >
+                                {/* HEADER DE LA TARJETA (Estado Público/Privado) */}
+                                <div className="absolute top-4 right-4 z-20">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleTogglePublic(festival);
+                                        }}
+                                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border transition-all ${
+                                            festival.isPublic 
+                                            ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' 
+                                            : 'bg-black/40 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                        title={festival.isPublic ? "Público: Visible en Explorar" : "Privado: Solo tú puedes verlo"}
+                                    >
+                                        {festival.isPublic ? <GlobeAltIcon className="w-3 h-3" /> : <LockClosedIcon className="w-3 h-3" />}
+                                        {festival.isPublic ? "Público" : "Privado"}
+                                    </button>
+                                </div>
+
                                 <div className="p-6 flex-grow relative">
                                     {/* Gradient overlay on hover */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none"></div>
                                     
                                     <h3
-                                        className="text-xl font-bold text-white mb-2 cursor-pointer hover:text-cyan-400 truncate transition-colors relative z-10"
+                                        className="text-xl font-bold text-white mb-2 cursor-pointer hover:text-cyan-400 truncate transition-colors relative z-10 pr-20"
                                         onClick={() => navigate(`/festival/${festival.id}/artistas`)}
                                         title={festival.nombre || festival.name || 'Festival sin nombre'}
                                     >
                                         {festival.nombre || festival.name || 'Festival sin nombre'}
                                     </h3>
 
-                                    <div className="flex items-center gap-4 text-sm text-gray-400 mb-2 relative z-10">
+                                    {/* --- STATS DEL FESTIVAL --- */}
+                                    <div className="flex items-center gap-3 text-sm text-gray-400 mb-2 relative z-10 flex-wrap">
+                                        
+                                        {/* Likes (NUEVO) */}
+                                        <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-1 rounded-md font-semibold">
+                                            <HeartIcon className="w-3.5 h-3.5" />
+                                            {festival.likes || 0}
+                                        </span>
+
                                         <span className="inline-flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-md">
-                                            <CalendarDaysIcon className="w-4 h-4 text-purple-400" />
-                                            {festival.days || '?'} {festival.days === 1 ? 'día' : 'días'}
+                                            <CalendarDaysIcon className="w-3.5 h-3.5 text-purple-400" />
+                                            {festival.days || '?'}d
                                         </span>
                                         <span className="inline-flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-md">
-                                            <MapPinIcon className="w-4 h-4 text-pink-400" />
-                                            {festival.stages?.length || 0} {festival.stages?.length === 1 ? 'escenario' : 'escenarios'}
+                                            <MapPinIcon className="w-3.5 h-3.5 text-pink-400" />
+                                            {festival.stages?.length || 0}e
                                         </span>
                                     </div>
                                 </div>
@@ -177,7 +227,7 @@ const MisFestivales = () => {
                         ))}
                     </div>
                 ) : (
-                    // Estado Vacío (Empty State)
+                    // Estado Vacío
                     <div className="text-center py-20 px-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
                         <div className="bg-white/5 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                             <TicketIcon className="w-10 h-10 text-gray-500" />
@@ -197,7 +247,6 @@ const MisFestivales = () => {
                 )}
             </main>
 
-            {/* --- FOOTER --- */}
             <footer className="w-full py-6 text-center text-xs text-gray-500 border-t border-white/5 bg-[#0B0F19]">
                 <div className="container mx-auto px-4">
                     © {new Date().getFullYear()} MiFestival. Todos los derechos reservados.

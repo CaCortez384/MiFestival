@@ -12,7 +12,8 @@ import {
   ExclamationTriangleIcon,
   SparklesIcon,
   FireIcon,
-  ShareIcon
+  GlobeAltIcon, // Nuevo icono para el banner
+  HeartIcon // Nuevo icono para el banner
 } from '@heroicons/react/24/outline';
 
 const quickActions = [
@@ -33,6 +34,14 @@ const quickActions = [
     colorClass: "hover:border-purple-500/50 hover:bg-purple-500/10"
   },
   {
+    title: "Explorar",
+    desc: "Descubre festivales de la comunidad.",
+    icon: <GlobeAltIcon className="w-10 h-10 text-orange-400 mb-3 group-hover:scale-110 transition-transform duration-300" />,
+    href: "/explorar",
+    disabled: false,
+    colorClass: "hover:border-orange-500/50 hover:bg-orange-500/10"
+  },
+  {
     title: "Mi Perfil",
     desc: "Estadísticas y ajustes de cuenta.",
     icon: <UserCircleIcon className="w-10 h-10 text-gray-500 mb-3" />,
@@ -42,7 +51,6 @@ const quickActions = [
   }
 ];
 
-// Datos falsos para la sección de inspiración visual
 const inspirationIdeas = [
     { title: "Indie Sunset", gradient: "from-orange-400 to-pink-600", tag: "Playa" },
     { title: "Neon Cyberpunk", gradient: "from-cyan-400 to-blue-800", tag: "Ciudad" },
@@ -113,10 +121,9 @@ const Inicio = () => {
               Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">{user.displayName || "Usuario"}</span>
             </h1>
             <p className="text-lg text-gray-400 max-w-xl">
-              El escenario está listo. Crea lineups épicos, comparte con amigos y viraliza tu gusto musical.
+              El escenario es tuyo. Diseña, publica y descubre nueva música.
             </p>
           </div>
-          {/* Botón CTA extra para móviles o acceso rápido visual */}
           <Link to="/crear-festival" className="hidden md:flex items-center gap-2 bg-white text-[#0B0F19] px-6 py-3 rounded-full font-bold hover:bg-cyan-400 transition shadow-lg shadow-white/5">
             <SparklesIcon className="w-5 h-5" />
             Nuevo Proyecto
@@ -137,6 +144,31 @@ const Inicio = () => {
             </div>
           </div>
         )}
+
+        {/* --- NUEVO BANNER: LANZAMIENTO COMUNIDAD --- */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-indigo-500/30 p-6 md:p-8 mb-12 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+            {/* Efecto de brillo de fondo */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+            
+            <div className="relative z-10 flex-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">
+                    <SparklesIcon className="w-3 h-3" /> Novedad
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">¡Llegó la Comunidad MiFestival!</h2>
+                <p className="text-indigo-200/80 text-sm leading-relaxed max-w-lg">
+                    Ahora puedes hacer tus festivales <strong>públicos</strong>. Comparte tus lineups en el muro de "Explorar", recibe likes de otros usuarios y compite por estar en el <strong>Top Trending</strong>.
+                </p>
+                <div className="flex gap-4 mt-4 text-xs font-semibold text-indigo-300">
+                    <span className="flex items-center gap-1"><GlobeAltIcon className="w-4 h-4"/> Publica tu cartel</span>
+                    <span className="flex items-center gap-1"><HeartIcon className="w-4 h-4"/> Recibe Likes</span>
+                    <span className="flex items-center gap-1"><FireIcon className="w-4 h-4"/> Entra al Ranking</span>
+                </div>
+            </div>
+
+            <Link to="/explorar" className="relative z-10 shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-900/30 transition transform hover:-translate-y-0.5">
+                Explorar Feed →
+            </Link>
+        </div>
 
         {/* --- SECTION 1: ACCIONES PRINCIPALES --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
@@ -165,8 +197,7 @@ const Inicio = () => {
           ))}
         </div>
 
-        {/* --- SECTION 2: INSPIRACIÓN VISUAL (NUEVO) --- */}
-        {/* Esto llena el vacío visual y da ideas */}
+        {/* --- SECTION 2: INSPIRACIÓN VISUAL --- */}
         <div className="mb-16">
             <div className="flex items-center gap-3 mb-6">
                 <FireIcon className="w-6 h-6 text-orange-500" />
@@ -176,10 +207,7 @@ const Inicio = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {inspirationIdeas.map((item, idx) => (
                     <Link to="/crear-festival" key={idx} className="group relative aspect-[3/4] md:aspect-video lg:aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-cyan-500/20 transition-all duration-500 hover:-translate-y-1">
-                        {/* Background Gradient simulando póster */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-80 group-hover:opacity-100 transition-opacity duration-500`}></div>
-                        
-                        {/* Overlay Content */}
                         <div className="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
                             <span className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1 border border-white/20 px-2 py-1 rounded-md w-fit backdrop-blur-sm">{item.tag}</span>
                             <h3 className="text-2xl font-bold text-white">{item.title}</h3>
@@ -192,9 +220,8 @@ const Inicio = () => {
             </div>
         </div>
 
-        {/* --- SECTION 3: PRO TIPS (TEXTO DE RELLENO ÚTIL) --- */}
+        {/* --- SECTION 3: PRO TIPS --- */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 md:p-10 relative overflow-hidden">
-            {/* Elemento decorativo de fondo */}
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]"></div>
             
             <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
@@ -214,7 +241,7 @@ const Inicio = () => {
                         </li>
                         <li className="flex items-start gap-2">
                             <span className="text-cyan-400">•</span>
-                            <span>Comparte en Stories etiquetando a tus amigos para que hagan su versión.</span>
+                            <span>Haz público tu festival para que otros puedan darle like y subir en el ranking.</span>
                         </li>
                     </ul>
                 </div>

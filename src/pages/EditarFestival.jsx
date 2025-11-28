@@ -1,14 +1,10 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { doc, getDoc, updateDoc, arrayUnion, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
-// Imágenes de fondo
-import cityImg from "../assets/City.svg";
-import beachImg from "../assets/Beach.svg";
-import desertImg from "../assets/Desert.svg";
 import { AuthContext } from "../context/AuthContext";
 // Iconos
 import {
@@ -18,13 +14,15 @@ import {
     ArrowDownTrayIcon,
     ShareIcon,
     CalendarDaysIcon,
-    LightBulbIcon,
     XMarkIcon,
     MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 const EditarFestival = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
+    const { user } = useContext(AuthContext);
+
     const [festival, setFestival] = useState(null);
     const [loading, setLoading] = useState(true);
     const [artistas, setArtistas] = useState([]);
@@ -32,20 +30,23 @@ const EditarFestival = () => {
     const [draggedArtista, setDraggedArtista] = useState(null);
     const [busqueda, setBusqueda] = useState("");
     const [artistasApi, setArtistasApi] = useState([]);
+    
+    // Estados para lógica móvil
     const [artistaSeleccionado, setArtistaSeleccionado] = useState(null);
     const [showAsignarModal, setShowAsignarModal] = useState(false);
     const [diaSeleccionado, setDiaSeleccionado] = useState('Día 1');
     const [escenarioSeleccionado, setEscenarioSeleccionado] = useState('');
+    
     const [fondoPoster, setFondoPoster] = useState("city");
-    const { user } = useContext(AuthContext);
     const [artistaExpandido, setArtistaExpandido] = useState(null);
+    const [isPublic, setIsPublic] = useState(false); // Estado para publicación
 
     // REFS PARA EL PÓSTER
     const posterRef = useRef(null); 
     const previewContainerRef = useRef(null); 
     const [previewScale, setPreviewScale] = useState(0.3);
 
-    // --- LÓGICA DE ESCALADO ---
+    // --- LÓGICA DE ESCALADO DINÁMICO ---
     useEffect(() => {
         const calculateScale = () => {
             if (previewContainerRef.current) {
@@ -67,7 +68,7 @@ const EditarFestival = () => {
         return nombre.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "");
     }
 
-    // --- EFECTOS DE CARGA (Sin cambios lógicos) ---
+    // --- CARGAR DATOS ---
     useEffect(() => {
         const fetchArtistasFirestore = async () => {
             try {
@@ -79,49 +80,54 @@ const EditarFestival = () => {
                     .map(data => ({ nombre: data["Artist Name"] }));
                 setArtistasApi(artistas);
             } catch (error) {
-                console.error("No se pudo cargar la colección de artistas", error);
+                console.error("Error cargando artistas", error);
             }
         };
         fetchArtistasFirestore();
     }, []);
 
     useEffect(() => {
-        if (festival && !festival.slug && festival.name) {
-            const nuevoSlug = generarSlug(festival.name);
-            const docRef = doc(db, "festivals", id);
-            updateDoc(docRef, { slug: nuevoSlug });
-            setFestival({ ...festival, slug: nuevoSlug });
-        }
-    }, [festival, id]);
-
-    useEffect(() => {
-        if (!festival) return;
-        const docRef = doc(db, "festivals", id);
-        updateDoc(docRef, { fondoPoster });
-    }, [fondoPoster]);
-
-    useEffect(() => {
         const fetchFestival = async () => {
             const docRef = doc(db, "festivals", id);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                setFestival({ id: docSnap.id, ...docSnap.data() });
-                setArtistas(docSnap.data().artistas || []);
-                setFondoPoster(docSnap.data().fondoPoster || "city");
+                const data = docSnap.data();
+                setFestival({ id: docSnap.id, ...data });
+                setArtistas(data.artistas || []);
+                setFondoPoster(data.fondoPoster || "city");
+                setIsPublic(data.isPublic || false); // Cargar estado público
+                
+                // Actualizar slug si cambió el nombre
+                if (!data.slug && data.name) {
+                    const nuevoSlug = generarSlug(data.name);
+                    updateDoc(docRef, { slug: nuevoSlug });
+                }
             }
             setLoading(false);
         };
         fetchFestival();
     }, [id]);
 
+    // --- ACTUALIZACIONES A FIREBASE ---
     useEffect(() => {
-        [cityImg, beachImg, desertImg].forEach(src => {
-            const img = new window.Image();
-            img.src = src;
-        });
-    }, []);
+        if (!festival) return;
+        const docRef = doc(db, "festivals", id);
+        updateDoc(docRef, { fondoPoster });
+    }, [fondoPoster, id, festival]);
 
-    // --- HANDLERS (Sin cambios lógicos) ---
+    const togglePublic = async () => {
+        if (!user) return;
+        const newState = !isPublic;
+        setIsPublic(newState);
+        const docRef = doc(db, "festivals", id);
+        await updateDoc(docRef, { 
+            isPublic: newState,
+            userName: user.displayName || "Anónimo",
+            likes: festival.likes || 0 
+        });
+    };
+
+    // --- HANDLERS ---
     const handleAgregarArtista = async () => {
         if (!nuevoArtista.trim()) return;
         const docRef = doc(db, "festivals", id);
@@ -257,7 +263,6 @@ const EditarFestival = () => {
                 <aside className="w-full lg:w-72 bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-5 flex-shrink-0 h-[80vh] lg:sticky lg:top-24 flex flex-col">
                     <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Artistas</h2>
                     
-                    {/* Buscador */}
                     <div className="relative mb-4">
                         <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" />
                         <input
@@ -269,11 +274,10 @@ const EditarFestival = () => {
                         />
                     </div>
 
-                    {/* Lista Scrolleable */}
                     <ul className="flex-grow overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                         {artistasSinAsignar
                             .filter(artista => artista.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-                            .slice(0, 20) // Limitado para performance
+                            .slice(0, 20)
                             .map((artista) => (
                                 <React.Fragment key={artista.nombre}>
                                     <li
@@ -290,7 +294,6 @@ const EditarFestival = () => {
                                         <div className="w-2 h-2 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-100 transition"></div>
                                     </li>
 
-                                    {/* Mobile Expand */}
                                     {window.innerWidth < 768 && artistaExpandido === artista.nombre && (
                                         <div className="bg-black/40 border border-white/10 rounded-lg p-3 mt-1 flex flex-col gap-2 animate-fade-in-down">
                                             <select
@@ -312,7 +315,6 @@ const EditarFestival = () => {
                                                 className="w-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold py-2 rounded-lg transition"
                                                 disabled={!diaSeleccionado || !escenarioSeleccionado}
                                                 onClick={async () => {
-                                                    /* Lógica inline replicada del original */
                                                     const nuevos = [...artistas.filter(a => a.nombre !== artista.nombre), { ...artista, dia: diaSeleccionado, escenario: escenarioSeleccionado }];
                                                     await updateDoc(doc(db, "festivals", id), { artistas: nuevos });
                                                     setArtistas(nuevos);
@@ -327,7 +329,6 @@ const EditarFestival = () => {
                             ))}
                     </ul>
 
-                    {/* Agregar Artista Manual */}
                     <div className="mt-4 pt-4 border-t border-white/10">
                         <div className="flex gap-2">
                             <input
@@ -350,7 +351,6 @@ const EditarFestival = () => {
                 {/* 2. COLUMNA CENTRAL: GRILLA */}
                 <section className="flex-1 w-full bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 overflow-hidden flex flex-col min-h-[600px]">
                     
-                    {/* Header del Editor */}
                     <div className="border-b border-white/10 pb-6 mb-6">
                         <label className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2 block">Nombre del Festival</label>
                         <input
@@ -369,7 +369,6 @@ const EditarFestival = () => {
                         </div>
                     </div>
 
-                    {/* La Tabla Drag & Drop */}
                     <div className="overflow-x-auto flex-grow custom-scrollbar pb-4">
                         <table className="min-w-full border-collapse">
                             <thead>
@@ -389,7 +388,6 @@ const EditarFestival = () => {
                                                 onDragOver={onDragOver}
                                                 onDrop={() => onDrop(dia, escenario)}
                                             >
-                                                {/* Header de celda (solo visible en hover o si tiene items) */}
                                                 <div className="text-[10px] text-gray-600 mb-2 text-center uppercase tracking-widest opacity-30 group-hover/row:opacity-100 transition-opacity">
                                                     {escenario}
                                                 </div>
@@ -415,7 +413,6 @@ const EditarFestival = () => {
                                                             </div>
                                                         ))}
                                                         
-                                                    {/* Placeholder Drop */}
                                                     {artistas.filter(a => a.dia === dia && a.escenario === escenario).length === 0 && (
                                                         <div className="h-full w-full flex items-center justify-center border-2 border-dashed border-white/5 rounded-lg">
                                                             <span className="text-xs text-gray-700 font-medium">Soltar aquí</span>
@@ -469,7 +466,6 @@ const EditarFestival = () => {
                                 backgroundType={fondoPoster}
                             />
                         </div>
-                        {/* Overlay informativo */}
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
                             <span className="text-white text-xs font-bold tracking-widest uppercase border border-white/30 px-3 py-1 rounded-full backdrop-blur-md">Preview HD</span>
                         </div>
@@ -477,6 +473,20 @@ const EditarFestival = () => {
 
                     {/* Acciones */}
                     <div className="space-y-3">
+                        {/* SWITCH PUBLICAR */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between">
+                            <div>
+                                <span className="text-sm font-bold text-white block">Hacer Público</span>
+                                <span className="text-[10px] text-gray-400">Aparecer en Explorar</span>
+                            </div>
+                            <button 
+                                onClick={togglePublic}
+                                className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${isPublic ? 'bg-green-500' : 'bg-gray-600'}`}
+                            >
+                                <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${isPublic ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                            </button>
+                        </div>
+
                         <button
                             onClick={handleDescargarPoster}
                             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-bold py-3 px-4 rounded-xl shadow-lg shadow-cyan-900/20 transition-all transform hover:-translate-y-0.5"
@@ -524,7 +534,7 @@ const EditarFestival = () => {
                                 <span className="text-xs text-gray-500 uppercase tracking-widest">Artista seleccionado</span>
                                 <div className="text-xl font-bold text-cyan-400 mt-1">{artistaSeleccionado?.nombre}</div>
                             </div>
-                            {/* ... Selects con estilo dark ... (omitido por brevedad, usa clases bg-[#0B0F19] text-white border-white/10) */}
+                            {/* ... Selects con estilo dark ... */}
                             <div className="flex gap-3 pt-2">
                                 <button className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl" onClick={handleAsignarArtistaMobile}>Confirmar</button>
                                 <button className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-3 rounded-xl" onClick={() => setShowAsignarModal(false)}>Cancelar</button>

@@ -269,23 +269,7 @@ const Festival = () => {
                 <aside className="w-full lg:w-80 xl:w-96 bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-5 lg:sticky lg:top-24 flex-shrink-0 space-y-6">
                     <div>
                         <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Póster Oficial</h2>
-                        
-                        {/* Selector de fondo */}
-                        <div className="grid grid-cols-3 gap-2 mb-4">
-                            {['city', 'beach', 'desert'].map((style) => (
-                                <button
-                                    key={style}
-                                    onClick={() => setFondoPoster(style)}
-                                    className={`px-2 py-1.5 rounded-lg text-[10px] font-bold capitalize transition border ${
-                                        fondoPoster === style 
-                                        ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300' 
-                                        : 'bg-black/20 border-white/10 text-gray-500 hover:border-white/30 hover:text-gray-300'
-                                    }`}
-                                >
-                                    {style}
-                                </button>
-                            ))}
-                        </div>
+                    
 
                         {/* PREVIEW CONTAINER */}
                         <div 

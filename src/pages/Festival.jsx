@@ -346,11 +346,7 @@ const Festival = () => {
                             </button>
                         )}
                     </div>
-                    
-                    <div className="text-center">
-                        <p className="text-[10px] text-gray-500 uppercase tracking-widest">¿Quieres crear el tuyo?</p>
-                        <Link to="/register" className="text-xs font-bold text-cyan-400 hover:text-cyan-300 underline mt-1 block">Regístrate Gratis en MiFestival</Link>
-                    </div>
+                
                 </aside>
             </main>
 
