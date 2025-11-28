@@ -9,8 +9,23 @@ import MisFestivales from './pages/MisFestivales';
 import Festival from './pages/Festival';
 import EditarFestival from './pages/EditarFestival';
 import VerFestival from './pages/VerFestival';
+import Mantenimiento from './pages/Mantenimiento';
 
 function App() {
+  const isMaintenance = String(import.meta.env.VITE_MAINTENANCE || '').toLowerCase() === 'true';
+
+  if (isMaintenance) {
+    return (
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="*" element={<Mantenimiento />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    );
+  }
+
   return (
     <AuthProvider>
       <Router>

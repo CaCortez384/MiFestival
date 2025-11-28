@@ -110,6 +110,7 @@ MiFestival fue desarrollado como parte de mi portafolio profesional para demostr
 ¿Te gustaría saber más sobre este proyecto o colaborar?  
 Puedes contactarme a través de [ca.cortez384@gmail.com] o visitar mi [LinkedIn](www.linkedin.com/in/carlos-cortez-castañeda-266546324).
 
+
 ---
 
-**© 2025 MiFestival · Creado por [Carlos Cortez Castañeda]**
+**© 2025 MiFestival · Creado por [Carlos Cortez Castañeda]** 
