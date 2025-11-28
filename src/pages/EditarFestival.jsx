@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
-import { collection, doc, getDoc, updateDoc, arrayUnion, getDocs } from "firebase/firestore";
+import { useParams, Link } from "react-router-dom";
+import { doc, getDoc, updateDoc, arrayUnion, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase";
 import { toPng } from "html-to-image";
 import PosterFestival from "./PosterFestival";
 import mflogo from "../assets/mflogo20.png";
-// Imágenes de fondo (se mantienen para la precarga)
+// Imágenes de fondo
 import cityImg from "../assets/City.svg";
 import beachImg from "../assets/Beach.svg";
 import desertImg from "../assets/Desert.svg";
 import { AuthContext } from "../context/AuthContext";
-// Iconos (importados del nuevo set de diseño)
+// Iconos
 import {
     ArrowLeftIcon,
     PlusIcon,
@@ -18,12 +18,10 @@ import {
     ArrowDownTrayIcon,
     ShareIcon,
     CalendarDaysIcon,
-    MapPinIcon,
     LightBulbIcon,
     XMarkIcon
 } from '@heroicons/react/24/outline';
 
-// RENOMBRADO para claridad, aunque el nombre original era 'Festival'
 const EditarFestival = () => {
     const { id } = useParams();
     const [festival, setFestival] = useState(null);
@@ -41,9 +39,35 @@ const EditarFestival = () => {
     const { user } = useContext(AuthContext);
     const [artistaExpandido, setArtistaExpandido] = useState(null);
 
-    const posterRef = useRef(null);
+    // REFS PARA EL PÓSTER
+    const posterRef = useRef(null); // Para la descarga (invisible, tamaño real)
+    const previewContainerRef = useRef(null); // Para medir el contenedor de la vista previa
+    const [previewScale, setPreviewScale] = useState(0.3); // Estado para la escala dinámica
 
-    // --- Toda la lógica funcional se mantiene intacta ---
+    // --- LÓGICA DE ESCALADO DINÁMICO ---
+    useEffect(() => {
+        const calculateScale = () => {
+            if (previewContainerRef.current) {
+                // El ancho actual del contenedor en pantalla
+                const containerWidth = previewContainerRef.current.offsetWidth;
+                // El ancho real del póster es 1080px. Calculamos el radio.
+                const scale = containerWidth / 1080;
+                setPreviewScale(scale);
+            }
+        };
+
+        // Calcular al inicio y cada vez que cambie el tamaño de la ventana
+        calculateScale();
+        window.addEventListener('resize', calculateScale);
+        
+        // Timeout para asegurar que el DOM esté listo
+        const timer = setTimeout(calculateScale, 100);
+
+        return () => {
+            window.removeEventListener('resize', calculateScale);
+            clearTimeout(timer);
+        };
+    }, [loading]); // Recalcular cuando termine de cargar
 
     function generarSlug(nombre) {
         return nombre
@@ -153,7 +177,8 @@ const EditarFestival = () => {
     const handleDescargarPoster = async () => {
         if (!posterRef.current) return;
         try {
-            const dataUrl = await toPng(posterRef.current.firstChild, { pixelRatio: 2.5, cacheBust: true });
+            // Usamos posterRef que apunta al DIV oculto de tamaño real (1080x1920)
+            const dataUrl = await toPng(posterRef.current.firstChild, { pixelRatio: 1, cacheBust: true });
             const link = document.createElement("a");
             link.download = `${generarSlug(festival.name || 'mi-festival')}-poster.png`;
             link.href = dataUrl;
@@ -175,14 +200,9 @@ const EditarFestival = () => {
         setArtistas(nuevosArtistas);
         setShowAsignarModal(false);
         setArtistaSeleccionado(null);
-        setDiaSeleccionado('Día 1'); // Resetea al valor por defecto
+        setDiaSeleccionado('Día 1');
         setEscenarioSeleccionado('');
     };
-
-    // --- FIN Lógica funcional ---
-
-
-    // --- Renderizado Condicional (Nuevo Estilo) ---
 
     if (loading) {
         return (
@@ -193,7 +213,6 @@ const EditarFestival = () => {
     }
 
     if (!festival) {
-        // Pantalla de error/no encontrado simple
         return (
             <div className="min-h-screen flex flex-col bg-gray-50">
                 <header className="w-full px-4 sm:px-6 py-3 border-b border-gray-100 bg-white">
@@ -214,7 +233,6 @@ const EditarFestival = () => {
             (user.isGuest && festival.userId !== "invitado")
         )
     ) {
-        // Pantalla de permisos
         return (
             <div className="min-h-screen flex flex-col bg-gray-50 items-center justify-center p-4">
                 <img src={mflogo} alt="" className="w-16 h-16 mb-4 rounded-lg opacity-80" />
@@ -224,7 +242,6 @@ const EditarFestival = () => {
         );
     }
 
-    // Variables para Render (Originales)
     const dias = Array.from({ length: festival.days }, (_, i) => `Día ${i + 1}`);
     const escenarios = festival.stages || [];
 
@@ -233,10 +250,8 @@ const EditarFestival = () => {
         ...artistasApi.filter(apiArtista => !artistas.some(a => a.nombre === apiArtista.nombre))
     ];
 
-    // --- JSX Principal (Nuevo Diseño) ---
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800 font-sans">
-            {/* Header (Nuevo Estilo) */}
             <header className="w-full px-4 sm:px-6 py-3 border-b border-gray-100 sticky top-0 z-30 bg-white bg-opacity-95 backdrop-blur-sm">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-2">
@@ -253,7 +268,6 @@ const EditarFestival = () => {
                 </div>
             </header>
 
-            {/* Layout 3 Columnas (Nuevo Estilo) */}
             <main className="flex-grow container mx-auto px-4 sm:px-6 py-8 md:py-12 flex flex-col lg:flex-row gap-8 items-start">
 
                 {/* Columna Izquierda: Artistas */}
@@ -269,7 +283,7 @@ const EditarFestival = () => {
                     <ul className="space-y-1.5 max-h-60 md:max-h-80 overflow-y-auto">
                         {artistasSinAsignar
                             .filter(artista => artista.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-                            .slice(0, 10) // Mantenemos límite por performance
+                            .slice(0, 10)
                             .map((artista, idx) => (
                                 <React.Fragment key={artista.nombre}>
                                     <li
@@ -278,14 +292,13 @@ const EditarFestival = () => {
                                         onDragStart={window.innerWidth >= 768 ? () => onDragStart(artista) : undefined}
                                         onClick={window.innerWidth < 768 ? () => {
                                             setArtistaExpandido(artista.nombre === artistaExpandido ? null : artista.nombre);
-                                            setDiaSeleccionado('Día 1'); // Lógica original
-                                            setEscenarioSeleccionado(escenarios[0] || ''); // Pre-selecciona primer escenario
+                                            setDiaSeleccionado('Día 1');
+                                            setEscenarioSeleccionado(escenarios[0] || '');
                                         } : undefined}
                                     >
                                         {artista.nombre}
                                     </li>
 
-                                    {/* Lógica de asignación móvil (se mantiene), con nuevo estilo */}
                                     {window.innerWidth < 768 && artistaExpandido === artista.nombre && (
                                         <div className="bg-white rounded-md shadow border border-gray-200 p-3 mt-1 flex flex-col gap-2">
                                             <select
@@ -311,7 +324,6 @@ const EditarFestival = () => {
                                                 className="w-full flex items-center justify-center gap-2 bg-cyan-500 text-white text-sm font-semibold py-2 px-3 rounded-md shadow-sm hover:bg-cyan-600 transition disabled:opacity-50"
                                                 disabled={!diaSeleccionado || !escenarioSeleccionado}
                                                 onClick={async () => {
-                                                    // Lógica original de asignación rápida
                                                     const nuevosArtistas = [
                                                         ...artistas.filter(a => a.nombre !== artista.nombre),
                                                         { ...artista, dia: diaSeleccionado, escenario: escenarioSeleccionado }
@@ -378,7 +390,6 @@ const EditarFestival = () => {
                         </div>
                     </div>
 
-                    {/* Grilla de edición (Nuevo Estilo) */}
                     <div className="overflow-x-auto">
                         <table className="min-w-full border-collapse">
                             <thead>
@@ -430,7 +441,6 @@ const EditarFestival = () => {
                         </table>
                     </div>
 
-                    {/* Consejos (Nuevo Estilo) */}
                     <div className="mt-8 w-full bg-gray-50 rounded-lg border border-gray-200 p-4">
                         <h3 className="text-sm font-semibold text-cyan-700 mb-2 inline-flex items-center gap-1.5"><LightBulbIcon className="w-4 h-4" />Tips de edición</h3>
                         <ul className="list-disc list-inside text-gray-600 text-xs space-y-1 pl-2">
@@ -446,7 +456,6 @@ const EditarFestival = () => {
                 <aside className="w-full lg:w-80 xl:w-96 bg-white rounded-lg shadow border border-gray-100 p-4 lg:sticky lg:top-20 flex-shrink-0 space-y-4">
                     <h2 className="text-base font-semibold text-gray-900">Vista previa del póster</h2>
 
-                    {/* Selector de fondo */}
                     <div className="w-full">
                         <label htmlFor="fondo-poster" className="text-sm font-medium text-gray-700 mb-1 block">
                             Fondo del póster:
@@ -463,41 +472,39 @@ const EditarFestival = () => {
                         </select>
                     </div>
 
-                    {/* Preview del póster escalado */}
+                    {/* VISTA PREVIA RESPONSIVA (CORREGIDA) */}
                     <div 
+                        ref={previewContainerRef} // Referencia para medir el ancho
                         className="border border-gray-200 rounded-md overflow-hidden bg-gray-100"
                         style={{
                             width: "100%",
+                            aspectRatio: "9/16", // Mantiene la proporción correcta del póster (1080/1920)
                             position: "relative",
                         }}
                     >
+                        {/* Contenedor del póster escalado */}
                         <div style={{
-                            width: "100%",
-                            paddingBottom: "108%", // Ratio 1512/1400 = 1.08
-                            position: "relative",
+                            width: 1080, // Tamaño REAL del diseño
+                            height: 1920, // Tamaño REAL del diseño
+                            transform: `scale(${previewScale})`, // Escala calculada dinámicamente
+                            transformOrigin: "top left",
+                            position: "absolute",
+                            top: 0,
+                            left: 0
                         }}>
-                            <div style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                width: "100%",
-                                height: "100%",
-                                transform: "scale(0.27)", // Escala para que quepa en ~380px
-                                transformOrigin: "top left",
-                            }}>
-                                <PosterFestival
-                                    festival={{
-                                        ...festival,
-                                        artistas: artistas
-                                    }}
-                                    backgroundType={fondoPoster}
-                                />
-                            </div>
+                            <PosterFestival
+                                festival={{
+                                    ...festival,
+                                    artistas: artistas
+                                }}
+                                backgroundType={fondoPoster}
+                            />
                         </div>
                     </div>
 
-                    {/* Póster para descarga (tamaño real, oculto) */}
-                    <div style={{ position: "absolute", left: "-99999px", top: 0 }}>
+                    {/* PÓSTER OCULTO PARA DESCARGA (TAMAÑO REAL) */}
+                    {/* IMPORTANTE: Este no debe tener transform scale para salir en HD */}
+                    <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
                         <div ref={posterRef}>
                             <PosterFestival
                                 festival={{
@@ -509,7 +516,6 @@ const EditarFestival = () => {
                         </div>
                     </div>
 
-                    {/* Botones de acción */}
                     <div className="space-y-2 pt-4 border-t border-gray-100">
                         <button
                             onClick={handleDescargarPoster}
@@ -561,7 +567,7 @@ const EditarFestival = () => {
                     </span>
                 </aside>
 
-                {/* Modal (Lógica original, Nuevo Estilo) */}
+                {/* Modal */}
                 {showAsignarModal && (
                     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm flex flex-col gap-4">
@@ -615,7 +621,6 @@ const EditarFestival = () => {
                 )}
             </main>
 
-            {/* Footer (Nuevo Estilo) */}
             <footer className="w-full py-5 text-center text-xs text-gray-400 border-t border-gray-100 mt-auto">
                 <div className="container mx-auto px-4 sm:px-6">
                     © {new Date().getFullYear()} <span className="font-semibold text-gray-600">MiFestival</span> · Desarrollado por <a href="https://github.com/CaCortez384" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:underline">Carlos Cortez</a>
