@@ -19,65 +19,72 @@ const Home = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white font-sans selection:bg-cyan-500 selection:text-white overflow-x-hidden">
       
-      {/* Efectos de fondo ambiental */}
+      {/* Efectos de fondo */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse"></div>
         <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-cyan-600/20 rounded-full blur-[100px]"></div>
       </div>
 
-      {/* --- HEADER --- */}
-      <header className="w-full px-6 py-4 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md bg-[#0B0F19]/80">
+      {/* --- HEADER CORREGIDO PARA MÓVIL --- */}
+      <header className="w-full px-4 sm:px-6 py-4 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md bg-[#0B0F19]/80">
         <div className="container mx-auto flex justify-between items-center max-w-7xl">
-          <Link to="/" className="flex items-center gap-3 group">
+          
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 group shrink-0">
             <div className="relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg blur opacity-40 group-hover:opacity-100 transition duration-200"></div>
-                <img src={mflogo} alt="MiFestival Logo" className="relative w-9 h-9 rounded-lg" />
+                <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">MiFestival</span>
+            <span className="text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">MiFestival</span>
           </Link>
-          <nav className="flex items-center gap-4">
+
+          {/* Navegación Responsive */}
+          <nav className="flex items-center gap-2 sm:gap-4">
             <Link
               to="/login"
-              className="hidden sm:block px-4 py-2 rounded-full text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition"
+              // CAMBIO: Quitamos 'hidden'. Ahora es visible siempre. Ajustamos padding para móvil.
+              className="px-3 py-2 sm:px-4 rounded-full text-xs sm:text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition whitespace-nowrap"
             >
               Iniciar Sesión
             </Link>
             <Link
               to="/register"
-              className="px-5 py-2 rounded-full text-sm font-bold text-[#0B0F19] bg-white hover:bg-cyan-400 transition transform hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+              // CAMBIO: Texto más corto en móvil ("Crear") para ahorrar espacio
+              className="px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-[#0B0F19] bg-white hover:bg-cyan-400 transition transform hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.3)] whitespace-nowrap"
             >
-              Crear Cuenta
+              <span className="hidden sm:inline">Crear Cuenta</span>
+              <span className="sm:hidden">Crear</span>
             </Link>
           </nav>
         </div>
       </header>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-40">
+      <section className="relative pt-12 pb-24 lg:pt-32 lg:pb-40">
         <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
             
             {/* Texto Hero */}
             <div className="lg:w-1/2 text-center lg:text-left z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-6 animate-fade-in-up">
+              <div className="inline-flex items-center justify-center lg:justify-start gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-6 animate-fade-in-up">
                 <SparklesIcon className="w-4 h-4" /> Ahora con Comunidad y Likes
               </div>
               
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
                 Crea, Comparte y <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500">
                   Viraliza tu Festival.
                 </span>
               </h1>
               
-              <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                El generador de lineups definitivo. Diseña carteles de música sin Spotify, publícalos en nuestra comunidad global y compite por ser el más votado.
+              <p className="text-base sm:text-lg text-gray-400 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                Diseña el cartel definitivo sin Spotify. Publica tu lineup en nuestra comunidad global, recibe likes y llega al top de tendencias.
               </p>
 
               <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                 <Link
                   to="/register"
-                  className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-cyan-600 font-lg rounded-xl hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-600"
+                  className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-cyan-600 font-lg rounded-xl hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-600 w-full sm:w-auto"
                 >
                   <div className="absolute -inset-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-xl blur-lg opacity-40 group-hover:opacity-70 transition duration-200"></div>
                   <span className="relative flex items-center gap-2">
@@ -86,13 +93,13 @@ const Home = () => {
                 </Link>
                 <button
                   onClick={handleGuest}
-                  className="px-8 py-4 rounded-xl text-white font-semibold border border-white/20 hover:bg-white/10 transition backdrop-blur-sm"
+                  className="px-8 py-4 rounded-xl text-white font-semibold border border-white/20 hover:bg-white/10 transition backdrop-blur-sm w-full sm:w-auto"
                 >
                   Probar Demo
                 </button>
               </div>
               
-              <div className="mt-10 flex items-center justify-center lg:justify-start gap-6 text-sm text-gray-500">
+              <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
                 <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]"></div> 100% Gratis</span>
                 <span className="flex items-center gap-2"><HeartIcon className="w-4 h-4 text-red-500"/> Comunidad Social</span>
                 <span className="flex items-center gap-2"><BoltIcon className="w-4 h-4 text-yellow-500"/> Sin Spotify</span>
@@ -100,7 +107,7 @@ const Home = () => {
             </div>
 
             {/* Imagen Hero */}
-            <div className="lg:w-1/2 relative perspective-1000">
+            <div className="lg:w-1/2 relative perspective-1000 w-full">
               <div className="relative transform rotate-y-[-5deg] rotate-x-[5deg] hover:rotate-0 transition duration-500 ease-out">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur-xl opacity-30"></div>
                 <img
