@@ -1,14 +1,14 @@
 import { useState, useContext, useEffect } from 'react';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+// MODIFICADO: Importamos sendPasswordResetEmail
+import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../context/AuthContext";
 import mflogo from "../assets/mflogo20.png";
 import { Link } from "react-router-dom";
-// Iconos Heroicons para los inputs
-import { EnvelopeIcon, LockClosedIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+// MODIFICADO: Agregamos XMarkIcon para el modal
+import { EnvelopeIcon, LockClosedIcon, ArrowLeftIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-// Reutilizamos el icono de Google (SVG limpio)
 const GoogleIcon = () => (
   <svg className="w-5 h-5 mr-2" viewBox="0 0 48 48">
     <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
@@ -24,6 +24,14 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // --- NUEVOS ESTADOS PARA RESET PASSWORD ---
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
@@ -60,6 +68,42 @@ function Login() {
       } finally {
           setLoading(false);
       }
+  };
+
+  // --- NUEVA FUNCIÓN: ENVIAR CORREO DE RESET ---
+  const handleResetPassword = async (e) => {
+      e.preventDefault();
+      if (!resetEmail) {
+          setResetError("Por favor ingresa tu correo.");
+          return;
+      }
+      setResetLoading(true);
+      setResetError('');
+      setResetMessage('');
+      
+      try {
+          await sendPasswordResetEmail(auth, resetEmail);
+          setResetMessage("¡Listo! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.");
+      } catch (error) {
+          console.error(error);
+          if (error.code === 'auth/user-not-found') {
+              setResetError("No existe una cuenta con este correo.");
+          } else if (error.code === 'auth/invalid-email') {
+              setResetError("El correo no es válido.");
+          } else {
+              setResetError("Ocurrió un error. Inténtalo más tarde.");
+          }
+      } finally {
+          setResetLoading(false);
+      }
+  };
+
+  // Pre-llenar el email del modal si el usuario ya escribió algo en el login
+  const openResetModal = () => {
+      setResetEmail(email); 
+      setShowResetModal(true);
+      setResetError('');
+      setResetMessage('');
   };
 
   return (
@@ -106,15 +150,15 @@ function Login() {
             </p>
           </div>
 
-          {/* Mensaje de Error */}
+          {/* Mensaje de Error Login */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 text-red-200 text-sm rounded-xl p-3 mb-6 text-center animate-pulse">
               {error}
             </div>
           )}
 
-          {/* Formulario */}
-          <form onSubmit={handleLogin} id='login-form' className="space-y-5">
+          {/* Formulario Login */}
+          <form onSubmit={handleLogin} className="space-y-5">
              
              {/* Input Email */}
              <div>
@@ -151,6 +195,17 @@ function Login() {
                     required
                     className="w-full pl-10 pr-4 py-3 bg-[#0B0F19]/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none text-white placeholder-gray-600 transition duration-200"
                   />
+                </div>
+                
+                {/* MODIFICADO: Enlace Olvidaste contraseña */}
+                <div className="text-right mt-2">
+                   <button 
+                     type="button"
+                     onClick={openResetModal}
+                     className="text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition"
+                   >
+                     ¿Olvidaste tu contraseña?
+                   </button>
                 </div>
              </div>
 
@@ -198,6 +253,65 @@ function Login() {
           </p>
         </div>
       </main>
+
+      {/* --- MODAL DE RECUPERACIÓN DE CONTRASEÑA --- */}
+      {showResetModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+              <div className="bg-[#1a1f2e] border border-white/10 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-fade-in-up">
+                  
+                  {/* Botón cerrar */}
+                  <button 
+                      onClick={() => setShowResetModal(false)}
+                      className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                  >
+                      <XMarkIcon className="w-6 h-6" />
+                  </button>
+
+                  <h3 className="text-xl font-bold text-white mb-2">Recuperar Cuenta</h3>
+                  <p className="text-gray-400 text-sm mb-6">
+                      Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.
+                  </p>
+
+                  {resetMessage ? (
+                      <div className="bg-green-500/10 border border-green-500/30 text-green-300 text-sm rounded-lg p-4 text-center mb-4">
+                          {resetMessage}
+                          <button 
+                             onClick={() => setShowResetModal(false)}
+                             className="block w-full mt-3 bg-green-600/20 hover:bg-green-600/40 text-white text-xs font-bold py-2 rounded transition"
+                          >
+                              Cerrar
+                          </button>
+                      </div>
+                  ) : (
+                      <form onSubmit={handleResetPassword} className="space-y-4">
+                          <div>
+                              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Correo</label>
+                              <input 
+                                  type="email" 
+                                  value={resetEmail}
+                                  onChange={(e) => setResetEmail(e.target.value)}
+                                  className="w-full bg-[#0B0F19] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition"
+                                  placeholder="ejemplo@correo.com"
+                                  required
+                              />
+                          </div>
+                          
+                          {resetError && (
+                              <p className="text-red-400 text-xs text-center">{resetError}</p>
+                          )}
+
+                          <button 
+                              type="submit"
+                              disabled={resetLoading}
+                              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-900/20 disabled:opacity-50"
+                          >
+                              {resetLoading ? "Enviando..." : "Enviar Enlace"}
+                          </button>
+                      </form>
+                  )}
+              </div>
+          </div>
+      )}
 
       {/* --- FOOTER --- */}
       <footer className="w-full py-6 text-center text-xs text-gray-500 border-t border-white/5 bg-[#0B0F19]">
