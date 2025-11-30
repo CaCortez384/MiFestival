@@ -12,6 +12,7 @@ import VerFestival from './pages/VerFestival';
 import Mantenimiento from './pages/Mantenimiento';
 import Explorar from './pages/Explorar';
 import Restablecer from './pages/Restablecer';
+import Perfil from './pages/Perfil';
 
 function App() {
   const isMaintenance = String(import.meta.env.VITE_MAINTENANCE || '').toLowerCase() === 'true';
@@ -46,6 +47,7 @@ function App() {
           <Route path="/editarFestival/:id" element={<EditarFestival />} />
           <Route path="/explorar" element={<Explorar />} />
           <Route path="/restablecer" element={<Restablecer />} />
+          <Route path="/perfil" element={<Perfil />} />
         </Routes>
       </Router>
     </AuthProvider>

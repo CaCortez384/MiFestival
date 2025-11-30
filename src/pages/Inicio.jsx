@@ -45,9 +45,9 @@ const quickActions = [
     title: "Mi Perfil",
     desc: "Estadísticas y ajustes de cuenta.",
     icon: <UserCircleIcon className="w-10 h-10 text-gray-500 mb-3" />,
-    href: "#",
-    disabled: true,
-    colorClass: ""
+    href: "/perfil",
+    disabled: false, // <--- ¡Habilítalo!
+    colorClass: "hover:border-gray-500/50 hover:bg-gray-500/10"
   }
 ];
 
