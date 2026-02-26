@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { createUserWithEmailAndPassword, updateProfile, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +28,12 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  useSEO({
+    title: 'Crear Cuenta | MiFestival',
+    description: 'Regístrate gratis en MiFestival para crear tus propios lineups de festivales, compartirlos con la comunidad y competir por likes.',
+    canonical: 'https://mifestival.web.app/register',
+  });
+
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!nombre.trim()) {
@@ -37,6 +45,7 @@ function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: nombre });
+      trackEvent('sign_up', { method: 'email' });
       navigate('/inicio');
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
@@ -57,6 +66,7 @@ function Register() {
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
+      trackEvent('sign_up', { method: 'google' });
       navigate('/inicio');
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') {

@@ -1,5 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext'; // <-- Importa el AuthProvider
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { AuthProvider } from './context/AuthContext';
+import { trackPageView } from './utils/analytics';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -14,6 +16,15 @@ import Explorar from './pages/Explorar';
 import Restablecer from './pages/Restablecer';
 import Perfil from './pages/Perfil';
 
+// Virtual Pageview tracker for GA4 via GTM
+function RouteTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    trackPageView(location.pathname, document.title);
+  }, [location]);
+  return null;
+}
+
 function App() {
   const isMaintenance = String(import.meta.env.VITE_MAINTENANCE || '').toLowerCase() === 'true';
 
@@ -21,6 +32,7 @@ function App() {
     return (
       <AuthProvider>
         <Router>
+          <RouteTracker />
           <Routes>
             <Route path="*" element={<Mantenimiento />} />
           </Routes>
@@ -32,12 +44,12 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <RouteTracker />
         <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<div className="p-4">Página no encontrada</div>} />
           <Route path="/crear-festival" element={<CreateFestival />} />
           <Route path="/inicio" element={<Inicio />} />
           <Route path="/mis-festivales" element={<MisFestivales />} />
@@ -48,6 +60,7 @@ function App() {
           <Route path="/explorar" element={<Explorar />} />
           <Route path="/restablecer" element={<Restablecer />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="*" element={<div className="p-4">Página no encontrada</div>} />
         </Routes>
       </Router>
     </AuthProvider>

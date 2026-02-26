@@ -3,6 +3,7 @@ import { Navigate, Link } from "react-router-dom";
 import { auth } from "../firebase";
 import mflogo from "../assets/mflogo20.png";
 import { AuthContext } from "../context/AuthContext";
+import useSEO from "../hooks/useSEO";
 // Iconos
 import {
   PlusCircleIcon,
@@ -16,7 +17,7 @@ import {
   HeartIcon // Nuevo icono para el banner
 } from '@heroicons/react/24/outline';
 
-const quickActions = [
+const getQuickActions = (isGuest) => [
   {
     title: "Crear Nuevo Festival",
     desc: "Empieza a diseñar tu próximo evento.",
@@ -27,10 +28,10 @@ const quickActions = [
   },
   {
     title: "Mis Festivales",
-    desc: "Ver y editar tus creaciones guardadas.",
+    desc: isGuest ? "Necesitas cuenta para guardar." : "Ver y editar tus creaciones guardadas.",
     icon: <ListBulletIcon className="w-12 h-12 text-black mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300" />,
     href: "/mis-festivales",
-    disabled: false,
+    disabled: isGuest,
     colorClass: "bg-[#FF90E8] hover:bg-white"
   },
   {
@@ -43,16 +44,22 @@ const quickActions = [
   },
   {
     title: "Mi Perfil",
-    desc: "Estadísticas y ajustes de cuenta.",
+    desc: isGuest ? "Necesitas cuenta para acceder." : "Estadísticas y ajustes de cuenta.",
     icon: <UserCircleIcon className="w-12 h-12 text-black mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300" />,
     href: "/perfil",
-    disabled: false,
+    disabled: isGuest,
     colorClass: "bg-[#00E5FF] hover:bg-white"
   }
 ];
 
 const Inicio = () => {
   const { user, setUser } = useContext(AuthContext);
+
+  useSEO({
+    title: 'Mi Panel | MiFestival',
+    description: 'Panel de control de MiFestival. Crea festivales, explora la comunidad y gestiona tus lineups.',
+    noindex: true,
+  });
 
   if (user === undefined) {
     return (
@@ -165,7 +172,7 @@ const Inicio = () => {
 
         {/* --- SECTION 1: ACCIONES PRINCIPALES --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {quickActions.map((action, i) => (
+          {getQuickActions(user.isGuest).map((action, i) => (
             <Link
               key={i}
               to={action.disabled ? '#' : action.href}

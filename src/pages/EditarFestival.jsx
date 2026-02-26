@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
+import useSEO from "../hooks/useSEO";
 import { useParams, Link } from "react-router-dom";
 import { doc, getDoc, updateDoc, arrayUnion, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase";
@@ -21,6 +22,12 @@ import {
 const EditarFestival = () => {
     const { id } = useParams();
     const { user } = useContext(AuthContext);
+
+    useSEO({
+        title: 'Editar Festival | MiFestival',
+        description: 'Editor de lineup de MiFestival. Arrastra artistas, personaliza fondos y descarga tu cartel en HD.',
+        noindex: true,
+    });
 
     const [festival, setFestival] = useState(null);
     const [loading, setLoading] = useState(true);

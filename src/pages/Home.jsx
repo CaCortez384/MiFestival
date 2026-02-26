@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import mflogo from "../assets/mflogo20.png";
 import poster1 from "../assets/poster1.webp";
 import poster2 from "../assets/poster2.webp";
@@ -17,7 +19,14 @@ const Home = () => {
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useSEO({
+    title: 'MiFestival - Crea, Comparte y Vota Lineups de Festivales',
+    description: 'El generador de carteles de música #1. Crea tu lineup sin Spotify, publícalo en la comunidad, recibe likes y compite por estar en el Top Tendencias. Descarga gratis en HD.',
+    canonical: 'https://mifestival.web.app/',
+  });
+
   const handleGuest = () => {
+    trackEvent('guest_mode_start');
     setUser({ isGuest: true, displayName: "Invitado" });
     navigate("/inicio");
   };

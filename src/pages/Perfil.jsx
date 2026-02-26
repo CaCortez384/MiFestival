@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import useSEO from "../hooks/useSEO";
 import { AuthContext } from '../context/AuthContext';
 import { db, auth } from '../firebase';
 import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
@@ -17,6 +18,12 @@ import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 
 const Perfil = () => {
     const { user, setUser } = useContext(AuthContext);
+
+    useSEO({
+        title: 'Mi Perfil | MiFestival',
+        description: 'Tu perfil en MiFestival. Estadísticas, insignias y configuración de cuenta.',
+        noindex: true,
+    });
     const [stats, setStats] = useState({ totalFestivales: 0, totalLikes: 0 });
     const [favorites, setFavorites] = useState([]);
     const [activeTab, setActiveTab] = useState('stats');
@@ -88,7 +95,7 @@ const Perfil = () => {
     };
 
     const handleChangePassword = async () => {
-        if (user.providerData[0]?.providerId === 'google.com') {
+        if (user.providerData?.[0]?.providerId === 'google.com') {
             showModal('error', 'Cuenta de Google', 'Debes cambiar tu contraseña desde tu configuración de Google.');
             return;
         }
@@ -153,7 +160,7 @@ const Perfil = () => {
     };
 
     if (!user) return null;
-    const isGoogleUser = user.providerData[0]?.providerId === 'google.com';
+    const isGoogleUser = user.providerData?.[0]?.providerId === 'google.com';
     const userBadges = getBadges();
 
     return (

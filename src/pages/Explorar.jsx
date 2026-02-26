@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
+import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { collection, query, where, getDocs, orderBy, limit, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Link } from 'react-router-dom';
@@ -21,6 +23,16 @@ const Explorar = () => {
     const [fetchError, setFetchError] = useState(null);
     const [filtro, setFiltro] = useState('trending');
     const { user } = useContext(AuthContext);
+
+    useSEO({
+        title: 'Explorar Festivales | MiFestival',
+        description: 'Descubre los mejores lineups creados por la comunidad. Vota por tus favoritos y compite en el ranking de tendencias.',
+        canonical: 'https://mifestival.web.app/explorar',
+    });
+
+    useEffect(() => {
+        trackEvent('explore_page_viewed');
+    }, []);
 
     // Cargar Festivales
     useEffect(() => {
@@ -84,6 +96,7 @@ const Explorar = () => {
                     likes: increment(1),
                     likesBy: arrayUnion(user.uid)
                 });
+                trackEvent('festival_liked', { festival_id: festival.id });
             }
         } catch (error) {
             console.error("Error al dar like:", error);

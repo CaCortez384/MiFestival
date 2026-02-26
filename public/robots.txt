@@ -1,2 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /perfil
+Disallow: /mis-festivales
+Disallow: /editarFestival/
+
+Sitemap: https://mifestival.web.app/sitemap.xml

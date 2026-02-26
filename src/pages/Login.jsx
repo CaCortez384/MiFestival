@@ -1,4 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
+import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 // MODIFICADO: Importamos sendPasswordResetEmail
 import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
@@ -35,6 +37,12 @@ function Login() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
+  useSEO({
+    title: 'Iniciar Sesión | MiFestival',
+    description: 'Inicia sesión en MiFestival para gestionar tus lineups, votar festivales y competir en el ranking global.',
+    canonical: 'https://mifestival.web.app/login',
+  });
+
   useEffect(() => {
     if (user) {
       navigate("/inicio");
@@ -47,6 +55,7 @@ function Login() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      trackEvent('login', { method: 'email' });
     } catch (err) {
       setError('Correo o contraseña incorrectos. Inténtalo de nuevo.');
       console.error("Error de login:", err);
@@ -60,6 +69,7 @@ function Login() {
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
+      trackEvent('login', { method: 'google' });
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') {
         setError('Error al iniciar sesión con Google.');

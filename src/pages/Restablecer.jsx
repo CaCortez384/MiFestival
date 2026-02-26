@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import useSEO from "../hooks/useSEO";
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -8,6 +9,12 @@ import { LockClosedIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/2
 const Restablecer = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+
+    useSEO({
+        title: 'Restablecer Contraseña | MiFestival',
+        description: 'Restablece tu contraseña de MiFestival para recuperar el acceso a tu cuenta.',
+        noindex: true,
+    });
 
     // Firebase envía el código en el parámetro 'oobCode'
     const oobCode = searchParams.get('oobCode');

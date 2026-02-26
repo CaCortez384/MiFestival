@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import useSEO from "../hooks/useSEO";
 import { collection, query, where, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../firebase';
@@ -12,6 +13,12 @@ const MisFestivales = () => {
     const [loading, setLoading] = useState(true);
     const [usuario, setUsuario] = useState(null);
     const navigate = useNavigate();
+
+    useSEO({
+        title: 'Mis Festivales | MiFestival',
+        description: 'Gestiona y edita tus festivales creados en MiFestival.',
+        noindex: true,
+    });
 
     const handleVolver = () => {
         if (window.history.length > 2) {

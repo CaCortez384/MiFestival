@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
+import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -24,6 +26,12 @@ const Festival = () => {
 
     const [artistas, setArtistas] = useState([]);
     const [fondoPoster, setFondoPoster] = useState("city");
+
+    useSEO({
+        title: festival ? `${festival.name} | MiFestival` : 'Festival | MiFestival',
+        description: festival ? `Mira el lineup de ${festival.name} en MiFestival. ${festival.days || ''} días de música increíble.` : 'Visualiza lineups de festivales en MiFestival.',
+        canonical: id ? `https://mifestival.web.app/festival/${id}` : undefined,
+    });
 
     // REFS
     const posterRef = useRef(null);
@@ -71,6 +79,7 @@ const Festival = () => {
             link.download = `${generarSlug(festival.name || 'mi-festival')}-poster.png`;
             link.href = dataUrl;
             link.click();
+            trackEvent('poster_downloaded', { festival_name: festival.name });
         } catch (err) {
             console.error(err);
             alert("No se pudo generar imagen.");
@@ -100,6 +109,7 @@ const Festival = () => {
             } else {
                 await navigator.share({ ...shareData, text: `${shareData.text}\n${shareUrl}` });
             }
+            trackEvent('poster_shared', { festival_name: festival.name });
         } catch (err) {
             if (err.name !== 'AbortError') alert('No se pudo compartir.');
             console.error(err);
@@ -125,6 +135,7 @@ const Festival = () => {
                         setFestival({ id: docSnap.id, ...docSnap.data() });
                         setArtistas(docSnap.data().artistas || []);
                         setFondoPoster(docSnap.data().fondoPoster || "city");
+                        trackEvent('festival_viewed', { festival_id: docSnap.id, festival_name: docSnap.data().name });
                     } else {
                         setError("Festival no encontrado.");
                         setFestival(null);

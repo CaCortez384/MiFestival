@@ -1,4 +1,6 @@
 import React, { useState, useContext } from "react";
+import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
@@ -21,6 +23,13 @@ const CreateFestival = () => {
     const [loading, setLoading] = useState(false);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    useSEO({
+        title: 'Crear Festival | MiFestival',
+        description: 'Crea tu propio cartel de festival personalizado. Elige nombre, duración y empieza a diseñar tu lineup ideal.',
+        canonical: 'https://mifestival.web.app/crear-festival',
+        noindex: true,
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -53,6 +62,7 @@ const CreateFestival = () => {
                 createdAt: serverTimestamp(),
                 userId: user.isGuest ? "invitado" : user.uid,
             });
+            trackEvent('festival_created', { festival_name: name.trim() });
             navigate(`/editarFestival/${docRef.id}`);
         } catch (error) {
             setError("Error al guardar el festival. Intenta de nuevo.");
