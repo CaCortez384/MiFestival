@@ -6,11 +6,11 @@ import { updateProfile, deleteUser, sendPasswordResetEmail } from 'firebase/auth
 // CORRECCIÓN AQUÍ: Se agregó Link
 import { useNavigate, Link } from 'react-router-dom';
 import mflogo from "../assets/mflogo20.png";
-import { 
-    UserCircleIcon, FireIcon, TicketIcon, ArrowLeftIcon, 
-    PencilSquareIcon, ArrowRightOnRectangleIcon, TrashIcon, 
+import {
+    UserCircleIcon, FireIcon, TicketIcon, ArrowLeftIcon,
+    PencilSquareIcon, ArrowRightOnRectangleIcon, TrashIcon,
     LockClosedIcon, CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon,
-    HeartIcon, 
+    HeartIcon,
     CalendarDaysIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
@@ -22,18 +22,17 @@ const Perfil = () => {
     const [activeTab, setActiveTab] = useState('stats');
     const [isEditing, setIsEditing] = useState(false);
     const [newName, setNewName] = useState(user?.displayName || "");
-    const [loading, setLoading] = useState(true);
-    
+
     // Estado para validar la palabra "ELIMINAR"
-    const [deleteInput, setDeleteInput] = useState(''); 
+    const [deleteInput, setDeleteInput] = useState('');
 
     // Estado del Modal
-    const [modal, setModal] = useState({ 
-        show: false, 
-        type: '', 
-        title: '', 
+    const [modal, setModal] = useState({
+        show: false,
+        type: '',
+        title: '',
         message: '',
-        onConfirm: null 
+        onConfirm: null
     });
 
     const navigate = useNavigate();
@@ -44,7 +43,7 @@ const Perfil = () => {
 
     const closeModal = () => {
         setModal({ ...modal, show: false });
-        setDeleteInput(''); 
+        setDeleteInput('');
     };
 
     useEffect(() => {
@@ -93,14 +92,14 @@ const Perfil = () => {
             showModal('error', 'Cuenta de Google', 'Debes cambiar tu contraseña desde tu configuración de Google.');
             return;
         }
-        
+
         showModal('confirm', '¿Cambiar contraseña?', `Enviaremos un correo a ${user.email} para restablecerla.`, async () => {
-            try { 
-                await sendPasswordResetEmail(auth, user.email); 
-                closeModal(); 
+            try {
+                await sendPasswordResetEmail(auth, user.email);
+                closeModal();
                 setTimeout(() => showModal('success', 'Correo Enviado', 'Revisa tu bandeja de entrada.'), 300);
-            } 
-            catch (error) { 
+            }
+            catch (error) {
                 console.error(error);
                 closeModal();
                 showModal('error', 'Error', 'No se pudo enviar el correo.');
@@ -111,7 +110,7 @@ const Perfil = () => {
     const handleLogout = async () => { await auth.signOut(); navigate('/'); };
 
     const handleDeleteAccountRequest = () => {
-        setDeleteInput(''); 
+        setDeleteInput('');
         showModal('delete-account', '¿Eliminar Cuenta Permanentemente?', 'Esta acción borrará todos tus festivales y datos. No hay vuelta atrás.', executeDeleteAccount);
     };
 
@@ -126,11 +125,11 @@ const Perfil = () => {
 
             await deleteUser(auth.currentUser);
             navigate('/');
-            
+
         } catch (error) {
             console.error("Error eliminando cuenta:", error);
-            closeModal(); 
-            
+            closeModal();
+
             if (error.code === 'auth/requires-recent-login') {
                 setTimeout(() => {
                     showModal('error', 'Seguridad', 'Para eliminar tu cuenta, necesitas haber iniciado sesión recientemente. Por favor, cierra sesión e ingresa de nuevo.');
@@ -158,205 +157,208 @@ const Perfil = () => {
     const userBadges = getBadges();
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white font-sans relative overflow-x-hidden">
-            
-            <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[10%] right-[30%] w-[40%] h-[40%] bg-cyan-900/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[10%] left-[10%] w-[30%] h-[30%] bg-purple-900/10 rounded-full blur-[100px]"></div>
-            </div>
+        <div className="min-h-screen flex flex-col bg-brutal-base text-[#050510] font-inter relative overflow-x-hidden border-x-4 border-black max-w-[1600px] mx-auto">
 
-            <header className="w-full px-6 py-4 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md bg-[#0B0F19]/80">
-                <div className="container mx-auto flex justify-between items-center max-w-4xl">
-                    <div className="flex items-center gap-3">
-                        <img src={mflogo} alt="Logo" className="w-8 h-8 rounded-lg" />
-                        <span className="text-lg font-bold">Mi Perfil</span>
+            {/* Fondo Textura */}
+            <div className="fixed inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "20px 20px" }}></div>
+
+            {/* --- HEADER --- */}
+            <header className="w-full px-4 sm:px-6 py-4 border-b-4 border-black sticky top-0 z-50 bg-white">
+                <div className="container mx-auto flex justify-between items-center max-w-[1400px]">
+                    <div className="flex items-center gap-3 shrink-0">
+                        <div className="relative border-2 border-black rounded-none shadow-[2px_2px_0px_#000]">
+                            <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 sm:w-9 sm:h-9 object-cover" />
+                        </div>
+                        <span className="text-lg sm:text-xl brutal-title hidden sm:inline bg-[#00E5FF] px-2 mt-1 border-2 border-black rotate-1">MI PERFIL</span>
                     </div>
-                    <button onClick={() => navigate('/inicio')} className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-400 hover:bg-white/5 transition">
-                        <ArrowLeftIcon className="w-4 h-4" /> Volver
-                    </button>
+                    <button onClick={() => navigate('/inicio')} className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black border-2 border-black hover:bg-yellow-400 shadow-[2px_2px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all bg-white"><ArrowLeftIcon className="w-5 h-5" />Volver</button>
                 </div>
             </header>
 
-            <main className="flex-grow container mx-auto px-4 py-12 max-w-3xl">
-                
-                <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl relative overflow-hidden mb-8">
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-500 to-purple-600"></div>
+            <main className="flex-grow container mx-auto px-4 py-12 max-w-4xl relative z-10">
 
-                    <div className="flex flex-col items-center text-center">
-                        <div className="relative mb-4">
-                            {user.photoURL ? (
-                                <img src={user.photoURL} alt="Avatar" className="w-24 h-24 rounded-full border-4 border-[#0B0F19] shadow-xl" />
-                            ) : (
-                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center border-4 border-[#0B0F19] shadow-xl">
-                                    <span className="text-3xl font-bold text-white">{user.displayName?.charAt(0) || "U"}</span>
-                                </div>
-                            )}
-                            <button onClick={() => setIsEditing(!isEditing)} className="absolute bottom-0 right-0 bg-cyan-600 p-2 rounded-full hover:bg-cyan-500 transition shadow-lg">
-                                <PencilSquareIcon className="w-4 h-4 text-white" />
+                {/* --- TARJETA DE PERFIL --- */}
+                <div className="bg-[#FFD500] border-4 border-black shadow-[8px_8px_0_#000] p-8 relative overflow-hidden mb-12 transform -rotate-1">
+
+                    <div className="flex flex-col items-center text-center relative z-10">
+                        <div className="relative mb-6">
+                            <div className="w-28 h-28 border-4 border-black bg-white flex items-center justify-center shadow-[4px_4px_0_#000]">
+                                <UserCircleIcon className="w-20 h-20 text-gray-300 stroke-1" />
+                            </div>
+                            <button onClick={() => setIsEditing(!isEditing)} className="absolute -bottom-2 -right-2 bg-[#00FF66] border-2 border-black p-2 shadow-[2px_2px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none transition-all">
+                                <PencilSquareIcon className="w-5 h-5 text-black" />
                             </button>
                         </div>
 
                         {isEditing ? (
-                            <div className="flex gap-2 mb-2 w-full max-w-xs justify-center">
-                                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="bg-black/30 border border-white/20 rounded-lg px-3 py-1 text-center text-white focus:border-cyan-500 outline-none" />
-                                <button onClick={handleUpdateName} className="bg-green-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-green-500 transition">OK</button>
+                            <div className="flex gap-2 mb-4 w-full max-w-xs justify-center bg-white border-4 border-black p-2 shadow-[4px_4px_0_#000] transform rotate-1">
+                                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="bg-transparent border-none text-center text-black font-bold uppercase focus:ring-0 outline-none w-full" placeholder="NUEVO NOMBRE" />
+                                <button onClick={handleUpdateName} className="bg-[#00FF66] border-2 border-black px-4 py-2 text-sm font-black text-black hover:bg-yellow-400 transition-colors">OK</button>
                             </div>
                         ) : (
-                            <h1 className="text-3xl font-bold text-white mb-1">{user.displayName || "Usuario"}</h1>
+                            <h1 className="text-4xl md:text-5xl brutal-title mb-2 bg-white border-4 border-black inline-block px-4 py-2 shadow-[4px_4px_0_#000] rotate-1">{user.displayName || "USUARIO"}</h1>
                         )}
-                        <p className="text-sm text-gray-500 mb-4">{user.email}</p>
+                        <p className="text-lg font-bold text-black bg-white/80 px-2 mt-2">{user.email}</p>
 
-                        <div className="flex flex-wrap justify-center gap-2 mb-8">
+                        <div className="flex flex-wrap justify-center gap-3 mt-8">
                             {userBadges.length > 0 ? userBadges.map((badge, i) => (
-                                <span key={i} className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badge.color}`}>
+                                <span key={i} className={`px-4 py-2 text-xs font-black uppercase tracking-widest border-2 border-black bg-white shadow-[2px_2px_0_#000] transform ${i % 2 === 0 ? 'rotate-2' : '-rotate-2'}`}>
                                     {badge.label}
                                 </span>
                             )) : (
-                                <span className="px-3 py-1 rounded-full text-[10px] bg-white/5 text-gray-500 border border-white/5">Sin insignias aún</span>
+                                <span className="px-4 py-2 text-xs font-black uppercase tracking-widest border-2 border-black bg-gray-200">SIN INSIGNIAS AÚN</span>
                             )}
                         </div>
                     </div>
                 </div>
 
-                <div className="flex border-b border-white/10 mb-6">
-                    <button 
+                {/* --- TABS --- */}
+                <div className="flex mb-8 gap-4">
+                    <button
                         onClick={() => setActiveTab('stats')}
-                        className={`flex-1 pb-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'stats' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-500 hover:text-gray-300'}`}
+                        className={`flex-1 py-4 text-lg font-black uppercase tracking-widest border-4 border-black transition-all ${activeTab === 'stats' ? 'bg-[#FF90E8] shadow-[4px_4px_0_#000] text-black translate-y-[-4px]' : 'bg-white text-black hover:bg-yellow-50 shadow-[2px_2px_0_#000]'}`}
                     >
-                        Estadísticas
+                        ESTADÍSTICAS
                     </button>
-                    <button 
+                    <button
                         onClick={() => setActiveTab('favorites')}
-                        className={`flex-1 pb-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'favorites' ? 'text-pink-400 border-b-2 border-pink-400' : 'text-gray-500 hover:text-gray-300'}`}
+                        className={`flex-1 py-4 text-lg font-black uppercase tracking-widest border-4 border-black transition-all ${activeTab === 'favorites' ? 'bg-[#00E5FF] shadow-[4px_4px_0_#000] text-black translate-y-[-4px]' : 'bg-white text-black hover:bg-cyan-50 shadow-[2px_2px_0_#000]'}`}
                     >
-                        Favoritos ({favorites.length})
+                        FAVS ({favorites.length})
                     </button>
                 </div>
 
                 {activeTab === 'stats' ? (
                     <div className="animate-fade-in-up">
-                        <div className="grid grid-cols-2 gap-4 mb-8">
-                            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 flex flex-col items-center">
-                                <span className="text-4xl font-black text-white mb-2">{stats.totalFestivales}</span>
-                                <span className="text-xs text-gray-400 uppercase tracking-wider font-bold flex items-center gap-2">
-                                    <TicketIcon className="w-4 h-4 text-purple-400" /> Festivales
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                            <div className="bg-[#00FF66] border-4 border-black p-8 flex flex-col items-center shadow-[6px_6px_0_#000] transform rotate-1">
+                                <span className="text-6xl brutal-title text-black mb-2 bg-white px-4 border-4 border-black shadow-[4px_4px_0_#000]">{stats.totalFestivales}</span>
+                                <span className="text-sm text-black font-black uppercase tracking-widest flex items-center gap-2 mt-4 bg-white px-2 border-2 border-black">
+                                    <TicketIcon className="w-6 h-6" /> FESTIVALES
                                 </span>
                             </div>
-                            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 flex flex-col items-center">
-                                <span className="text-4xl font-black text-white mb-2">{stats.totalLikes}</span>
-                                <span className="text-xs text-gray-400 uppercase tracking-wider font-bold flex items-center gap-2">
-                                    <FireIcon className="w-4 h-4 text-orange-500" /> Impacto Social
+                            <div className="bg-[#FF90E8] border-4 border-black p-8 flex flex-col items-center shadow-[6px_6px_0_#000] transform -rotate-1">
+                                <span className="text-6xl brutal-title text-black mb-2 bg-white px-4 border-4 border-black shadow-[4px_4px_0_#000]">{stats.totalLikes}</span>
+                                <span className="text-sm text-black font-black uppercase tracking-widest flex items-center gap-2 mt-4 bg-white px-2 border-2 border-black">
+                                    <FireIcon className="w-6 h-6" /> IMPACTO SOCIAL
                                 </span>
                             </div>
                         </div>
-                        
-                        <div className="space-y-3">
+
+                        <div className="space-y-4">
                             {!isGoogleUser && !user.isGuest && (
-                                <button onClick={handleChangePassword} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-cyan-400 font-semibold py-3 rounded-xl transition border border-white/5">
-                                    <LockClosedIcon className="w-5 h-5" /> Cambiar Contraseña
+                                <button onClick={handleChangePassword} className="w-full flex items-center justify-center gap-3 bg-white border-4 border-black text-black font-bold uppercase text-lg py-4 shadow-[4px_4px_0_#000] hover:bg-yellow-400 hover:shadow-[6px_6px_0_#000] transition-all">
+                                    <LockClosedIcon className="w-6 h-6" /> CAMBIAR CONTRASEÑA
                                 </button>
                             )}
-                            <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-gray-300 font-semibold py-3 rounded-xl transition">
-                                <ArrowRightOnRectangleIcon className="w-5 h-5" /> Cerrar Sesión
+                            <button onClick={handleLogout} className="w-full flex items-center justify-center gap-3 bg-white border-4 border-black text-black font-bold uppercase text-lg py-4 shadow-[4px_4px_0_#000] hover:bg-yellow-400 hover:shadow-[6px_6px_0_#000] transition-all">
+                                <ArrowRightOnRectangleIcon className="w-6 h-6" /> CERRAR SESIÓN
                             </button>
-                            
+
                             {!user.isGuest && (
-                                <button onClick={handleDeleteAccountRequest} className="w-full text-red-500/60 hover:text-red-500 text-xs mt-4 py-2 transition font-bold uppercase tracking-wider">
-                                    Eliminar cuenta permanentemente
+                                <button onClick={handleDeleteAccountRequest} className="w-full text-white bg-red-600 border-4 border-black text-lg py-4 transition font-black uppercase tracking-widest shadow-[4px_4px_0_#000] hover:bg-red-500 hover:shadow-[6px_6px_0_#000] mt-8">
+                                    ELIMINAR CUENTA PERMANENTEMENTE
                                 </button>
                             )}
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in-up">
                         {favorites.length > 0 ? favorites.map(fav => (
-                            <Link to={`/festival/${fav.id}/artistas`} key={fav.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-pink-500/30 transition group">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h4 className="font-bold text-white truncate pr-2 group-hover:text-pink-300 transition">{fav.name}</h4>
-                                    <span className="flex items-center gap-1 text-xs font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full">
-                                        <HeartIconSolid className="w-3 h-3" /> {fav.likes}
+                            <Link to={`/festival/${fav.id}/artistas`} key={fav.id} className="bg-white border-4 border-black shadow-[6px_6px_0_#000] p-5 hover:bg-yellow-50 hover:-translate-y-1 transition-all group">
+                                <div className="flex justify-between items-start mb-4">
+                                    <h4 className="text-xl brutal-title truncate pr-2 group-hover:text-[#00E5FF] transition-colors">{fav.name}</h4>
+                                    <span className="flex items-center gap-1 text-sm font-black text-black border-2 border-black bg-[#FF90E8] px-2 py-1 shadow-[2px_2px_0_#000]">
+                                        <HeartIconSolid className="w-4 h-4" /> {fav.likes}
                                     </span>
                                 </div>
-                                <div className="text-xs text-gray-500 flex gap-3">
-                                    <span className="flex items-center gap-1"><CalendarDaysIcon className="w-3 h-3"/> {fav.days}d</span>
-                                    <span className="flex items-center gap-1"><UserCircleIcon className="w-3 h-3"/> {fav.userName || 'Anon'}</span>
+                                <div className="text-sm text-black font-bold flex gap-4 bg-gray-100 p-2 border-2 border-black">
+                                    <span className="flex items-center gap-2"><CalendarDaysIcon className="w-4 h-4" /> {fav.days} DÍAS</span>
+                                    <span className="flex items-center gap-2"><UserCircleIcon className="w-4 h-4" /> {fav.userName || 'ANON'}</span>
                                 </div>
                             </Link>
                         )) : (
-                            <div className="col-span-full text-center py-10 text-gray-500 bg-white/5 rounded-xl border border-dashed border-white/10">
-                                <HeartIcon className="w-10 h-10 mx-auto mb-2 opacity-20" />
-                                <p>Aún no tienes favoritos.</p>
-                                <Link to="/explorar" className="text-pink-400 text-sm font-bold hover:underline mt-2 block">Ir a Explorar</Link>
+                            <div className="col-span-full text-center py-16 bg-white border-4 border-black border-dashed shadow-[8px_8px_0_#000] transform rotate-1">
+                                <HeartIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                                <p className="text-xl brutal-title mb-4">AÚN NO TIENES FAVORITOS.</p>
+                                <Link to="/explorar" className="inline-block bg-[#00E5FF] brutal-btn py-3 px-8 text-lg">IR A EXPLORAR</Link>
                             </div>
                         )}
                     </div>
                 )}
             </main>
 
+            {/* --- MODAL --- */}
             {modal.show && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in">
-                    <div className="bg-[#1a1f2e] border border-white/10 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative transform transition-all scale-100">
-                        
-                        <div className="flex justify-center mb-4">
-                            {modal.type === 'success' && <CheckCircleIcon className="w-12 h-12 text-green-400" />}
-                            {modal.type === 'error' && <XCircleIcon className="w-12 h-12 text-red-400" />}
-                            {(modal.type === 'confirm' || modal.type === 'delete-account') && <ExclamationTriangleIcon className="w-12 h-12 text-yellow-400" />}
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-white border-4 border-black shadow-[16px_16px_0_#000] p-8 w-full max-w-md relative transform transition-all -rotate-1">
+
+                        <div className="flex justify-center mb-6">
+                            {modal.type === 'success' && <div className="bg-[#00FF66] p-4 border-4 border-black rounded-full shadow-[4px_4px_0_#000]"><CheckCircleIcon className="w-10 h-10 text-black" /></div>}
+                            {modal.type === 'error' && <div className="bg-red-500 p-4 border-4 border-black rounded-full shadow-[4px_4px_0_#000]"><XCircleIcon className="w-10 h-10 text-white" /></div>}
+                            {(modal.type === 'confirm' || modal.type === 'delete-account') && <div className="bg-[#FFD500] p-4 border-4 border-black rounded-full shadow-[4px_4px_0_#000]"><ExclamationTriangleIcon className="w-10 h-10 text-black" /></div>}
                             {modal.type === 'loading' && (
-                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-400"></div>
+                                <div className="bg-white p-4 border-4 border-black rounded-full shadow-[4px_4px_0_#000]"><div className="animate-spin h-10 w-10 border-4 border-black border-b-transparent rounded-full"></div></div>
                             )}
                         </div>
 
-                        <h3 className="text-xl font-bold text-white text-center mb-2">{modal.title}</h3>
-                        <p className="text-gray-400 text-center text-sm mb-6 leading-relaxed">{modal.message}</p>
+                        <h3 className="text-2xl brutal-title text-black text-center mb-4 bg-yellow-400 inline-block px-4 py-2 border-2 border-black rotate-1">{modal.title}</h3>
+                        <p className="text-black text-center font-bold mb-8 text-lg border-2 border-dashed border-black p-4">{modal.message}</p>
 
                         {modal.type === 'delete-account' && (
-                            <div className="mb-6">
-                                <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-2 text-center font-bold">
+                            <div className="mb-8">
+                                <label className="block text-sm font-black uppercase tracking-widest text-black mb-2 text-center bg-red-500 text-white border-2 border-black inline-block px-2">
                                     Escribe "ELIMINAR" para confirmar
                                 </label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={deleteInput}
                                     onChange={(e) => setDeleteInput(e.target.value)}
-                                    className="w-full bg-black/30 border border-red-500/30 rounded-lg py-2 px-3 text-center text-white placeholder-gray-700 focus:border-red-500 outline-none transition"
+                                    className="w-full bg-white border-4 border-black shadow-[4px_4px_0_#000] py-3 px-4 text-center text-black font-bold uppercase text-xl focus:border-red-500 focus:ring-0 outline-none transition"
                                     placeholder="ELIMINAR"
                                 />
                             </div>
                         )}
 
-                        <div className="flex gap-3">
+                        <div className="flex gap-4">
                             {(modal.type === 'confirm' || modal.type === 'delete-account') ? (
                                 <>
-                                    <button 
+                                    <button
                                         onClick={closeModal}
-                                        className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-3 rounded-xl transition"
+                                        className="flex-1 bg-white border-4 border-black text-black font-bold uppercase py-4 shadow-[4px_4px_0_#000] hover:bg-gray-200 transition"
                                     >
-                                        Cancelar
+                                        CANCELAR
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={modal.onConfirm}
                                         disabled={modal.type === 'delete-account' && deleteInput !== 'ELIMINAR'}
-                                        className={`flex-1 font-bold py-3 rounded-xl transition ${
-                                            modal.type === 'delete-account' && deleteInput !== 'ELIMINAR'
-                                            ? 'bg-red-500/20 text-red-500/50 cursor-not-allowed'
-                                            : 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-900/20'
-                                        }`}
+                                        className={`flex-1 border-4 border-black font-bold uppercase py-4 shadow-[4px_4px_0_#000] transition ${modal.type === 'delete-account' && deleteInput !== 'ELIMINAR'
+                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                                            : 'bg-red-600 hover:bg-red-500 text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#000]'
+                                            }`}
                                     >
-                                        Confirmar
+                                        CONFIRMAR
                                     </button>
                                 </>
                             ) : modal.type !== 'loading' && (
-                                <button 
+                                <button
                                     onClick={closeModal}
-                                    className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl transition"
+                                    className="w-full bg-[#00FF66] brutal-btn py-4 text-xl"
                                 >
-                                    Entendido
+                                    ENTENDIDO
                                 </button>
                             )}
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* --- FOOTER --- */}
+            <footer className="w-full py-8 text-center text-sm font-black uppercase tracking-widest text-black border-t-4 border-black bg-white mt-10 relative z-10">
+                <div className="container mx-auto px-4">
+                    © {new Date().getFullYear()} MiFestival. HAZ RUIDO.
+                </div>
+            </footer>
         </div>
     );
 };

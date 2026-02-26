@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import mflogo from "../assets/mflogo20.png";
-import banner from "../assets/banner.png";
+import poster1 from "../assets/poster1.webp";
+import poster2 from "../assets/poster2.webp";
+import poster3 from "../assets/poster3.webp";
+import poster4 from "../assets/poster4.webp";
+import poster5 from "../assets/poster5.webp";
+import poster6 from "../assets/poster6.webp";
+import poster7 from "../assets/poster7.webp";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -16,41 +22,38 @@ const Home = () => {
     navigate("/inicio");
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white font-sans selection:bg-cyan-500 selection:text-white overflow-x-hidden">
-      
-      {/* Efectos de fondo */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-cyan-600/20 rounded-full blur-[100px]"></div>
-      </div>
+  const posters = [poster1, poster2, poster3, poster4, poster5, poster6, poster7];
+  const doubledPosters = [...posters, ...posters];
 
-      {/* --- HEADER CORREGIDO PARA MÓVIL --- */}
-      <header className="w-full px-4 sm:px-6 py-4 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md bg-[#0B0F19]/80">
+  return (
+    <div className="min-h-screen flex flex-col bg-brutal-base text-[#050510] font-inter selection:bg-yellow-400 selection:text-black overflow-x-hidden border-x-4 border-black max-w-[1600px] mx-auto">
+
+      {/* Fondo de patrón de puntos Brutalista (opcional, le da textura) */}
+      <div className="fixed inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "20px 20px" }}></div>
+
+      {/* --- HEADER --- */}
+      <header className="w-full px-4 sm:px-6 py-4 border-b-4 border-black sticky top-0 z-50 bg-brutal-base">
         <div className="container mx-auto flex justify-between items-center max-w-7xl">
-          
+
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group shrink-0">
-            <div className="relative">
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg blur opacity-40 group-hover:opacity-100 transition duration-200"></div>
-                <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg" />
+          <Link to="/" className="flex items-center gap-3 shrink-0 hover:translate-x-1 hover:-translate-y-1 transition-transform">
+            <div className="relative border-2 border-black rounded-none shadow-[2px_2px_0px_#000]">
+              <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 sm:w-9 sm:h-9 object-cover" />
             </div>
-            <span className="text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">MiFestival</span>
+            <span className="text-lg sm:text-xl font-outfit font-black tracking-tight text-black uppercase">MiFestival</span>
           </Link>
 
           {/* Navegación Responsive */}
-          <nav className="flex items-center gap-2 sm:gap-4">
+          <nav className="flex items-center gap-3 sm:gap-4">
             <Link
               to="/login"
-              // CAMBIO: Quitamos 'hidden'. Ahora es visible siempre. Ajustamos padding para móvil.
-              className="px-3 py-2 sm:px-4 rounded-full text-xs sm:text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition whitespace-nowrap"
+              className="px-3 py-2 text-xs sm:text-sm font-bold text-black hover:bg-yellow-100 transition whitespace-nowrap border-2 border-transparent hover:border-black rounded-none"
             >
               Iniciar Sesión
             </Link>
             <Link
               to="/register"
-              // CAMBIO: Texto más corto en móvil ("Crear") para ahorrar espacio
-              className="px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-[#0B0F19] bg-white hover:bg-cyan-400 transition transform hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.3)] whitespace-nowrap"
+              className="px-4 py-2 text-xs sm:text-sm bg-yellow-400 brutal-btn"
             >
               <span className="hidden sm:inline">Crear Cuenta</span>
               <span className="sm:hidden">Crear</span>
@@ -60,71 +63,105 @@ const Home = () => {
       </header>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-12 pb-24 lg:pt-32 lg:pb-40">
+      <section className="relative pt-12 pb-24 lg:pt-32 lg:pb-40 border-b-4 border-black bg-[#FF90E8]">
         <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            
+
             {/* Texto Hero */}
             <div className="lg:w-1/2 text-center lg:text-left z-10">
-              <div className="inline-flex items-center justify-center lg:justify-start gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-6 animate-fade-in-up">
-                <SparklesIcon className="w-4 h-4" /> Ahora con Comunidad y Likes
+              <div className="inline-flex items-center justify-center lg:justify-start gap-2 px-4 py-2 bg-yellow-400 border-4 border-black brutal-title text-xs sm:text-sm mb-6 shadow-[4px_4px_0px_#000]">
+                <SparklesIcon className="w-5 h-5 text-black" /> Ahora con Comunidad y Likes
               </div>
-              
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
-                Crea, Comparte y <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500">
-                  Viraliza tu Festival.
+
+              <h1 className="text-5xl sm:text-6xl lg:text-8xl brutal-title mb-6 leading-tight md:leading-[0.9] tracking-tighter"
+                style={{
+                  color: window.innerWidth > 768 ? 'white' : 'black',
+                  textShadow: window.innerWidth > 768 ? "4px 4px 0px #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000" : "none"
+                }}>
+                Crea, <br />
+                Comparte & <br />
+                <span className="text-yellow-400"
+                  style={{
+                    textShadow: window.innerWidth <= 768 ? "2px 2px 0px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" : "none"
+                  }}>
+                  Viraliza.
                 </span>
               </h1>
-              
-              <p className="text-base sm:text-lg text-gray-400 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+
+              <p className="text-base sm:text-xl text-black font-bold mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed border-l-4 border-black pl-4">
                 Diseña el cartel definitivo sin Spotify. Publica tu lineup en nuestra comunidad global, recibe likes y llega al top de tendencias.
               </p>
 
-              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-6">
                 <Link
                   to="/register"
-                  className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-cyan-600 font-lg rounded-xl hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-600 w-full sm:w-auto"
+                  className="inline-flex items-center justify-center px-8 py-5 text-lg bg-[#00FF66] brutal-btn w-full sm:w-auto"
                 >
-                  <div className="absolute -inset-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-xl blur-lg opacity-40 group-hover:opacity-70 transition duration-200"></div>
-                  <span className="relative flex items-center gap-2">
-                    Empezar Gratis <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform"/>
+                  <span className="flex items-center gap-2">
+                    Empezar Gratis <ArrowRightIcon className="w-6 h-6 border-2 border-black bg-white rounded-full p-1" />
                   </span>
                 </Link>
                 <button
                   onClick={handleGuest}
-                  className="px-8 py-4 rounded-xl text-white font-semibold border border-white/20 hover:bg-white/10 transition backdrop-blur-sm w-full sm:w-auto"
+                  className="px-8 py-5 text-lg bg-white brutal-btn w-full sm:w-auto"
                 >
                   Probar Demo
                 </button>
               </div>
-              
-              <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
-                <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]"></div> 100% Gratis</span>
-                <span className="flex items-center gap-2"><HeartIcon className="w-4 h-4 text-red-500"/> Comunidad Social</span>
-                <span className="flex items-center gap-2"><BoltIcon className="w-4 h-4 text-yellow-500"/> Sin Spotify</span>
+
+              <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-sm font-bold text-black">
+                <span className="flex items-center gap-2 px-3 py-1 bg-white border-2 border-black rounded-full shadow-[2px_2px_0_#000]"><div className="w-2 h-2 rounded-full bg-green-500"></div> Gratis</span>
+                <span className="flex items-center gap-2 px-3 py-1 bg-white border-2 border-black rounded-full shadow-[2px_2px_0_#000]"><HeartIcon className="w-4 h-4 text-red-500" /> Comunidad</span>
+                <span className="flex items-center gap-2 px-3 py-1 bg-white border-2 border-black rounded-full shadow-[2px_2px_0_#000]"><BoltIcon className="w-4 h-4 text-yellow-500" /> Sin Spotify</span>
               </div>
             </div>
 
-            {/* Imagen Hero */}
-            <div className="lg:w-1/2 relative perspective-1000 w-full">
-              <div className="relative transform rotate-y-[-5deg] rotate-x-[5deg] hover:rotate-0 transition duration-500 ease-out">
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur-xl opacity-30"></div>
-                <img
-                  src={banner}
-                  alt="Generador de cartel de festival de música online"
-                  className="relative w-full rounded-2xl shadow-2xl border border-white/10 bg-[#151923]"
-                />
-                <div className="absolute -bottom-6 -left-6 bg-[#1a1f2e] border border-white/10 p-4 rounded-xl shadow-xl backdrop-blur-md hidden md:block animate-bounce-slow">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-red-500/10 p-2 rounded-full text-red-500">
-                            <HeartIcon className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="text-white text-sm font-bold">Nuevo Top #1</p>
-                            <p className="text-gray-400 text-xs">Festival Primavera</p>
-                        </div>
+            {/* Imagen Hero (Carrusel Animado) */}
+            <div className="lg:w-1/2 relative w-full mt-10 lg:mt-0 xl:pl-10">
+              <div className="relative transform hover:-translate-y-2 hover:translate-x-2 transition-transform duration-300">
+                <div className="absolute top-4 left-4 w-full h-full bg-[#00E5FF] border-4 border-black -z-10"></div>
+
+                {/* Contenedor del Carrusel brutalista */}
+                <div className="w-full h-64 sm:h-80 lg:h-[720px] xl:h-[800px] border-4 border-black shadow-[8px_8px_0_#000] bg-black overflow-hidden relative">
+                  {/* Carrusel Horizontal (Móvil/Tablet) */}
+                  <div className="flex w-max h-full animate-marquee lg:hidden">
+                    {doubledPosters.map((src, i) => (
+                      <img key={`mobile-${i}`} src={src} className="h-full w-auto object-cover border-r-4 border-black shrink-0" alt={`Poster ${i}`} />
+                    ))}
+                  </div>
+
+                  {/* Carrusel Vertical Alternado (Escritorio) - 2 Columnas */}
+                  <div className="hidden lg:flex w-full h-full gap-4 bg-black p-4">
+                    {/* Columna 1 - Sube */}
+                    <div className="flex-1 overflow-hidden relative">
+                      <div className="flex flex-col gap-4 w-full h-max animate-marquee-vertical">
+                        {doubledPosters.map((src, i) => (
+                          <img key={`desktop-c1-${i}`} src={src} className="w-full h-auto object-cover border-4 border-black shrink-0 bg-white" alt={`Poster Col 1 - ${i}`} />
+                        ))}
+                      </div>
                     </div>
+                    {/* Columna 2 - Baja */}
+                    <div className="flex-1 overflow-hidden relative">
+                      <div className="flex flex-col gap-4 w-full h-max animate-marquee-vertical-reverse">
+                        {doubledPosters.map((src, i) => (
+                          <img key={`desktop-c2-${i}`} src={src} className="w-full h-auto object-cover border-4 border-black shrink-0 bg-white" alt={`Poster Col 2 - ${i}`} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Etiqueta Flotante Brutalista */}
+                <div className="absolute -bottom-6 -left-6 bg-yellow-400 border-4 border-black p-4 brutal-card hidden md:block rotate-[-5deg] animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white border-2 border-black p-2 shadow-[2px_2px_0_#000]">
+                      <HeartIcon className="w-6 h-6 text-red-500 fill-red-500" />
+                    </div>
+                    <div>
+                      <p className="text-black text-sm brutal-title">Top #1 📈</p>
+                      <p className="text-black font-bold text-xs uppercase">Primavera Fest</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -133,106 +170,129 @@ const Home = () => {
       </section>
 
       {/* --- FEATURES GRID --- */}
-      <section className="py-24 bg-[#0B0F19] relative">
-        <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Más que una herramienta. <span className="text-cyan-400">Una comunidad.</span></h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">La mejor alternativa a Instafest. Únete a miles de creadores, descubre música nueva y comparte tu visión.</p>
+      <section className="py-24 border-b-4 border-black bg-[#00E5FF] relative overflow-hidden">
+        {/* Decoración geométrica */}
+        <div className="absolute top-10 right-10 w-24 h-24 border-8 border-black rounded-full opacity-20 hidden md:block"></div>
+        <div className="absolute bottom-10 left-10 w-32 h-12 bg-black opacity-10 hidden md:block transform -rotate-12"></div>
+
+        <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
+          <div className="text-center mb-16 px-4">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl brutal-title mb-6 leading-tight">Mucho más que <br className="md:hidden" /><span className="bg-yellow-400 px-4 border-4 border-black inline-block transform rotate-2">una app.</span></h2>
+            <p className="text-black font-bold text-lg md:text-xl max-w-2xl mx-auto border-4 border-black bg-white p-4 shadow-[4px_4px_0_#000]">La mejor alternativa a Instafest. Únete a miles de creadores, descubre música nueva y comparte tu visión.</p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="group p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition duration-300 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-cyan-500/20 transition"></div>
-                <MusicalNoteIcon className="w-12 h-12 text-cyan-400 mb-6" />
-                <h3 className="text-xl font-bold text-white mb-3">Libertad Musical</h3>
-                <p className="text-gray-400">Escribe lo que quieras. Bandas locales, artistas indie o headliners mundiales. No dependes de tu historial de escucha.</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+            <div className="bg-white p-8 brutal-card transform hover:-translate-y-2 hover:translate-x-2 transition-all duration-200">
+              <div className="w-16 h-16 bg-[#FF90E8] border-4 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0_#000]">
+                <MusicalNoteIcon className="w-8 h-8 text-black" />
+              </div>
+              <h3 className="text-2xl brutal-title mb-4">Libertad Musical</h3>
+              <p className="text-black font-semibold text-sm leading-relaxed border-t-2 border-black pt-4">Escribe lo que quieras. Bandas locales, artistas indie o headliners mundiales. No dependes de tu historial de escucha.</p>
             </div>
 
-            <div className="group p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/30 transition duration-300 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-purple-500/20 transition"></div>
-                <UserGroupIcon className="w-12 h-12 text-purple-400 mb-6" />
-                <h3 className="text-xl font-bold text-white mb-3">Comunidad Viral</h3>
-                <p className="text-gray-400">Publica tu festival en nuestra galería global. Recibe likes, sube en el ranking de tendencias y compite con otros usuarios.</p>
+            <div className="bg-yellow-400 p-8 brutal-card transform hover:-translate-y-2 hover:translate-x-2 transition-all duration-200 relative md:-top-6">
+              <div className="w-16 h-16 bg-white border-4 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0_#000]">
+                <UserGroupIcon className="w-8 h-8 text-black" />
+              </div>
+              <h3 className="text-2xl brutal-title mb-4">Comunidad Viral</h3>
+              <p className="text-black font-semibold text-sm leading-relaxed border-t-2 border-black pt-4">Publica tu festival en nuestra galería global. Recibe likes, sube en el ranking de tendencias y compite con otros.</p>
             </div>
 
-            <div className="group p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-pink-500/30 transition duration-300 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-pink-500/20 transition"></div>
-                <FireIcon className="w-12 h-12 text-pink-400 mb-6" />
-                <h3 className="text-xl font-bold text-white mb-3">Calidad HD</h3>
-                <p className="text-gray-400">Exporta en PNG de alta resolución (1080x1920) perfecto para Instagram Stories, TikTok y Twitter. Sin marcas de agua molestas.</p>
+            <div className="bg-white p-8 brutal-card transform hover:-translate-y-2 hover:translate-x-2 transition-all duration-200">
+              <div className="w-16 h-16 bg-[#00FF66] border-4 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0_#000]">
+                <FireIcon className="w-8 h-8 text-black" />
+              </div>
+              <h3 className="text-2xl brutal-title mb-4">Calidad HD</h3>
+              <p className="text-black font-semibold text-sm leading-relaxed border-t-2 border-black pt-4">Exporta en PNG de alta resolución (1080x1920) perfecto para IG Stories o TikTok. Cero marcas de agua.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* --- SEO CONTENT & FAQ (NUEVA SECCIÓN TEXTO) --- */}
-      <section className="py-20 border-t border-white/5 bg-[#0e121e]">
-        <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
-            
-            {/* Texto descriptivo para Google */}
-            <div className="mb-16 text-center md:text-left">
-                <h2 className="text-3xl font-bold text-white mb-6">El Creador de Carteles de Festivales Online #1</h2>
-                <div className="prose prose-invert prose-lg text-gray-400 max-w-none">
-                    <p className="mb-4">
-                        ¿Alguna vez has soñado con organizar tu propio evento musical? <strong>MiFestival</strong> es la herramienta gratuita que te permite convertirte en promotor por un día. A diferencia de otros generadores automáticos, aquí tienes el <strong>control total</strong>.
-                    </p>
-                    <p>
-                        No necesitas conectar tu cuenta de Spotify ni Apple Music. Simplemente ingresa los nombres de tus artistas favoritos, organiza los escenarios por días y personaliza el estilo visual. Ya sea un festival de rock en el desierto o una fiesta electrónica en la playa, tu imaginación es el único límite.
-                    </p>
-                </div>
+      {/* --- SEO CONTENT & FAQ --- */}
+      <section className="py-24 border-b-4 border-black bg-brutal-base">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+
+          {/* Texto descriptivo para Google */}
+          <div className="mb-20 text-center md:text-left bg-white brutal-card p-8 md:p-12">
+            <h2 className="text-4xl brutal-title mb-6">El Creador de Carteles de Festivales Online #1</h2>
+            <div className="prose prose-lg text-black font-semibold max-w-none">
+              <p className="mb-4">
+                ¿Alguna vez has soñado con organizar tu propio evento musical? <strong className="font-outfit uppercase">MiFestival</strong> es la herramienta gratuita que te permite convertirte en promotor por un día. A diferencia de otros generadores automáticos, aquí tienes el <strong className="bg-[#FF90E8] px-1">control total</strong>.
+              </p>
+              <p>
+                No necesitas conectar tu cuenta de Spotify ni Apple Music. Simplemente ingresa los nombres de tus artistas favoritos, organiza los escenarios por días y personaliza el estilo visual. Tu imaginación es el límite.
+              </p>
+            </div>
+          </div>
+
+          {/* Grid FAQ */}
+          <div>
+            <div className="flex items-center gap-4 mb-10 justify-center md:justify-start">
+              <div className="bg-[#00E5FF] p-2 border-4 border-black shadow-[4px_4px_0_#000]">
+                <QuestionMarkCircleIcon className="w-8 h-8 text-black" />
+              </div>
+              <h3 className="text-4xl brutal-title">FAQ</h3>
             </div>
 
-            {/* Grid FAQ */}
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12">
-                <div className="flex items-center gap-3 mb-8 justify-center md:justify-start">
-                    <QuestionMarkCircleIcon className="w-8 h-8 text-cyan-400" />
-                    <h3 className="text-2xl font-bold text-white">Preguntas Frecuentes</h3>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h4 className="text-lg font-bold text-white mb-2">¿Es realmente gratis?</h4>
-                        <p className="text-gray-400 text-sm leading-relaxed">Sí, 100%. Puedes crear, editar y descargar tantos pósters como quieras. No hay muros de pago para las funciones premium como la descarga en HD.</p>
-                    </div>
-                    <div>
-                        <h4 className="text-lg font-bold text-white mb-2">¿Cómo funciona el ranking social?</h4>
-                        <p className="text-gray-400 text-sm leading-relaxed">Al crear tu festival, puedes marcarlo como "Público". Aparecerá en la sección Explorar donde otros usuarios pueden darle "Like". ¡Los más votados aparecen en Tendencias!</p>
-                    </div>
-                    <div>
-                        <h4 className="text-lg font-bold text-white mb-2">¿Necesito Spotify?</h4>
-                        <p className="text-gray-400 text-sm leading-relaxed">No. MiFestival es una alternativa manual a Instafest. Es ideal si escuchas música en YouTube, vinilos, o si quieres crear un cartel de fantasía con bandas que ya no existen.</p>
-                    </div>
-                    <div>
-                        <h4 className="text-lg font-bold text-white mb-2">¿Puedo personalizar el fondo?</h4>
-                        <p className="text-gray-400 text-sm leading-relaxed">Sí. Ofrecemos varios temas visuales (Ciudad Nocturna, Playa al Atardecer, Desierto) que adaptan la paleta de colores de tu cartel automáticamente.</p>
-                    </div>
-                </div>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-[#FFD500] brutal-card p-6">
+                <h4 className="text-xl brutal-title mb-3">¿Es realmente gratis?</h4>
+                <p className="text-black font-semibold text-sm leading-relaxed border-t-2 border-black pt-3">Sí, 100%. Puedes crear, editar y descargar tantos pósters como quieras. Cero muros de pago.</p>
+              </div>
+              <div className="bg-white brutal-card p-6">
+                <h4 className="text-xl brutal-title mb-3">¿Ranking social?</h4>
+                <p className="text-black font-semibold text-sm leading-relaxed border-t-2 border-black pt-3">Al marcar un festival como "Público", aparece en Explorar. Los usuarios pueden darle Like y subirlo a Tendencias.</p>
+              </div>
+              <div className="bg-white brutal-card p-6">
+                <h4 className="text-xl brutal-title mb-3">¿Necesito Spotify?</h4>
+                <p className="text-black font-semibold text-sm leading-relaxed border-t-2 border-black pt-3">No. Es ideal si prefieres hacer carteles a mano, usas Youtube o quieres mezclar artistas imposibles.</p>
+              </div>
+              <div className="bg-[#FF90E8] brutal-card p-6">
+                <h4 className="text-xl brutal-title mb-3">¿Fondo personalizable?</h4>
+                <p className="text-black font-semibold text-sm leading-relaxed border-t-2 border-black pt-3">Tenemos temas brutales (Cyber, Retro, Desierto) que adaptan colores y tipografías al instante.</p>
+              </div>
             </div>
+          </div>
         </div>
       </section>
 
       {/* --- CTA FINAL --- */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/20 to-[#0B0F19] z-0"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tight">¿Listo para ser el Headliner?</h2>
-            <Link
-                to="/register"
-                className="inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-black bg-white rounded-full hover:bg-cyan-400 transition transform hover:-translate-y-1 shadow-[0_0_20px_rgba(255,255,255,0.4)]"
-            >
-                Empezar Ahora
-            </Link>
+      <section className="py-32 bg-[#00FF66] border-b-4 border-black relative overflow-hidden">
+        {/* Banner de texto moviéndose */}
+        <div className="absolute top-0 w-full overflow-hidden border-b-4 border-black bg-white p-2 flex whitespace-nowrap">
+          <div className="animate-marquee">
+            <p className="text-black font-bold uppercase tracking-widest opacity-50 shrink-0 px-4">
+              CREA TU CARTEL • DESCUBRE LINEUPS • MÚSICA SIN LÍMITES • TOTALMENTE GRATIS • CREA TU CARTEL • DESCUBRE LINEUPS •
+            </p>
+            <p className="text-black font-bold uppercase tracking-widest opacity-50 shrink-0 px-4" aria-hidden="true">
+              CREA TU CARTEL • DESCUBRE LINEUPS • MÚSICA SIN LÍMITES • TOTALMENTE GRATIS • CREA TU CARTEL • DESCUBRE LINEUPS •
+            </p>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 text-center mt-10 relative z-10">
+          <h2 className="text-4xl md:text-8xl brutal-title mb-10 text-white drop-shadow-[2px_2px_0_#000] md:drop-shadow-none"
+            style={{ textShadow: window.innerWidth > 768 ? "4px 4px 0px #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000" : "2px 2px 0px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }}>
+            ¿Listo para <br />el Main Stage?
+          </h2>
+          <Link
+            to="/register"
+            className="inline-flex items-center justify-center px-12 py-6 text-2xl md:text-3xl bg-yellow-400 brutal-btn"
+          >
+            HACER FESTIVAL AHORA
+          </Link>
         </div>
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="w-full py-8 border-t border-white/5 bg-[#0B0F19]">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} MiFestival. Todos los derechos reservados.</p>
-          <div className="flex gap-4 mt-4 md:mt-0">
-            <span className="hover:text-cyan-400 transition cursor-pointer">Privacidad</span>
-            <span className="hover:text-cyan-400 transition cursor-pointer">Términos</span>
-            <a href="https://github.com/CaCortez384" target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition">GitHub</a>
+      <footer className="w-full py-10 bg-white">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm font-bold text-black uppercase tracking-widest border-t-4 border-black pt-10">
+          <p>© {new Date().getFullYear()} MiFestival. HAZ RUIDO.</p>
+          <div className="flex gap-6 mt-6 md:mt-0">
+            <span className="hover:bg-yellow-400 px-2 border-2 border-transparent hover:border-black transition cursor-pointer">Privacidad</span>
+            <span className="hover:bg-pink-400 px-2 border-2 border-transparent hover:border-black transition cursor-pointer">Términos</span>
+            <a href="https://github.com/CaCortez384" target="_blank" rel="noreferrer" className="hover:bg-cyan-400 px-2 border-2 border-transparent hover:border-black transition">GitHub</a>
           </div>
         </div>
       </footer>

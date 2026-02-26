@@ -21,7 +21,7 @@ export const loginWithGoogle = async () => {
   try {
     await signInWithRedirect(auth, googleProvider);
     // El usuario se autentica y tu AuthContext lo detecta automáticamente
-  } catch (error) {
+  } catch {
     alert("Error al iniciar sesión con Google");
   }
 };

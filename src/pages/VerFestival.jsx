@@ -21,13 +21,13 @@ const Festival = () => {
     const [festival, setFestival] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
+
     const [artistas, setArtistas] = useState([]);
     const [fondoPoster, setFondoPoster] = useState("city");
-    
+
     // REFS
-    const posterRef = useRef(null); 
-    const previewContainerRef = useRef(null); 
+    const posterRef = useRef(null);
+    const previewContainerRef = useRef(null);
     const [previewScale, setPreviewScale] = useState(0.3);
 
     // --- 2. LÓGICA BOTÓN VOLVER INTELIGENTE ---
@@ -62,7 +62,7 @@ const Festival = () => {
 
     const handleDescargarPoster = async () => {
         if (!posterRef.current || !festival) return;
-        const node = posterRef.current.firstChild; 
+        const node = posterRef.current.firstChild;
         if (!node) return;
 
         try {
@@ -87,8 +87,8 @@ const Festival = () => {
             const res = await fetch(dataUrl);
             const blob = await res.blob();
             const file = new File([blob], `${generarSlug(festival.name || 'mi-festival')}.png`, { type: 'image/png' });
-            const shareUrl = window.location.href; 
-            
+            const shareUrl = window.location.href;
+
             const shareData = {
                 title: festival.name || 'Poster',
                 text: `¡Mira mi lineup para ${festival.name || 'mi festival'}!`,
@@ -143,26 +143,34 @@ const Festival = () => {
     // --- RENDERIZADO CONDICIONAL ---
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
-                <p className="text-gray-400 animate-pulse">Cargando festival...</p>
+            <div className="min-h-screen flex items-center justify-center bg-brutal-base font-inter border-x-4 border-black max-w-[1600px] mx-auto">
+                <div className="bg-white border-4 border-black shadow-[8px_8px_0_#000] p-8 flex items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-xl brutal-title">CARGANDO FESTIVAL...</span>
+                </div>
             </div>
         );
     }
 
     if (error || !festival) {
         return (
-            <div className="min-h-screen flex flex-col bg-[#0B0F19]">
-                <header className="w-full px-4 sm:px-6 py-3 border-b border-white/5 bg-[#0B0F19]">
-                    <div className="container mx-auto flex justify-between items-center">
-                        <Link to="/inicio" className="flex items-center gap-2"><img src={mflogo} alt="MiFestival Logo" className="w-8 h-8 rounded-md" /><span className="text-lg font-bold text-white">MiFestival</span></Link>
-                        <button onClick={handleVolver} className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium text-gray-400 hover:text-white transition"><ArrowLeftIcon className="w-4 h-4" />Volver</button>
+            <div className="min-h-screen flex flex-col bg-brutal-base font-inter border-x-4 border-black max-w-[1600px] mx-auto">
+                <header className="w-full px-4 sm:px-6 py-4 border-b-4 border-black bg-white">
+                    <div className="container mx-auto flex justify-between items-center max-w-[1400px]">
+                        <Link to="/inicio" className="flex items-center gap-3 shrink-0">
+                            <div className="relative border-2 border-black rounded-none shadow-[2px_2px_0px_#000]">
+                                <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 sm:w-9 sm:h-9 object-cover" />
+                            </div>
+                            <span className="text-lg sm:text-xl brutal-title hidden sm:inline bg-[#FF90E8] px-2 mt-1 border-2 border-black">MIFESTIVAL</span>
+                        </Link>
+                        <button onClick={handleVolver} className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black border-2 border-black hover:bg-yellow-400 shadow-[2px_2px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all bg-white"><ArrowLeftIcon className="w-5 h-5" />Volver</button>
                     </div>
                 </header>
-                <main className="flex-grow flex items-center justify-center px-4">
-                    <div className="bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 text-center max-w-md backdrop-blur-md">
-                        <h2 className="text-xl font-bold text-red-400 mb-4">Error</h2>
-                        <p className="text-gray-400 mb-6">{error || "Festival no encontrado"}</p>
-                        <button onClick={handleVolver} className="inline-block bg-cyan-600 text-white font-bold py-2 px-6 rounded-full hover:bg-cyan-500 transition">Volver al inicio</button>
+                <main className="flex-grow flex items-center justify-center px-4 py-12">
+                    <div className="bg-[#FF90E8] border-4 border-black p-8 shadow-[8px_8px_0_#000] max-w-lg text-center transform -rotate-1">
+                        <h2 className="text-3xl brutal-title mb-4 bg-white border-4 border-black inline-block px-4 py-2 rotate-2">ERROR</h2>
+                        <p className="text-black font-semibold mb-6 text-lg">{error || "Festival no encontrado"}</p>
+                        <button onClick={handleVolver} className="inline-block bg-[#00E5FF] brutal-btn py-3 px-8 text-xl">VOLVER AL INICIO</button>
                     </div>
                 </main>
             </div>
@@ -174,87 +182,79 @@ const Festival = () => {
     const isOwner = user && (festival.userId === user.uid || (user.isGuest && festival.userId === 'invitado'));
 
     return (
-        // FONDO OSCURO
-        <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white font-sans selection:bg-cyan-500 selection:text-white relative overflow-x-hidden">
-            
-            {/* Blobs de luz */}
-            <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-900/10 rounded-full blur-[100px]"></div>
-            </div>
+        <div className="min-h-screen flex flex-col bg-brutal-base text-[#050510] font-inter selection:bg-yellow-400 selection:text-black relative overflow-x-hidden border-x-4 border-black max-w-[1600px] mx-auto">
+            {/* Fondo Textura */}
+            <div className="fixed inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "20px 20px" }}></div>
 
-            {/* Header */}
-            <header className="w-full px-4 sm:px-6 py-3 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md bg-[#0B0F19]/80">
-                 <div className="container mx-auto flex justify-between items-center max-w-[1400px]">
-                     <div className="flex items-center gap-2 min-w-0 group">
-                         <div className="relative flex-shrink-0">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg blur opacity-40 group-hover:opacity-100 transition duration-200"></div>
-                            <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 rounded-md" />
-                         </div>
-                         <span className="text-lg font-bold text-white truncate group-hover:text-cyan-400 transition-colors">{festival.name || 'Detalle'}</span>
-                     </div>
-                     
-                     <div className="flex items-center gap-2">
-                         <button
-                             onClick={handleVolver}
-                             className="flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition border border-transparent hover:border-white/10 whitespace-nowrap"
-                         >
-                             <ArrowLeftIcon className="w-4 h-4" />
-                             Volver
-                         </button>
-
-                         {isOwner && (
-                             <Link
-                                 to={`/editarFestival/${id}`}
-                                 className="flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-bold text-[#0B0F19] bg-white hover:bg-cyan-400 transition whitespace-nowrap shadow-lg shadow-white/10"
-                             >
-                                 <PencilSquareIcon className="w-4 h-4" />
-                                 <span className="hidden sm:inline">Editar</span>
-                             </Link>
-                         )}
-                     </div>
-                 </div>
-             </header>
-
-            {/* Layout Principal */}
-            <main className="flex-grow container mx-auto px-4 sm:px-6 py-8 md:py-12 flex flex-col lg:flex-row gap-8 items-start max-w-[1400px]">
-
-                {/* Columna Izquierda: Grilla */}
-                <section className="flex-grow w-full bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 overflow-hidden">
-                    <div className="mb-6 border-b border-white/10 pb-4">
-                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">{festival.name || 'Festival'}</h1>
-                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-400">
-                             <span className="inline-flex items-center gap-1 bg-black/20 px-2 py-1 rounded-md border border-white/5"><CalendarDaysIcon className="w-4 h-4 text-purple-400"/>{dias.length} {dias.length === 1 ? 'día' : 'días'}</span>
-                             <span className="inline-flex items-center gap-1 bg-black/20 px-2 py-1 rounded-md border border-white/5"><MapPinIcon className="w-4 h-4 text-pink-400"/>{escenarios.length} {escenarios.length === 1 ? 'escenario' : 'escenarios'}</span>
-                         </div>
+            {/* --- HEADER --- */}
+            <header className="w-full px-4 sm:px-6 py-4 border-b-4 border-black sticky top-0 z-50 bg-white">
+                <div className="container mx-auto flex justify-between items-center max-w-[1400px]">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <Link to="/inicio" className="relative flex-shrink-0 border-2 border-black rounded-none shadow-[2px_2px_0px_#000]">
+                            <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 sm:w-9 sm:h-9 object-cover" />
+                        </Link>
+                        <span className="text-lg sm:text-lg brutal-title truncate hidden sm:inline bg-[#00FF66] px-2 mt-1 border-2 border-black max-w-[200px] bg-[#FFD500] rotate-1">{festival.name || 'Detalle'}</span>
                     </div>
 
-                    <div className="overflow-x-auto custom-scrollbar pb-2">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={handleVolver}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black border-2 border-black hover:bg-yellow-400 shadow-[2px_2px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all bg-white whitespace-nowrap"
+                        >
+                            <ArrowLeftIcon className="w-5 h-5" />
+                            <span className="hidden sm:inline">Volver</span>
+                        </button>
+
+                        {isOwner && (
+                            <Link
+                                to={`/editarFestival/${id}`}
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-black uppercase tracking-widest text-black border-2 border-black bg-[#FF90E8] shadow-[2px_2px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap"
+                            >
+                                <PencilSquareIcon className="w-5 h-5" />
+                                <span className="hidden sm:inline">Editar</span>
+                            </Link>
+                        )}
+                    </div>
+                </div>
+            </header>
+
+            {/* --- LAYOUT PRINCIPAL BRUTALISTA --- */}
+            <main className="flex-grow container mx-auto px-4 sm:px-6 py-8 md:py-12 flex flex-col lg:flex-row gap-8 items-start max-w-[1400px] relative z-10">
+
+                {/* Columna Izquierda: Grilla */}
+                <section className="flex-grow w-full bg-white border-4 border-black shadow-[8px_8px_0_#000] p-6 lg:p-8 overflow-hidden min-h-[600px] flex flex-col">
+                    <div className="mb-6 border-b-4 border-black border-dashed pb-6">
+                        <h1 className="text-3xl md:text-5xl font-outfit font-black uppercase text-black mb-4 truncate transform -rotate-1 bg-[#00E5FF] inline-block px-4 py-2 border-4 border-black shadow-[4px_4px_0_#000] max-w-full">{festival.name || 'Festival'}</h1>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 text-sm font-black text-black tracking-widest uppercase">
+                            <span className="inline-flex items-center gap-1 bg-[#FFD500] px-3 py-1.5 border-2 border-black shadow-[2px_2px_0_#000] rotate-1"><CalendarDaysIcon className="w-5 h-5" />{dias.length} {dias.length === 1 ? 'DÍA' : 'DÍAS'}</span>
+                            <span className="inline-flex items-center gap-1 bg-[#00FF66] px-3 py-1.5 border-2 border-black shadow-[2px_2px_0_#000] -rotate-1"><MapPinIcon className="w-5 h-5" />{escenarios.length} ESC.</span>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto flex-grow custom-scrollbar pb-4 bg-[#f5f5f0] border-4 border-black p-2">
                         <table className="min-w-full border-collapse">
                             <thead>
                                 <tr>
-                                    <th className="sticky left-0 bg-[#161b28] px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-white/10 text-left z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">Escenario</th>
                                     {dias.map((dia) => (
-                                        <th key={dia} className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-white/10 text-center min-w-[140px]">{dia}</th>
+                                        <th key={dia} className="px-4 py-4 text-lg font-black text-black uppercase tracking-widest border-b-4 border-black border-r-4 border-black last:border-r-0 text-center min-w-[200px] bg-[#00E5FF]">{dia}</th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y-4 divide-black divide-dashed bg-white">
                                 {escenarios.map((escenario) => (
-                                    <tr key={escenario} className="hover:bg-white/[0.02] transition-colors">
-                                        <td className="sticky left-0 bg-[#1a1f2e] px-4 py-3 text-sm font-bold text-cyan-100 border-b border-white/5 whitespace-nowrap z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">{escenario}</td>
+                                    <tr key={escenario} className="hover:bg-yellow-50 transition-colors group">
                                         {dias.map((dia) => {
                                             const artistasEnCelda = artistas.filter(a => a.dia === dia && a.escenario === escenario);
                                             return (
-                                                <td key={`${dia}-${escenario}`} className="px-2 py-2 text-xs border-b border-white/5 align-top h-24">
-                                                    <div className="space-y-1.5">
+                                                <td key={`${dia}-${escenario}`} className="px-3 py-3 text-sm border-r-4 border-black last:border-r-0 align-top h-32">
+                                                    <div className="space-y-2">
                                                         {artistasEnCelda.map((a, i) => (
-                                                            <div key={i} className="bg-cyan-900/30 border border-cyan-500/20 rounded px-2.5 py-1.5 text-cyan-100 text-xs font-medium truncate backdrop-blur-sm">
+                                                            <div key={i} className="bg-[#FFD500] border-2 border-black px-3 py-2 text-black text-sm font-bold truncate shadow-[2px_2px_0_#000] transform hover:-rotate-1 transition-transform cursor-default">
                                                                 {a.nombre}
                                                             </div>
                                                         ))}
                                                     </div>
-                                                    {artistasEnCelda.length === 0 && <span className="text-gray-600 italic text-[10px] block text-center mt-2">-</span>}
+                                                    {artistasEnCelda.length === 0 && <span className="text-gray-400 italic font-bold text-xs block text-center mt-4">_</span>}
                                                 </td>
                                             );
                                         })}
@@ -266,24 +266,24 @@ const Festival = () => {
                 </section>
 
                 {/* Columna Derecha: Vista Previa */}
-                <aside className="w-full lg:w-80 xl:w-96 bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-5 lg:sticky lg:top-24 flex-shrink-0 space-y-6">
+                <aside className="w-full lg:w-80 xl:w-96 bg-white border-4 border-black shadow-[8px_8px_0_#000] p-5 lg:sticky lg:top-24 flex-shrink-0 space-y-6">
                     <div>
-                        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Póster Oficial</h2>
-                    
+                        <h2 className="text-lg brutal-title mb-4 bg-yellow-400 inline-block px-2 border-2 border-black -rotate-2">PÓSTER OFICIAL</h2>
 
-                        {/* PREVIEW CONTAINER */}
-                        <div 
-                            ref={previewContainerRef} 
-                            className="rounded-xl overflow-hidden bg-[#0c0032] border border-white/10 shadow-2xl relative group"
+
+                        {/* PREVIEW CONTAINER BRUTALISTA */}
+                        <div
+                            ref={previewContainerRef}
+                            className="overflow-hidden bg-black border-4 border-black shadow-[4px_4px_0_#000] relative group flex items-center justify-center"
                             style={{
                                 width: "100%",
-                                aspectRatio: "9/16", 
+                                aspectRatio: "9/16",
                             }}
                         >
                             <div style={{
-                                width: 1080, 
+                                width: 1080,
                                 height: 1920,
-                                transform: `scale(${previewScale})`, 
+                                transform: `scale(${previewScale})`,
                                 transformOrigin: "top left",
                                 position: "absolute",
                                 top: 0,
@@ -294,10 +294,8 @@ const Festival = () => {
                                     backgroundType={fondoPoster}
                                 />
                             </div>
-                            {/* Overlay */}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center pointer-events-none">
-                                <span className="text-white text-xs font-bold uppercase tracking-widest border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full">Preview</span>
-                            </div>
+                            {/* Overlay Brutalista */}
+                            <div className="absolute inset-0 bg-transparent pointer-events-none"></div>
                         </div>
                     </div>
 
@@ -311,35 +309,35 @@ const Festival = () => {
                         </div>
                     </div>
 
-                    {/* Botones de acción */}
-                    <div className="space-y-3 pt-2 border-t border-white/10">
+                    {/* Botones de acción Brutalistas */}
+                    <div className="space-y-4 pt-4 border-t-4 border-black border-dashed">
                         <button
                             onClick={handleDescargarPoster}
-                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-bold py-3 px-4 rounded-xl shadow-lg shadow-cyan-900/20 transition-all transform hover:-translate-y-0.5"
+                            className="w-full flex items-center justify-center gap-2 bg-[#00FF66] brutal-btn py-4 text-xl"
                         >
-                            <ArrowDownTrayIcon className="w-5 h-5" />
-                            Descargar HD
+                            <ArrowDownTrayIcon className="w-6 h-6 border-2 border-black bg-white rounded-none p-0.5" />
+                            DESCARGAR
                         </button>
                         {navigator.share && (
                             <button
                                 onClick={handleSharePoster}
-                                className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-sm font-bold py-3 px-4 rounded-xl transition"
+                                className="w-full flex items-center justify-center gap-2 bg-white brutal-btn py-4 text-xl"
                             >
-                                <ShareIcon className="w-5 h-5" />
-                                Compartir
+                                <ShareIcon className="w-6 h-6" />
+                                COMPARTIR
                             </button>
                         )}
                     </div>
-                    
-                    <div className="text-center">
-                        <p className="text-[10px] text-gray-500 uppercase tracking-widest">¿Quieres crear el tuyo?</p>
-                        <Link to="/register" className="text-xs font-bold text-cyan-400 hover:text-cyan-300 underline mt-1 block">Regístrate Gratis en MiFestival</Link>
+
+                    <div className="text-center bg-[#f5f5f0] border-4 border-black p-4 mt-6 transform rotate-1">
+                        <p className="text-xs font-black uppercase tracking-widest text-black mb-2">¿QUIERES ESTAR AQUÍ?</p>
+                        <Link to="/register" className="text-lg font-bold text-black border-b-4 border-black hover:bg-yellow-400 transition-colors inline-block pb-1">ARMA TU LINEUP →</Link>
                     </div>
                 </aside>
             </main>
 
-            <footer className="w-full py-6 text-center text-xs text-gray-500 border-t border-white/5 bg-[#0B0F19]">
-                 <div className="container mx-auto px-4 sm:px-6">© {new Date().getFullYear()} MiFestival.</div>
+            <footer className="w-full py-8 text-center text-sm font-black uppercase tracking-widest text-black border-t-4 border-black bg-white mt-10 relative z-10">
+                <div className="container mx-auto px-4">© {new Date().getFullYear()} MiFestival. HAZ RUIDO.</div>
             </footer>
         </div>
     );

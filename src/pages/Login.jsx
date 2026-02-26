@@ -24,7 +24,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   // --- NUEVOS ESTADOS PARA RESET PASSWORD ---
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
@@ -48,89 +48,85 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
-       setError('Correo o contraseña incorrectos. Inténtalo de nuevo.');
-       console.error("Error de login:", err);
+      setError('Correo o contraseña incorrectos. Inténtalo de nuevo.');
+      console.error("Error de login:", err);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-      setError('');
-      setLoading(true);
-      try {
-          await signInWithPopup(auth, googleProvider);
-      } catch (err) {
-          if (err.code !== 'auth/popup-closed-by-user') {
-              setError('Error al iniciar sesión con Google.');
-          }
-          console.error("Error Google Login:", err);
-      } finally {
-          setLoading(false);
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError('Error al iniciar sesión con Google.');
       }
+      console.error("Error Google Login:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // --- NUEVA FUNCIÓN: ENVIAR CORREO DE RESET ---
   const handleResetPassword = async (e) => {
-      e.preventDefault();
-      if (!resetEmail) {
-          setResetError("Por favor ingresa tu correo.");
-          return;
+    e.preventDefault();
+    if (!resetEmail) {
+      setResetError("Por favor ingresa tu correo.");
+      return;
+    }
+    setResetLoading(true);
+    setResetError('');
+    setResetMessage('');
+
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetMessage("¡Listo! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.");
+    } catch (error) {
+      console.error(error);
+      if (error.code === 'auth/user-not-found') {
+        setResetError("No existe una cuenta con este correo.");
+      } else if (error.code === 'auth/invalid-email') {
+        setResetError("El correo no es válido.");
+      } else {
+        setResetError("Ocurrió un error. Inténtalo más tarde.");
       }
-      setResetLoading(true);
-      setResetError('');
-      setResetMessage('');
-      
-      try {
-          await sendPasswordResetEmail(auth, resetEmail);
-          setResetMessage("¡Listo! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.");
-      } catch (error) {
-          console.error(error);
-          if (error.code === 'auth/user-not-found') {
-              setResetError("No existe una cuenta con este correo.");
-          } else if (error.code === 'auth/invalid-email') {
-              setResetError("El correo no es válido.");
-          } else {
-              setResetError("Ocurrió un error. Inténtalo más tarde.");
-          }
-      } finally {
-          setResetLoading(false);
-      }
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   // Pre-llenar el email del modal si el usuario ya escribió algo en el login
   const openResetModal = () => {
-      setResetEmail(email); 
-      setShowResetModal(true);
-      setResetError('');
-      setResetMessage('');
+    setResetEmail(email);
+    setShowResetModal(true);
+    setResetError('');
+    setResetMessage('');
   };
 
   return (
-    // FONDO OSCURO + LUCES AMBIENTALES
-    <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white font-sans selection:bg-cyan-500 selection:text-white relative overflow-hidden">
-      
-      {/* Blobs de luz de fondo */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-purple-900/20 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-cyan-900/20 rounded-full blur-[120px]"></div>
-      </div>
+    // FONDO BRUTALISTA
+    <div className="min-h-screen flex flex-col bg-brutal-base text-[#050510] font-inter selection:bg-yellow-400 selection:text-black relative overflow-hidden border-x-4 border-black max-w-[1600px] mx-auto">
+
+      {/* Fondo Textura */}
+      <div className="fixed inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "20px 20px" }}></div>
 
       {/* --- HEADER --- */}
-      <header className="w-full px-6 py-4 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md bg-[#0B0F19]/80">
-        <div className="container mx-auto flex justify-between items-center max-w-7xl">
-          <Link to="/" className="flex items-center gap-3 group">
-             <div className="relative">
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg blur opacity-40 group-hover:opacity-100 transition duration-200"></div>
-                <img src={mflogo} alt="MiFestival Logo" className="relative w-9 h-9 rounded-lg" />
+      <header className="w-full px-4 sm:px-6 py-4 border-b-4 border-black sticky top-0 z-50 bg-white">
+        <div className="container mx-auto flex justify-between items-center max-w-[1400px]">
+          <Link to="/" className="flex items-center gap-3 shrink-0">
+            <div className="relative border-2 border-black rounded-none shadow-[2px_2px_0px_#000]">
+              <img src={mflogo} alt="MiFestival Logo" className="relative w-8 h-8 sm:w-9 sm:h-9 object-cover" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">MiFestival</span>
+            <span className="text-lg sm:text-xl brutal-title hidden sm:inline bg-[#FF90E8] px-2 mt-1 border-2 border-black">MIFESTIVAL</span>
           </Link>
           <Link
             to="/"
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition border border-transparent hover:border-white/10"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black border-2 border-black hover:bg-yellow-400 shadow-[2px_2px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all bg-white"
           >
-            <ArrowLeftIcon className="w-4 h-4" />
+            <ArrowLeftIcon className="w-5 h-5" />
             Volver
           </Link>
         </div>
@@ -138,106 +134,101 @@ function Login() {
 
       {/* --- MAIN CARD --- */}
       <main className="flex-grow flex items-center justify-center px-4 py-12 sm:py-16 relative z-10">
-        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8 sm:p-10 max-w-md w-full shadow-2xl relative">
-          
-          {/* Luz superior decorativa */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50 blur-[2px]"></div>
+        <div className="bg-[#00E5FF] border-4 border-black p-8 sm:p-10 max-w-md w-full relative shadow-[8px_8px_0_#000] transform rotate-1">
 
-          <div className="text-center mb-8">
-             <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Bienvenido de Vuelta</h1>
-            <p className="text-sm text-gray-400">
-              Inicia sesión para gestionar tus lineups.
+          <div className="text-center mb-8 bg-white border-4 border-black p-4 shadow-[8px_8px_0_#000] transform -rotate-2">
+            <h1 className="text-3xl brutal-title mb-2">BIENVENIDO DE VUELTA</h1>
+            <p className="text-sm font-black uppercase tracking-widest text-black">
+              INICIA SESIÓN PARA GESTIONAR TUS LINEUPS.
             </p>
           </div>
 
           {/* Mensaje de Error Login */}
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-200 text-sm rounded-xl p-3 mb-6 text-center animate-pulse">
+            <div className="bg-red-500 border-4 border-black text-white text-sm font-bold uppercase tracking-widest p-4 mb-6 text-center transform rotate-1 shadow-[4px_4px_0_#000]">
               {error}
             </div>
           )}
 
           {/* Formulario Login */}
-          <form onSubmit={handleLogin} className="space-y-5">
-             
-             {/* Input Email */}
-             <div>
-               <label htmlFor="email-login" className="block text-sm font-medium text-gray-300 mb-1.5 ml-1">Correo Electrónico</label>
-               <div className="relative">
-                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                   <EnvelopeIcon className="h-5 w-5" />
-                 </div>
-                 <input
-                   id="email-login"
-                   type="email"
-                   placeholder="tu@correo.com"
-                   value={email}
-                   onChange={(e) => setEmail(e.target.value)}
-                   required
-                   className="w-full pl-10 pr-4 py-3 bg-[#0B0F19]/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none text-white placeholder-gray-600 transition duration-200"
-                 />
-               </div>
-             </div>
+          <form onSubmit={handleLogin} className="space-y-6">
 
-             {/* Input Password */}
-             <div>
-                <label htmlFor="password-login" className="block text-sm font-medium text-gray-300 mb-1.5 ml-1">Contraseña</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                    <LockClosedIcon className="h-5 w-5" />
-                  </div>
-                  <input
-                    id="password-login"
-                    type="password"
-                    placeholder="Tu contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full pl-10 pr-4 py-3 bg-[#0B0F19]/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none text-white placeholder-gray-600 transition duration-200"
-                  />
+            {/* Input Email */}
+            <div>
+              <label htmlFor="email-login" className="block text-sm font-black text-black uppercase tracking-widest mb-2 bg-yellow-400 inline-block px-1 border-2 border-black">CORREO</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-black">
+                  <EnvelopeIcon className="h-6 w-6" />
                 </div>
-                
-                {/* MODIFICADO: Enlace Olvidaste contraseña */}
-                <div className="text-right mt-2">
-                   <button 
-                     type="button"
-                     onClick={openResetModal}
-                     className="text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition"
-                   >
-                     ¿Olvidaste tu contraseña?
-                   </button>
+                <input
+                  id="email-login"
+                  type="email"
+                  placeholder="TU@CORREO.COM"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full pl-12 pr-4 py-3 bg-white border-4 border-black focus:ring-4 focus:ring-yellow-400 focus:outline-none text-black font-bold placeholder-gray-500 shadow-[4px_4px_0_#000] transition-shadow uppercase"
+                />
+              </div>
+            </div>
+
+            {/* Input Password */}
+            <div>
+              <label htmlFor="password-login" className="block text-sm font-black text-black uppercase tracking-widest mb-2 bg-[#FF90E8] inline-block px-1 border-2 border-black">CONTRASEÑA</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-black">
+                  <LockClosedIcon className="h-6 w-6" />
                 </div>
-             </div>
+                <input
+                  id="password-login"
+                  type="password"
+                  placeholder="********"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full pl-12 pr-4 py-3 bg-white border-4 border-black focus:ring-4 focus:ring-[#FF90E8] focus:outline-none text-black font-bold placeholder-gray-500 shadow-[4px_4px_0_#000] transition-shadow"
+                />
+              </div>
+
+              {/* MODIFICADO: Enlace Olvidaste contraseña */}
+              <div className="text-right mt-3">
+                <button
+                  type="button"
+                  onClick={openResetModal}
+                  className="text-xs font-black uppercase text-black hover:bg-yellow-400 border-b-2 border-black transition"
+                >
+                  ¿OLVIDASTE TU CONTRASEÑA?
+                </button>
+              </div>
+            </div>
 
             <button
               type="submit"
               disabled={loading}
-              className={`w-full text-center bg-cyan-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-200 transform hover:-translate-y-0.5 ${
-                 loading
-                   ? 'opacity-70 cursor-not-allowed'
-                   : 'hover:bg-cyan-500 hover:shadow-[0_0_25px_rgba(6,182,212,0.5)]'
-               }`}
+              className={`w-full text-xl py-4 brutal-btn mt-4 ${loading
+                ? 'bg-gray-300 cursor-not-allowed text-black opacity-70 border-4 border-black shadow-[4px_4px_0_#000]'
+                : 'bg-[#00FF66] text-black shadow-[6px_6px_0_#000] hover:shadow-[8px_8px_0_#000]'
+                }`}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? 'INICIANDO SESIÓN...' : 'ENTRAR'}
             </button>
           </form>
 
           {/* Divisor */}
           <div className="flex items-center my-8">
-            <div className="flex-grow border-t border-white/10"></div>
-            <span className="mx-4 text-xs text-gray-500 font-medium uppercase tracking-wider">O inicia con</span>
-            <div className="flex-grow border-t border-white/10"></div>
+            <div className="flex-grow border-t-4 border-black border-dashed"></div>
+            <span className="mx-4 text-sm font-black text-black uppercase tracking-widest bg-white border-2 border-black px-2">O</span>
+            <div className="flex-grow border-t-4 border-black border-dashed"></div>
           </div>
 
           {/* Botón Google */}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className={`w-full flex items-center justify-center gap-3 bg-white text-gray-900 rounded-xl py-3 px-4 text-sm font-bold shadow-lg transition duration-200 transform hover:-translate-y-0.5 ${
-                loading
-                  ? 'opacity-70 cursor-not-allowed'
-                  : 'hover:bg-gray-100'
-             }`}
+            className={`w-full flex items-center justify-center gap-3 bg-white text-black border-4 border-black py-4 text-xl font-bold uppercase transition-all shadow-[6px_6px_0_#000] mb-8 ${loading
+              ? 'opacity-70 cursor-not-allowed'
+              : 'hover:bg-gray-100 hover:shadow-[8px_8px_0_#000]'
+              }`}
             type="button"
           >
             <GoogleIcon />
@@ -245,78 +236,80 @@ function Login() {
           </button>
 
           {/* Enlace Registro */}
-          <p className="text-sm text-center text-gray-400 mt-8">
-            ¿Eres nuevo aquí?{' '}
-            <Link to="/register" className="font-bold text-cyan-400 hover:text-cyan-300 hover:underline transition">
-              Crea una cuenta gratis
+          <div className="text-center bg-white border-4 border-black p-4 transform rotate-1">
+            <p className="text-sm font-black text-black uppercase tracking-widest mb-2">
+              ¿ERES NUEVO AQUÍ?
+            </p>
+            <Link to="/register" className="font-bold text-black border-b-4 border-black hover:bg-yellow-400 transition-colors inline-block pb-1 text-lg">
+              CREA UNA CUENTA GRATIS →
             </Link>
-          </p>
+          </div>
         </div>
       </main>
 
       {/* --- MODAL DE RECUPERACIÓN DE CONTRASEÑA --- */}
       {showResetModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-              <div className="bg-[#1a1f2e] border border-white/10 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-fade-in-up">
-                  
-                  {/* Botón cerrar */}
-                  <button 
-                      onClick={() => setShowResetModal(false)}
-                      className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
-                  >
-                      <XMarkIcon className="w-6 h-6" />
-                  </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#FF90E8] border-4 border-black p-8 w-full max-w-sm relative shadow-[16px_16px_0_#000] transform -rotate-2">
 
-                  <h3 className="text-xl font-bold text-white mb-2">Recuperar Cuenta</h3>
-                  <p className="text-gray-400 text-sm mb-6">
-                      Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.
-                  </p>
+            {/* Botón cerrar */}
+            <button
+              onClick={() => setShowResetModal(false)}
+              className="absolute top-4 right-4 text-black border-2 border-black bg-white hover:bg-red-500 p-1 transition-colors"
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
 
-                  {resetMessage ? (
-                      <div className="bg-green-500/10 border border-green-500/30 text-green-300 text-sm rounded-lg p-4 text-center mb-4">
-                          {resetMessage}
-                          <button 
-                             onClick={() => setShowResetModal(false)}
-                             className="block w-full mt-3 bg-green-600/20 hover:bg-green-600/40 text-white text-xs font-bold py-2 rounded transition"
-                          >
-                              Cerrar
-                          </button>
-                      </div>
-                  ) : (
-                      <form onSubmit={handleResetPassword} className="space-y-4">
-                          <div>
-                              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Correo</label>
-                              <input 
-                                  type="email" 
-                                  value={resetEmail}
-                                  onChange={(e) => setResetEmail(e.target.value)}
-                                  className="w-full bg-[#0B0F19] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition"
-                                  placeholder="ejemplo@correo.com"
-                                  required
-                              />
-                          </div>
-                          
-                          {resetError && (
-                              <p className="text-red-400 text-xs text-center">{resetError}</p>
-                          )}
+            <h3 className="text-2xl brutal-title mb-4 bg-white border-4 border-black inline-block px-4 py-2 rotate-2">RECUPERAR</h3>
+            <p className="text-black font-semibold text-sm mb-6 bg-white border-2 border-black p-3 shadow-[2px_2px_0_#000] uppercase tracking-widest">
+              Ingresa tu correo y te enviaremos un enlace.
+            </p>
 
-                          <button 
-                              type="submit"
-                              disabled={resetLoading}
-                              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-900/20 disabled:opacity-50"
-                          >
-                              {resetLoading ? "Enviando..." : "Enviar Enlace"}
-                          </button>
-                      </form>
-                  )}
+            {resetMessage ? (
+              <div className="bg-[#00FF66] border-4 border-black text-black font-bold uppercase p-4 text-center mb-4 shadow-[4px_4px_0_#000] rotate-1">
+                {resetMessage}
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  className="block w-full mt-4 bg-white brutal-btn py-3 text-lg"
+                >
+                  CERRAR
+                </button>
               </div>
+            ) : (
+              <form onSubmit={handleResetPassword} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-black text-black uppercase tracking-widest mb-2 bg-yellow-400 inline-block px-1 border-2 border-black">CORREO</label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className="w-full bg-white border-4 border-black px-4 py-3 text-black font-bold uppercase focus:ring-4 focus:ring-yellow-400 focus:outline-none placeholder-gray-500 shadow-[4px_4px_0_#000]"
+                    placeholder="TU@CORREO.COM"
+                    required
+                  />
+                </div>
+
+                {resetError && (
+                  <p className="bg-red-500 text-white font-bold p-2 text-center border-2 border-black uppercase text-xs">{resetError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  className="w-full bg-white brutal-btn py-4 text-xl"
+                >
+                  {resetLoading ? "ENVIANDO..." : "ENVIAR ENLACE"}
+                </button>
+              </form>
+            )}
           </div>
+        </div>
       )}
 
       {/* --- FOOTER --- */}
-      <footer className="w-full py-6 text-center text-xs text-gray-500 border-t border-white/5 bg-[#0B0F19]">
+      <footer className="w-full py-8 text-center text-sm font-black uppercase tracking-widest text-black border-t-4 border-black bg-white mt-10 relative z-10">
         <div className="container mx-auto px-4">
-          © {new Date().getFullYear()} MiFestival. Todos los derechos reservados.
+          © {new Date().getFullYear()} MiFestival. HAZ RUIDO.
         </div>
       </footer>
     </div>
