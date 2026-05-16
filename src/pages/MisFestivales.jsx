@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { collection, query, where, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../firebase';
@@ -62,6 +63,7 @@ const MisFestivales = () => {
             try {
                 await deleteDoc(doc(db, 'festivals', festivalId));
                 setFestivales(prev => prev.filter(f => f.id !== festivalId));
+                trackEvent('festival_deleted', { festival_id: festivalId });
             } catch (error) {
                 console.error("Error deleting festival:", error);
                 alert('Error al eliminar el festival. Inténtalo de nuevo.');
@@ -84,6 +86,11 @@ const MisFestivales = () => {
                 isPublic: newState,
                 userName: usuario.displayName || "Anónimo",
                 likes: festival.likes || 0
+            });
+            trackEvent('festival_visibility_toggled', {
+                festival_id: festival.id,
+                festival_name: festival.name || festival.nombre,
+                is_public: newState
             });
         } catch (error) {
             console.error("Error actualizando estado público:", error);

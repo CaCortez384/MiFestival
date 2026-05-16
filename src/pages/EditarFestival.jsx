@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { useParams, Link } from "react-router-dom";
 import { doc, getDoc, updateDoc, arrayUnion, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase";
@@ -102,6 +103,7 @@ const EditarFestival = () => {
                 setArtistas(data.artistas || []);
                 setFondoPoster(data.fondoPoster || "city");
                 setIsPublic(data.isPublic || false); // Cargar estado público
+                trackEvent('festival_editor_opened', { festival_id: docSnap.id, festival_name: data.name });
 
                 // Actualizar slug si cambió el nombre
                 if (!data.slug && data.name) {
@@ -131,6 +133,11 @@ const EditarFestival = () => {
             userName: user.displayName || "Anónimo",
             likes: festival.likes || 0
         });
+        trackEvent('festival_visibility_toggled', {
+            festival_id: id,
+            festival_name: festival.name,
+            is_public: newState
+        });
     };
 
     // --- HANDLERS ---
@@ -141,6 +148,7 @@ const EditarFestival = () => {
             artistas: arrayUnion({ nombre: nuevoArtista, dia: null, escenario: null })
         });
         setArtistas([...artistas, { nombre: nuevoArtista, dia: null, escenario: null }]);
+        trackEvent('artist_added', { festival_id: id, artist_name: nuevoArtista });
         setNuevoArtista("");
     };
 
@@ -178,6 +186,7 @@ const EditarFestival = () => {
             link.download = `${generarSlug(festival.name || 'mi-festival')}-poster.png`;
             link.href = dataUrl;
             link.click();
+            trackEvent('poster_downloaded', { festival_name: festival.name, source: 'editor' });
         } catch (err) {
             console.error(err);
             alert("No se pudo generar la imagen.");
@@ -511,6 +520,7 @@ const EditarFestival = () => {
                                             const blob = await res.blob();
                                             const file = new File([blob], `${generarSlug(festival.name || 'mi-festival')}.png`, { type: 'image/png' });
                                             const shareUrl = `${window.location.origin}/verfestival/${festival.slug || id}`;
+                                            trackEvent('poster_shared', { festival_name: festival.name, source: 'editor' });
                                             await navigator.share({
                                                 files: [file],
                                                 title: festival.name,

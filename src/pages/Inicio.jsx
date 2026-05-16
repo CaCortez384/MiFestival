@@ -4,6 +4,7 @@ import { auth } from "../firebase";
 import mflogo from "../assets/mflogo20.png";
 import { AuthContext } from "../context/AuthContext";
 import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 // Iconos
 import {
   PlusCircleIcon,
@@ -73,6 +74,7 @@ const Inicio = () => {
 
   const handleLogout = async () => {
     try {
+      trackEvent('logout', { method: user.isGuest ? 'guest' : 'authenticated' });
       if (user.isGuest) {
         setUser(null);
       } else {

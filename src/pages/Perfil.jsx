@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { AuthContext } from '../context/AuthContext';
 import { db, auth } from '../firebase';
 import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
@@ -87,6 +88,7 @@ const Perfil = () => {
             await updateProfile(auth.currentUser, { displayName: newName });
             setUser({ ...user, displayName: newName });
             setIsEditing(false);
+            trackEvent('profile_name_updated');
             showModal('success', '¡Nombre Actualizado!', 'Tu perfil ahora luce genial con tu nuevo nombre.');
         } catch (error) {
             console.error(error);
@@ -103,6 +105,7 @@ const Perfil = () => {
         showModal('confirm', '¿Cambiar contraseña?', `Enviaremos un correo a ${user.email} para restablecerla.`, async () => {
             try {
                 await sendPasswordResetEmail(auth, user.email);
+                trackEvent('password_reset_requested', { source: 'profile' });
                 closeModal();
                 setTimeout(() => showModal('success', 'Correo Enviado', 'Revisa tu bandeja de entrada.'), 300);
             }
@@ -114,7 +117,7 @@ const Perfil = () => {
         });
     };
 
-    const handleLogout = async () => { await auth.signOut(); navigate('/'); };
+    const handleLogout = async () => { trackEvent('logout'); await auth.signOut(); navigate('/'); };
 
     const handleDeleteAccountRequest = () => {
         setDeleteInput('');
@@ -130,6 +133,7 @@ const Perfil = () => {
             const deletePromises = querySnapshot.docs.map(d => deleteDoc(doc(db, "festivals", d.id)));
             await Promise.all(deletePromises);
 
+            trackEvent('account_deleted');
             await deleteUser(auth.currentUser);
             navigate('/');
 

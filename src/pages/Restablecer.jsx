@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import useSEO from "../hooks/useSEO";
+import { trackEvent } from "../utils/analytics";
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -54,6 +55,7 @@ const Restablecer = () => {
 
         try {
             await confirmPasswordReset(auth, oobCode, newPassword);
+            trackEvent('password_reset_completed');
             setSuccess(true);
             setTimeout(() => navigate('/login'), 3000); // Redirigir tras 3 segundos
         } catch (err) {

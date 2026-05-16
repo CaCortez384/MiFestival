@@ -93,6 +93,7 @@ function Login() {
 
     try {
       await sendPasswordResetEmail(auth, resetEmail);
+      trackEvent('password_reset_requested', { source: 'login' });
       setResetMessage("¡Listo! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.");
     } catch (error) {
       console.error(error);
