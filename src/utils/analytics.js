@@ -1,5 +1,5 @@
 // src/utils/analytics.js
-// Direct GA4 event tracking via gtag.js (Measurement ID: G-KPFPE9YRN7)
+// Direct GA4 event tracking via gtag.js (Measurement ID: G-T5T2X1JLFN)
 
 /**
  * Send a custom event directly to GA4.
