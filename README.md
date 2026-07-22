@@ -1,116 +1,111 @@
-# MiFestival 🎤🎶
+# MiFestival — Platform Architecture & Engine
 
-**MiFestival** es una aplicación web interactiva inspirada en InstaFest que permite a los usuarios crear y personalizar el line up de su propio festival musical de manera visual e intuitiva. Pensada para entusiastas de la música, organizadores y creativos, MiFestival facilita la organización de artistas, días y escenarios, generando un póster profesional listo para compartir o descargar.
+## El Problema y el Impacto
 
-## 🌟 Demo en línea
+MiFestival es una aplicación web B2C de entretenimiento orientada a la generación interactiva y personalización de afiches de festivales de música ficticios, inspirada en la dinámica de consumo viral de InstaFest popularizada hacia el año 2023. El producto aborda la necesidad de consumo recreativo y contenido social auto-expresivo, permitiendo a los usuarios componer line-ups musicales a medida y generar piezas gráficas personalizadas directamente desde el navegador de forma ágil y lúdica. La plataforma actúa como un motor de enganche comunitario (social engagement), combinando renderizado dinámico en el cliente con almacenamiento distribuido Serverless para la preservación y compartición de afiches en redes sociales.
 
-Accede a la aplicación aquí:  
-[https://mifestival.web.app](https://mifestival.web.app/)
+## Arquitectura y Stack Tecnológico
 
----
+La arquitectura de la aplicación adopta un modelo decoupled/serverless centrado en el cliente, optimizado para alto rendimiento de renderizado en UI y baja latencia de respuesta:
 
-## Funcionalidades principales
+* **React 19 & Vite 6**: Núcleo de renderizado declarativo y entorno de construcción optimizado (HMR y empaquetado de producción minificado) para una interfaz de usuario reactiva y fluida.
+* **React Router 7**: Enrutador declarativo client-side que gestiona la navegación de la SPA, el middleware de modo mantenimiento dinámico y la captura automática de eventos de navegación.
+* **Firebase 11 (Firestore & Auth)**: Plataforma Backend-as-a-Service (BaaS) encargada de la autenticación de usuarios (Google OAuth / Email-Password) y la base de datos NoSQL distribuida Firestore para la persistencia en tiempo real de festivales y listas de artistas.
+* **Tailwind CSS v4 & Heroicons**: Motor de diseño utilitario para la construcción de interfaces responsivas de alta fidelidad con soporte para esquemas visuales personalizados en escritorio y dispositivos móviles.
+* **html-to-image**: Motor de rasterización en el cliente que transforma nodos del DOM en archivos de imagen (PNG/JPEG) en alta resolución para su descarga inmediata o distribución en redes sociales.
+* **PapaParse**: Parser sintáctico de archivos CSV en el navegador para la importación y procesamiento estructurado masivo de listas de artistas.
+* **Firebase Hosting**: Infraestructura CDN global optimizada para el despliegue de activos estáticos y la reescritura de peticiones HTTP al punto de entrada único (`index.html`).
 
-- **Gestión de artistas:** Agrega nuevos artistas o búscalos en la lista disponible.
-- **Asignación visual:**  
-  - **Escritorio:** Arrastra y suelta artistas en la grilla para asignarlos a un día y escenario.
-  - **Móvil:** Pulsa sobre una celda vacía para asignar un artista fácilmente.
-- **Edición flexible:** Modifica el nombre del festival, los días y los escenarios en cualquier momento.
-- **Vista previa dinámica:** Visualiza en tiempo real cómo quedará el póster de tu festival.
-- **Personalización:** Elige entre diferentes fondos para tu póster.
-- **Exportación y compartición:** Descarga el póster en alta calidad o compártelo directamente desde la app.
-- **Experiencia responsive:** Interfaz adaptada para computadoras y dispositivos móviles.
+## Guía de Despliegue a Prueba de Fallos (Instalación Local)
 
----
+Para ejecutar y validar la aplicación en un entorno de desarrollo local, siga de manera estricta la secuencia de comandos descrita a continuación:
 
-## Tecnologías utilizadas
+### 1. Prerrequisitos de Sistema
+* Node.js v18.0.0 o superior
+* npm v9.0.0 o superior
 
-- **React** – Librería principal para la interfaz de usuario.
-- **Firebase (Firestore)** – Backend para almacenamiento en la nube y persistencia de datos.
-- **Tailwind CSS** – Framework de estilos para un diseño moderno y adaptable.
-- **HTML5 & CSS3** – Estructura y estilos base.
+### 2. Clonación e Instalación de Dependencias
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd MiFestival
+npm install
+```
 
----
+### 3. Configuración de Variables de Entorno
+Es **obligatorio** crear un archivo `.env` en la raíz del proyecto a partir de la plantilla provista `.env.example`.
 
-## ¿Cómo funciona?
+```bash
+cp .env.example .env
+```
 
-1. Ingresa a [https://mifestival.web.app](https://mifestival.web.app# MiFestival 🎤🎶
+Asegúrese de definir las variables según el estado operativo requerido:
+```env
+# Modo mantenimiento (true: bloquea la SPA y muestra la vista de mantenimiento; false: operación normal)
+VITE_MAINTENANCE=false
+```
 
-**MiFestival** es una aplicación web interactiva inspirada en InstaFest que permite a los usuarios crear y personalizar el line up de su propio festival musical de manera visual e intuitiva. Pensada para entusiastas de la música, organizadores y creativos, MiFestival facilita la organización de artistas, días y escenarios, generando un póster profesional listo para compartir o descargar.
+### 4. Ejecución del Servidor de Desarrollo
+Para iniciar el servidor local con Hot Module Replacement (HMR):
 
-## 🌟 Demo en línea
+```bash
+npm run dev
+```
 
-Accede a la aplicación aquí:  
-[https://mifestival.web.app](https://mifestival.web.app/)
+El servidor estará disponible por defecto en `http://localhost:5173`.
 
----
+### 5. Validación de Código y Construcción para Producción
+Ejecute la verificación de calidad de código y el empaquetado de artefactos estáticos:
 
-## Funcionalidades principales
+```bash
+# Análisis estático de código
+npm run lint
 
-- **Gestión de artistas:** Agrega nuevos artistas o búscalos en la lista disponible.
-- **Asignación visual:**  
-  - **Escritorio:** Arrastra y suelta artistas en la grilla para asignarlos a un día y escenario.
-  - **Móvil:** Pulsa sobre una celda vacía para asignar un artista fácilmente.
-- **Edición flexible:** Modifica el nombre del festival, los días y los escenarios en cualquier momento.
-- **Vista previa dinámica:** Visualiza en tiempo real cómo quedará el póster de tu festival.
-- **Personalización:** Elige entre diferentes fondos para tu póster.
-- **Exportación y compartición:** Descarga el póster en alta calidad o compártelo directamente desde la app.
-- **Experiencia responsive:** Interfaz adaptada para computadoras y dispositivos móviles.
+# Generación del bundle de producción en el directorio /dist
+npm run build
 
----
-
-## Tecnologías utilizadas
-
-- **React** – Librería principal para la interfaz de usuario.
-- **Firebase (Firestore)** – Backend para almacenamiento en la nube y persistencia de datos.
-- **Tailwind CSS** – Framework de estilos para un diseño moderno y adaptable.
-- **HTML5 & CSS3** – Estructura y estilos base.
-
----
-
-## ¿Cómo funciona?
-
-1. Ingresa a [https://mifestival.web.app](https://mifestival.web.app).
-2. Agrega tus artistas favoritos o selecciona de la lista.
-3. Asigna cada artista a un día y escenario.
-4. Personaliza el nombre del festival y el fondo del póster.
-5. Descarga o comparte tu póster final.
+# Vista previa local del build de producción
+npm run preview
+```
 
 ---
 
-## Sobre el proyecto
+## Estructura del Repositorio
 
-MiFestival fue desarrollado como parte de mi portafolio profesional para demostrar habilidades en desarrollo frontend, experiencia de usuario y trabajo con servicios en la nube. El proyecto pone énfasis en la usabilidad, el diseño visual y la adaptabilidad a distintos dispositivos.
+El proyecto está estructurado bajo principios de modularidad por responsabilidades claras dentro del directorio `src/`:
 
----
-
-## Contacto
-
-¿Te gustaría saber más sobre este proyecto o colaborar?  
-Puedes contactarme a través de [ca.cortez384@gmail.com](mailto:ca.cortez384@gmail.com) o visitar mi [LinkedIn](https://www.linkedin.com/in/carlos-cortez-castañeda-266546324).
-
----
-
-**© 2024 MiFestival · Creado por Carlos Cortez Castañeda**).
-2. Agrega tus artistas favoritos o selecciona de la lista.
-3. Asigna cada artista a un día y escenario.
-4. Personaliza el nombre del festival y el fondo del póster.
-5. Descarga o comparte tu póster final.
-
----
-
-## Sobre el proyecto
-
-MiFestival fue desarrollado como parte de mi portafolio profesional para demostrar habilidades en desarrollo frontend, experiencia de usuario y trabajo con servicios en la nube. El proyecto pone énfasis en la usabilidad, el diseño visual y la adaptabilidad a distintos dispositivos.
-
----
-
-## Contacto
-
-¿Te gustaría saber más sobre este proyecto o colaborar?  
-Puedes contactarme a través de [ca.cortez384@gmail.com] o visitar mi [LinkedIn](www.linkedin.com/in/carlos-cortez-castañeda-266546324).
-
-
----
-
-**© 2025 MiFestival · Creado por [Carlos Cortez Castañeda]** 
+```text
+.
+├── .env.example              # Plantilla de variables de entorno del cliente.
+├── .firebaserc               # Selección del proyecto activo en Firebase CLI.
+├── eslint.config.js          # Reglas y estándares de linter para React/JS.
+├── firebase.json             # Configuración del servidor de hosting estático y reescritura SPA.
+├── index.html                # Estructura HTML base y puntos de montaje DOM.
+├── package.json              # Manifiesto de dependencias y scripts de ejecución npm.
+├── vite.config.js            # Configuración del pipeline de construcción de Vite.
+└── src/
+    ├── App.jsx               # Orquestador de rutas principales, middleware y rastreador de tráfico.
+    ├── main.jsx              # Punto de entrada de hidratación de React en el DOM.
+    ├── firebase.js           # Inicialización de Firebase SDK (Auth, Firestore y Google Provider).
+    ├── index.css             # Directivas globales de Tailwind CSS y diseño base.
+    ├── context/
+    │   └── AuthContext.jsx   # Proveedor de estado global para la sesión de usuario y autenticación.
+    ├── hooks/
+    │   └── useSEO.js         # Hook personalizado para inyección dinámica de meta-tags y Open Graph.
+    ├── pages/                # Vistas y controladores de interfaz de la aplicación:
+    │   ├── Home.jsx          # Landing page principal y llamada a la acción.
+    │   ├── Inicio.jsx        # Panel de control de bienvenida para usuarios autenticados.
+    │   ├── CreateFestival.jsx# Flujo interactivo para la creación de un nuevo festival.
+    │   ├── EditarFestival.jsx# Editor dinámico de line-up, arrastre de artistas y escenarios.
+    │   ├── Festival.jsx      # Visualizador del festival y gestor de asignaciones.
+    │   ├── VerFestival.jsx   # Vista pública/compartible optimizada para consumo externo.
+    │   ├── PosterFestival.jsx# Canvas de renderizado y exportación de afiches gráficos.
+    │   ├── Explorar.jsx      # Catálogo de festivales públicos creados por la comunidad.
+    │   ├── MisFestivales.jsx # Colección personal de festivales guardados por el usuario.
+    │   ├── Perfil.jsx        # Gestión del perfil de usuario y configuraciones de cuenta.
+    │   ├── Login.jsx         # Controlador de inicio de sesión de usuario.
+    │   ├── Register.jsx      # Controlador de registro de usuarios.
+    │   ├── Restablecer.jsx   # Recuperación y restablecimiento de credenciales.
+    │   └── Mantenimiento.jsx # Pantalla de bloqueo operativa activada vía VITE_MAINTENANCE.
+    └── utils/
+        └── analytics.js      # Módulo de integración de telemetría y eventos con Google Tag Manager / GA4.
+```
